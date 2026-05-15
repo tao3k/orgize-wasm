@@ -12,6 +12,8 @@ on:
 
 env:
   ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || 'agenda-semantics-m16' }}
+  CARGO_INCREMENTAL: "0"
+  CARGO_TARGET_DIR: ${{ github.workspace }}/orgize/target/orgize-wasm
 
 jobs:
   wasm:

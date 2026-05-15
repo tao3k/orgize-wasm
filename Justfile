@@ -7,14 +7,14 @@ fmt:
     cargo fmt --manifest-path Cargo.toml --all -- --check
 
 test:
-    cargo test --manifest-path Cargo.toml --all-targets --all-features
+    CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=../target/orgize-wasm cargo test --manifest-path Cargo.toml --all-targets --all-features
 
 clippy:
-    cargo clippy --manifest-path Cargo.toml --all-targets --all-features -- -D warnings
+    CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=../target/orgize-wasm cargo clippy --manifest-path Cargo.toml --all-targets --all-features -- -D warnings
 
 build:
     rm -rf dist
-    wasm-pack build -t web -d dist --out-name orgize
+    CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=../target/orgize-wasm wasm-pack build -t web -d dist --out-name orgize
 
 pack: build
     mkdir -p package
