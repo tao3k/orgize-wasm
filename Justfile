@@ -15,6 +15,7 @@ clippy:
 build:
     rm -rf dist
     CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=../target/orgize-wasm wasm-pack build -t web -d dist --out-name orgize
+    rm -f dist/.gitignore
 
 pack: build
     mkdir -p package

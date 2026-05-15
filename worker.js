@@ -23,7 +23,15 @@ const requireSession = (sessionId) => {
 
 const parseJson = (json) => JSON.parse(json);
 
-const projectionFor = (org, projection, sourceFile, includeBaseDir) => {
+const projectionFor = (
+  org,
+  projection,
+  sourceFile,
+  includeBaseDir,
+  sparseTreeMatch,
+  sparseTreeText,
+  sparseTreeIncludeArchived
+) => {
   switch (projection) {
     case "outline":
       return parseJson(org.outlineJson());
@@ -33,6 +41,15 @@ const projectionFor = (org, projection, sourceFile, includeBaseDir) => {
       return parseJson(org.lintJson());
     case "sectionIndex":
       return parseJson(org.sectionIndexJson(sourceFile ?? undefined));
+    case "sparseTree":
+      return parseJson(
+        org.sparseTreeJson(
+          sourceFile ?? undefined,
+          sparseTreeMatch ?? undefined,
+          sparseTreeText ?? undefined,
+          sparseTreeIncludeArchived
+        )
+      );
     case "viewIndex":
       return parseJson(org.viewIndexJson(sourceFile ?? undefined));
     case "attachments":
@@ -120,7 +137,10 @@ const handleMessage = async (message) => {
           org,
           message.projection || "snapshot",
           message.sourceFile,
-          message.includeBaseDir
+          message.includeBaseDir,
+          message.sparseTreeMatch,
+          message.sparseTreeText,
+          message.sparseTreeIncludeArchived
         );
         break;
       }
@@ -139,7 +159,10 @@ const handleMessage = async (message) => {
           org,
           message.projection || "snapshot",
           message.sourceFile,
-          message.includeBaseDir
+          message.includeBaseDir,
+          message.sparseTreeMatch,
+          message.sparseTreeText,
+          message.sparseTreeIncludeArchived
         );
         break;
       }
@@ -148,7 +171,10 @@ const handleMessage = async (message) => {
           requireSession(sessionId),
           message.projection || "snapshot",
           message.sourceFile,
-          message.includeBaseDir
+          message.includeBaseDir,
+          message.sparseTreeMatch,
+          message.sparseTreeText,
+          message.sparseTreeIncludeArchived
         );
         break;
       }

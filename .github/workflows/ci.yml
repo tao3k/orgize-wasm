@@ -36,6 +36,19 @@ jobs:
         with:
           path: orgize/wasm
 
+      - name: Normalize parent workspace
+        working-directory: orgize
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          manifest = Path("Cargo.toml")
+          text = manifest.read_text()
+          text = re.sub(r'members\s*=\s*\[[^\]]*\]', 'members = ["."]', text, count=1)
+          manifest.write_text(text)
+          PY
+
       - name: Setup rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -64,7 +77,10 @@ jobs:
 
       - name: Build wasm package
         working-directory: orgize/wasm
-        run: wasm-pack build -t web -d dist --out-name orgize
+        run: |
+          wasm-pack build -t web -d dist --out-name orgize
+          rm -f dist/.gitignore
+          git diff --exit-code -- dist
 
       - name: Pack npm artifact
         working-directory: orgize/wasm

@@ -40,6 +40,13 @@ pub(crate) struct WasmSectionIndexResponse {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSparseTreeResponse {
+    pub(crate) schema_version: u8,
+    pub(crate) cards: Vec<WasmSparseTreeCard>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct WasmViewIndexResponse {
     pub(crate) schema_version: u8,
     pub(crate) records: Vec<WasmViewIndexRecord>,
@@ -153,6 +160,40 @@ pub(crate) struct WasmSectionIndexRecord {
     pub(crate) links: Vec<WasmLink>,
     pub(crate) targets: Vec<WasmTarget>,
     pub(crate) lifecycle: Vec<WasmLifecycleRecord>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSparseTreeCard {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) outline_path: Vec<String>,
+    pub(crate) level: usize,
+    pub(crate) title: String,
+    pub(crate) matches: Vec<WasmSparseTreeMatch>,
+    pub(crate) preview: Option<String>,
+    pub(crate) todo: Option<String>,
+    pub(crate) todo_state: Option<&'static str>,
+    pub(crate) priority: WasmPriority,
+    pub(crate) category: Option<String>,
+    pub(crate) tags: Vec<String>,
+    pub(crate) effective_tags: Vec<String>,
+    pub(crate) properties: Vec<WasmProperty>,
+    pub(crate) special_properties: Vec<WasmProperty>,
+    pub(crate) planning: WasmPlanning,
+    pub(crate) archive: WasmArchive,
+    pub(crate) attachment: WasmAttachmentState,
+    pub(crate) links: Vec<WasmLink>,
+    pub(crate) targets: Vec<WasmTarget>,
+    pub(crate) lifecycle: Vec<WasmLifecycleRecord>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSparseTreeMatch {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) kind: &'static str,
+    pub(crate) key: Option<String>,
+    pub(crate) value: String,
 }
 
 #[derive(Serialize)]

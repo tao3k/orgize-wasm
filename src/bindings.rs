@@ -10,7 +10,7 @@ use orgize::{
 use std::cell::{Ref, RefCell};
 use std::fmt::Write;
 
-use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
 
 #[wasm_bindgen]
 /// WebAssembly wrapper around [`orgize::Org`].
@@ -122,6 +122,25 @@ impl Org {
     pub fn section_index_json(&self, source_file: Option<String>) -> String {
         let document = self.document();
         dto_projection::section_index_json(&document, source_file.as_deref())
+    }
+
+    #[wasm_bindgen(js_name = sparseTreeJson)]
+    pub fn sparse_tree_json(
+        &self,
+        source_file: Option<String>,
+        match_expression: Option<String>,
+        text: Option<String>,
+        include_archived: Option<bool>,
+    ) -> Result<String, JsValue> {
+        let document = self.document();
+        dto_projection::sparse_tree_json(
+            &document,
+            source_file.as_deref(),
+            match_expression.as_deref(),
+            text.as_deref(),
+            include_archived,
+        )
+        .map_err(|error| JsValue::from_str(&error))
     }
 
     #[wasm_bindgen(js_name = viewIndexJson)]

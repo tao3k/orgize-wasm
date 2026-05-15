@@ -1,0 +1,36 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export const __wbg_org_free: (a: number, b: number) => void;
+export const org_agenda: (a: number) => [number, number];
+export const org_agentMemory: (a: number) => [number, number];
+export const org_agentPlanning: (a: number) => [number, number];
+export const org_attachmentsJson: (a: number, b: number, c: number) => [number, number];
+export const org_buildTime: () => [number, number];
+export const org_columnViewsJson: (a: number) => [number, number];
+export const org_datetreeJson: (a: number) => [number, number];
+export const org_gitHash: () => [number, number];
+export const org_html: (a: number) => [number, number];
+export const org_includeExpansionJson: (a: number, b: number, c: number) => [number, number];
+export const org_latex: (a: number) => [number, number];
+export const org_lintJson: (a: number) => [number, number];
+export const org_markdown: (a: number) => [number, number];
+export const org_metadataJson: (a: number) => [number, number];
+export const org_org: (a: number) => [number, number];
+export const org_outlineJson: (a: number) => [number, number];
+export const org_parse: (a: number, b: number) => number;
+export const org_sectionIndexJson: (a: number, b: number, c: number) => [number, number];
+export const org_semantic: (a: number) => [number, number];
+export const org_snapshotJson: (a: number, b: number, c: number) => [number, number];
+export const org_sourceBlocksJson: (a: number) => [number, number];
+export const org_sparseTreeJson: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number, number];
+export const org_syntax: (a: number) => [number, number];
+export const org_traverse: (a: number) => [number, number];
+export const org_update: (a: number, b: number, c: number) => void;
+export const org_viewIndexJson: (a: number, b: number, c: number) => [number, number];
+export const __wbindgen_externrefs: WebAssembly.Table;
+export const __wbindgen_free: (a: number, b: number, c: number) => void;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+export const __externref_table_dealloc: (a: number) => void;
+export const __wbindgen_start: () => void;

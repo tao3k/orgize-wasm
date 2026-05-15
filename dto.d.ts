@@ -316,6 +316,53 @@ export interface OrgizeSectionIndexResponseDto {
   records: OrgizeSectionIndexRecordDto[];
 }
 
+export type OrgizeSparseTreeMatchKindDto =
+  | "query"
+  | "title"
+  | "body"
+  | "tag"
+  | "property"
+  | "specialProperty"
+  | "planning"
+  | "priority"
+  | "link"
+  | "target";
+
+export interface OrgizeSparseTreeMatchDto {
+  source: OrgizeSourceRangeDto;
+  kind: OrgizeSparseTreeMatchKindDto;
+  key?: string | null;
+  value: string;
+}
+
+export interface OrgizeSparseTreeCardDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  matches: OrgizeSparseTreeMatchDto[];
+  preview?: string | null;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+  priority: OrgizePriorityDto;
+  category?: string | null;
+  tags: string[];
+  effectiveTags: string[];
+  properties: OrgizePropertyDto[];
+  specialProperties: OrgizePropertyDto[];
+  planning: OrgizePlanningDto;
+  archive: OrgizeArchiveDto;
+  attachment: OrgizeAttachmentStateDto;
+  links: OrgizeLinkDto[];
+  targets: OrgizeTargetDto[];
+  lifecycle: OrgizeLifecycleRecordDto[];
+}
+
+export interface OrgizeSparseTreeResponseDto {
+  schemaVersion: 1;
+  cards: OrgizeSparseTreeCardDto[];
+}
+
 export interface OrgizeViewPropertyDto {
   key: string;
   value: string;
@@ -485,6 +532,7 @@ export type OrgizeProjectionName =
   | "metadata"
   | "lint"
   | "sectionIndex"
+  | "sparseTree"
   | "viewIndex"
   | "attachments"
   | "sourceBlocks"
@@ -498,6 +546,7 @@ export type OrgizeProjectionDto =
   | OrgizeMetadataResponseDto
   | OrgizeLintResponseDto
   | OrgizeSectionIndexResponseDto
+  | OrgizeSparseTreeResponseDto
   | OrgizeViewIndexResponseDto
   | OrgizeAttachmentsResponseDto
   | OrgizeSourceBlocksResponseDto

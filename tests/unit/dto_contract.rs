@@ -124,3 +124,38 @@ SCHEDULED: <2026-05-15 Fri>
     assert!(records[0].get("links").is_none());
     assert_eq!(records[1]["planning"]["scheduled"], "<2026-05-15 Fri>");
 }
+
+#[test]
+fn wasm_sparse_tree_contract_exposes_agent_search_cards() {
+    let org = Org::parse(
+        r#"* TODO [#A] Agent memory :agent:
+The current memory links to [[id:old-memory][old memory]].
+* DONE Old memory :agent:ARCHIVE:
+CLOSED: [2026-05-12 Tue]
+"#,
+    );
+    let sparse_tree: Value = serde_json::from_str(
+        &org.sparse_tree_json(
+            Some("memory.org".to_string()),
+            Some(r#"+agent+TODO="TODO"+PRIORITY="A""#.to_string()),
+            Some("current memory".to_string()),
+            Some(false),
+        )
+        .expect("sparse-tree query should be valid"),
+    )
+    .expect("sparse-tree JSON should parse");
+
+    let cards = sparse_tree["cards"]
+        .as_array()
+        .expect("sparse-tree cards should be an array");
+    assert_eq!(sparse_tree["schemaVersion"], 1);
+    assert_eq!(cards.len(), 1);
+    assert_eq!(cards[0]["title"], "Agent memory");
+    assert_eq!(cards[0]["priority"]["effective"], "A");
+    assert_eq!(cards[0]["matches"][0]["kind"], "tag");
+    assert_eq!(cards[0]["links"][0]["path"], "id:old-memory");
+    assert!(cards[0]["preview"]
+        .as_str()
+        .unwrap()
+        .contains("current memory"));
+}

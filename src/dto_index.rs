@@ -8,12 +8,16 @@ use crate::{
     dto_model::{
         WasmArchive, WasmAttachmentRecord, WasmAttachmentState, WasmAttachmentsResponse,
         WasmLifecycleRecord, WasmLink, WasmLintFinding, WasmLintResponse, WasmProperty,
-        WasmSectionIndexRecord, WasmSectionIndexResponse, WasmTarget, WasmTextSlice,
-        WasmViewIndexRecord, WasmViewIndexResponse, WasmViewPlanning, WasmViewProperty,
+        WasmSectionIndexRecord, WasmSectionIndexResponse, WasmSparseTreeCard, WasmSparseTreeMatch,
+        WasmSparseTreeResponse, WasmTarget, WasmTextSlice, WasmViewIndexRecord,
+        WasmViewIndexResponse, WasmViewPlanning, WasmViewProperty,
     },
 };
 use orgize::{
-    ast::{Document, Element, ElementData, ParsedAnnotation, Section, SectionIndexRecord},
+    ast::{
+        Document, Element, ElementData, ParsedAnnotation, Section, SectionIndexRecord,
+        SparseTreeProjection,
+    },
     lint::{lint_document, LintFinding, LintSeverity},
 };
 use std::collections::HashSet;
@@ -32,6 +36,13 @@ pub(crate) fn section_index_response(records: &[SectionIndexRecord]) -> WasmSect
     WasmSectionIndexResponse {
         schema_version: 1,
         records: records.iter().map(section_index_record).collect(),
+    }
+}
+
+pub(crate) fn sparse_tree_response(projection: &SparseTreeProjection) -> WasmSparseTreeResponse {
+    WasmSparseTreeResponse {
+        schema_version: 1,
+        cards: projection.cards.iter().map(sparse_tree_card).collect(),
     }
 }
 
@@ -179,6 +190,98 @@ pub(crate) fn section_index_record(record: &SectionIndexRecord) -> WasmSectionIn
             })
             .collect(),
         lifecycle: record
+            .lifecycle
+            .iter()
+            .map(|record| WasmLifecycleRecord {
+                source: section_source(&record.source),
+                kind: format!("{:?}", record.kind),
+                raw: record.raw.clone(),
+            })
+            .collect(),
+    }
+}
+
+fn sparse_tree_card(card: &orgize::ast::SparseTreeCard) -> WasmSparseTreeCard {
+    WasmSparseTreeCard {
+        source: section_source(&card.source),
+        outline_path: card.outline_path.clone(),
+        level: card.level,
+        title: card.title.clone(),
+        matches: card
+            .matches
+            .iter()
+            .map(|matched| WasmSparseTreeMatch {
+                source: section_source(&matched.source),
+                kind: matched.kind.as_str(),
+                key: matched.key.clone(),
+                value: matched.value.clone(),
+            })
+            .collect(),
+        preview: card.preview.clone(),
+        todo: card.todo.as_ref().map(|todo| todo.name.clone()),
+        todo_state: card.todo.as_ref().map(todo_state),
+        priority: priority(&card.priority),
+        category: card
+            .category
+            .as_ref()
+            .map(|category| category.as_str().to_string()),
+        tags: card.tags.clone(),
+        effective_tags: card.effective_tags.clone(),
+        properties: card
+            .properties
+            .iter()
+            .map(|property| WasmProperty {
+                source: section_source(&property.source),
+                key: property.key.clone(),
+                value: property.value.clone(),
+            })
+            .collect(),
+        special_properties: card
+            .special_properties
+            .iter()
+            .map(|property| WasmProperty {
+                source: section_source(&property.source),
+                key: property.name.clone(),
+                value: property.value.clone(),
+            })
+            .collect(),
+        planning: planning(&card.planning),
+        archive: WasmArchive {
+            archived: card.archive.archived,
+            has_archive_tag: card.archive.has_archive_tag,
+            location: card.archive.location.clone(),
+        },
+        attachment: WasmAttachmentState {
+            has_attach_tag: card.attachment.has_attach_tag,
+            directory: card
+                .attachment
+                .directory
+                .as_ref()
+                .map(|directory| attachment_directory(&directory.source, &directory.path)),
+        },
+        links: card
+            .links
+            .iter()
+            .map(|link| WasmLink {
+                source: section_source(&link.source),
+                path: link.path.clone(),
+                description: link.description.clone(),
+                search: link.search.as_ref().map(link_search),
+                attachment: link.attachment.as_ref().map(attachment_link),
+                file: link.file.as_ref().map(file_link),
+            })
+            .collect(),
+        targets: card
+            .targets
+            .iter()
+            .map(|target| WasmTarget {
+                source: section_source(&target.source),
+                kind: target_kind(target.kind),
+                key: target.key.clone(),
+                value: target.value.clone(),
+            })
+            .collect(),
+        lifecycle: card
             .lifecycle
             .iter()
             .map(|record| WasmLifecycleRecord {

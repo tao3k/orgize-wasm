@@ -9,11 +9,12 @@ use crate::{
     },
     dto_index::{
         attachment_records, attachments_response, lint_findings, lint_response,
-        section_index_record, section_index_records, section_index_response, view_index_response,
+        section_index_record, section_index_records, section_index_response, sparse_tree_response,
+        view_index_response,
     },
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
 };
-use orgize::ast::{Document, IncludeExpansionOptions, ParsedAnnotation};
+use orgize::ast::{Document, IncludeExpansionOptions, ParsedAnnotation, SparseTreeQuery};
 
 pub(crate) fn outline_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&WasmOutlineResponse {
@@ -36,6 +37,33 @@ pub(crate) fn section_index_json(
 ) -> String {
     let records = section_index_records(document, source_file);
     to_json(&section_index_response(&records))
+}
+
+pub(crate) fn sparse_tree_json(
+    document: &Document<ParsedAnnotation>,
+    source_file: Option<&str>,
+    match_expression: Option<&str>,
+    text: Option<&str>,
+    include_archived: Option<bool>,
+) -> Result<String, String> {
+    let mut query = SparseTreeQuery::new();
+    if let Some(source_file) = source_file {
+        query = query.source_file(source_file);
+    }
+    if let Some(include_archived) = include_archived {
+        query = query.include_archived(include_archived);
+    }
+    if let Some(text) = text {
+        query = query.text(text);
+    }
+    if let Some(match_expression) = match_expression {
+        query = query
+            .match_expression(match_expression)
+            .map_err(|err| err.to_string())?;
+    }
+    Ok(to_json(&sparse_tree_response(
+        &document.sparse_tree_projection(&query),
+    )))
 }
 
 pub(crate) fn view_index_json(

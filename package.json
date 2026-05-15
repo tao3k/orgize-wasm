@@ -4,7 +4,7 @@
   "license": "MIT",
   "author": "PoiScript <poiscript@gmail.com>",
   "scripts": {
-    "build": "rm -rf dist && wasm-pack build -t web -d dist --out-name orgize"
+    "build": "rm -rf dist && wasm-pack build -t web -d dist --out-name orgize && rm -f dist/.gitignore"
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,7 @@
     "./wasm": "./dist/orgize_bg.wasm"
   },
   "files": [
-    "dist/orgize_bg.wasm",
-    "dist/orgize.js",
-    "dist/orgize.d.ts",
+    "dist",
     "dto.d.ts",
     "dto.js",
     "index.html",

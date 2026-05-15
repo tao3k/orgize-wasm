@@ -20,6 +20,9 @@ export interface OrgizeWorkerBaseRequest {
   requestId?: string | number;
   sessionId?: string;
   wasmUrl?: string | URL | Request;
+  sparseTreeMatch?: string;
+  sparseTreeText?: string;
+  sparseTreeIncludeArchived?: boolean;
 }
 
 export interface OrgizeWorkerInitRequest extends OrgizeWorkerBaseRequest {
