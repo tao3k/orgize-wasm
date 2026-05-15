@@ -16,7 +16,50 @@ env:
   CARGO_TARGET_DIR: ${{ github.workspace }}/orgize/target/orgize-wasm
 
 jobs:
-  wasm:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout orgize-wasm
+        uses: actions/checkout@v6
+
+      - name: Verify committed dist package
+        run: |
+          test -f dist/orgize.js
+          test -f dist/orgize.d.ts
+          test -f dist/orgize_bg.wasm
+          test -f dto.d.ts
+          test -f worker.js
+
+      - name: Smoke test git-consumable package
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { initSync, Org } from './dist/orgize.js';
+
+          const bytes = readFileSync('./dist/orgize_bg.wasm');
+          initSync({ module: bytes });
+          const org = new Org('* Git package smoke\n');
+          if (!org.html().includes('Git package smoke')) {
+            throw new Error('html projection did not render expected heading');
+          }
+          org.free();
+          JS
+
+      - name: Pack npm artifact
+        run: |
+          mkdir -p package
+          npm pack --pack-destination package
+
+      - name: Upload npm artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: orgize-wasm-npm-package
+          path: package/*.tgz
+          if-no-files-found: error
+
+  source-build:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -81,16 +124,3 @@ jobs:
           wasm-pack build -t web -d dist --out-name orgize
           rm -f dist/.gitignore
           git diff --exit-code -- dist
-
-      - name: Pack npm artifact
-        working-directory: orgize/wasm
-        run: |
-          mkdir -p package
-          npm pack --pack-destination package
-
-      - name: Upload npm artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: orgize-wasm-npm-package
-          path: orgize/wasm/package/*.tgz
-          if-no-files-found: error
