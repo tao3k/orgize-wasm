@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+    inputs:
+      orgize-ref:
+        description: orgize branch, tag, or commit to use as the parent checkout
+        required: false
+        default: agenda-semantics-m16
+
+env:
+  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || 'agenda-semantics-m16' }}
+
+jobs:
+  wasm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout orgize parent
+        uses: actions/checkout@v6
+        with:
+          repository: tao3k/orgize
+          ref: ${{ env.ORGIZE_REF }}
+          path: orgize
+          submodules: false
+
+      - name: Remove parent wasm placeholder
+        run: rm -rf orgize/wasm
+
+      - name: Checkout orgize-wasm
+        uses: actions/checkout@v6
+        with:
+          path: orgize/wasm
+
+      - name: Setup rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+
+      - name: Install wasm-pack
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orgize -> target
+          shared-key: orgize-wasm-ci-${{ runner.os }}
+          cache-on-failure: true
+
+      - name: Validate Rust package
+        working-directory: orgize
+        run: |
+          cargo fmt --manifest-path wasm/Cargo.toml --all -- --check
+          cargo test --manifest-path wasm/Cargo.toml --all-targets --all-features
+          cargo clippy --manifest-path wasm/Cargo.toml --all-targets --all-features -- -D warnings
+
+      - name: Build wasm package
+        working-directory: orgize/wasm
+        run: wasm-pack build -t web -d dist --out-name orgize
+
+      - name: Pack npm artifact
+        working-directory: orgize/wasm
+        run: |
+          mkdir -p package
+          npm pack --pack-destination package
