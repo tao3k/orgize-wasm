@@ -71,3 +71,10 @@ jobs:
         run: |
           mkdir -p package
           npm pack --pack-destination package
+
+      - name: Upload npm artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: orgize-wasm-npm-package
+          path: orgize/wasm/package/*.tgz
+          if-no-files-found: error
