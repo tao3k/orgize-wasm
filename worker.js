@@ -30,7 +30,10 @@ const projectionFor = (
   includeBaseDir,
   sparseTreeMatch,
   sparseTreeText,
-  sparseTreeIncludeArchived
+  sparseTreeIncludeArchived,
+  agendaView,
+  agendaBlock,
+  clockIssueProfile
 ) => {
   switch (projection) {
     case "outline":
@@ -48,6 +51,22 @@ const projectionFor = (
           sparseTreeMatch ?? undefined,
           sparseTreeText ?? undefined,
           sparseTreeIncludeArchived
+        )
+      );
+    case "agendaView":
+      if (!agendaView || !agendaView.start || !agendaView.end) {
+        throw new Error("agendaView projection requires start and end dates");
+      }
+      return parseJson(org.agendaViewJson(JSON.stringify(agendaView)));
+    case "agendaBlock":
+      if (!agendaBlock || !Array.isArray(agendaBlock.sections)) {
+        throw new Error("agendaBlock projection requires sections");
+      }
+      return parseJson(org.agendaBlockJson(JSON.stringify(agendaBlock)));
+    case "clockIssues":
+      return parseJson(
+        org.clockIssuesJson(
+          clockIssueProfile ? JSON.stringify(clockIssueProfile) : undefined
         )
       );
     case "viewIndex":
@@ -140,7 +159,10 @@ const handleMessage = async (message) => {
           message.includeBaseDir,
           message.sparseTreeMatch,
           message.sparseTreeText,
-          message.sparseTreeIncludeArchived
+          message.sparseTreeIncludeArchived,
+          message.agendaView,
+          message.agendaBlock,
+          message.clockIssueProfile
         );
         break;
       }
@@ -162,7 +184,10 @@ const handleMessage = async (message) => {
           message.includeBaseDir,
           message.sparseTreeMatch,
           message.sparseTreeText,
-          message.sparseTreeIncludeArchived
+          message.sparseTreeIncludeArchived,
+          message.agendaView,
+          message.agendaBlock,
+          message.clockIssueProfile
         );
         break;
       }
@@ -174,7 +199,10 @@ const handleMessage = async (message) => {
           message.includeBaseDir,
           message.sparseTreeMatch,
           message.sparseTreeText,
-          message.sparseTreeIncludeArchived
+          message.sparseTreeIncludeArchived,
+          message.agendaView,
+          message.agendaBlock,
+          message.clockIssueProfile
         );
         break;
       }

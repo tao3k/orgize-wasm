@@ -335,12 +335,31 @@ export interface OrgizeSparseTreeMatchDto {
   value: string;
 }
 
+export type OrgizeSparseTreeReceiptKindDto =
+  | "candidate"
+  | "visibilityFilterPassed"
+  | "matchExpressionMatched"
+  | "textMatched"
+  | "defaultAllMatched"
+  | "accepted"
+  | "skippedComment"
+  | "skippedArchived"
+  | "skippedDone"
+  | "skippedMatchExpression"
+  | "skippedText";
+
+export interface OrgizeSparseTreeReceiptDto {
+  kind: OrgizeSparseTreeReceiptKindDto;
+  message: string;
+}
+
 export interface OrgizeSparseTreeCardDto {
   source: OrgizeSourceRangeDto;
   outlinePath: string[];
   level: number;
   title: string;
   matches: OrgizeSparseTreeMatchDto[];
+  receipts: OrgizeSparseTreeReceiptDto[];
   preview?: string | null;
   todo?: string | null;
   todoState?: "todo" | "done" | null;
@@ -358,9 +377,128 @@ export interface OrgizeSparseTreeCardDto {
   lifecycle: OrgizeLifecycleRecordDto[];
 }
 
+export type OrgizeSparseTreeSkipReasonDto =
+  | "comment"
+  | "archived"
+  | "done"
+  | "matchExpression"
+  | "text";
+
+export interface OrgizeSparseTreeSkipDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  reason: OrgizeSparseTreeSkipReasonDto;
+  receipts: OrgizeSparseTreeReceiptDto[];
+}
+
 export interface OrgizeSparseTreeResponseDto {
   schemaVersion: 1;
+  totalCandidates: number;
   cards: OrgizeSparseTreeCardDto[];
+  skipped: OrgizeSparseTreeSkipDto[];
+}
+
+export interface OrgizeAgendaViewDateRequestDto {
+  year: number;
+  month: number;
+  day: number;
+}
+
+export interface OrgizeAgendaViewJsonRequestDto {
+  start: OrgizeAgendaViewDateRequestDto;
+  end: OrgizeAgendaViewDateRequestDto;
+  limit?: number | null;
+  sortStrategy?: OrgizeAgendaViewSortSpecDto[] | null;
+}
+
+export interface OrgizeAgendaViewSortSpecDto {
+  key:
+    | "displayDate"
+    | "time"
+    | "kind"
+    | "level"
+    | "title"
+    | "targetDate"
+    | "scheduledDate"
+    | "deadlineDate"
+    | "priority"
+    | "category"
+    | "todoState";
+  direction: "up" | "down" | "keep";
+}
+
+export interface OrgizeAgendaBlockSectionRequestDto {
+  name: string;
+  query: OrgizeAgendaViewJsonRequestDto;
+}
+
+export interface OrgizeAgendaBlockJsonRequestDto {
+  title?: string | null;
+  sections: OrgizeAgendaBlockSectionRequestDto[];
+}
+
+export interface OrgizeAgendaViewSortValueDto {
+  key: string;
+  value: string;
+}
+
+export interface OrgizeAgendaViewReceiptDto {
+  kind: string;
+  message: string;
+}
+
+export interface OrgizeAgendaViewCardDto {
+  source: OrgizeSourceRangeDto;
+  sortedPosition: number;
+  kind: string;
+  displayDate: string;
+  targetDate: string;
+  targetEndDate?: string | null;
+  time?: string | null;
+  endTime?: string | null;
+  title: string;
+  category?: string | null;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+  effectiveTags: string[];
+  blockers: OrgizeTaskBlockerRecordDto[];
+  sortKeys: OrgizeAgendaViewSortValueDto[];
+  receipts: OrgizeAgendaViewReceiptDto[];
+}
+
+export interface OrgizeAgendaViewSkipDto {
+  source: OrgizeSourceRangeDto;
+  sortedPosition: number;
+  title: string;
+  reason: string;
+  limit?: number | null;
+  blockers: OrgizeTaskBlockerRecordDto[];
+  sortKeys: OrgizeAgendaViewSortValueDto[];
+  receipts: OrgizeAgendaViewReceiptDto[];
+}
+
+export interface OrgizeAgendaViewResponseDto {
+  schemaVersion: 1;
+  totalCandidates: number;
+  limit?: number | null;
+  sortStrategy: OrgizeAgendaViewSortSpecDto[];
+  cards: OrgizeAgendaViewCardDto[];
+  skipped: OrgizeAgendaViewSkipDto[];
+}
+
+export interface OrgizeAgendaBlockSectionPlanDto {
+  index: number;
+  name: string;
+  plan: OrgizeAgendaViewResponseDto;
+}
+
+export interface OrgizeAgendaBlockViewResponseDto {
+  schemaVersion: 1;
+  title: string;
+  totalCandidates: number;
+  sections: OrgizeAgendaBlockSectionPlanDto[];
 }
 
 export interface OrgizeViewPropertyDto {
@@ -502,6 +640,473 @@ export interface OrgizeColumnViewsResponseDto {
   records: OrgizeColumnViewRecordDto[];
 }
 
+export interface OrgizeDynamicBlockParameterDto {
+  key: string;
+  value?: string | null;
+  raw: string;
+}
+
+export type OrgizeDynamicBlockWriterDto =
+  | "clocktable"
+  | "columnview"
+  | "unknown";
+
+export type OrgizeDynamicBlockContentStateDto =
+  | "empty"
+  | "existingOutput";
+
+export interface OrgizeDynamicBlockRecordDto {
+  source: OrgizeSourceRangeDto;
+  name: string;
+  writer: OrgizeDynamicBlockWriterDto;
+  parameters: OrgizeDynamicBlockParameterDto[];
+  contentState: OrgizeDynamicBlockContentStateDto;
+  contentLineCount: number;
+}
+
+export interface OrgizeDynamicBlocksResponseDto {
+  schemaVersion: 1;
+  records: OrgizeDynamicBlockRecordDto[];
+}
+
+export type OrgizePropertyInheritanceDto =
+  | "none"
+  | "all"
+  | "selective"
+  | "pattern";
+
+export type OrgizePropertyAllowedValueScopeKindDto =
+  | "fixedGlobal"
+  | "document"
+  | "section";
+
+export interface OrgizePropertyAllowedValueScopeDto {
+  kind: OrgizePropertyAllowedValueScopeKindDto;
+  outlinePath: string[];
+  level?: number | null;
+  title?: string | null;
+}
+
+export interface OrgizePropertyAllowedValueRecordDto {
+  source?: OrgizeSourceRangeDto | null;
+  scope: OrgizePropertyAllowedValueScopeDto;
+  property: string;
+  descriptorKey: string;
+  values: string[];
+}
+
+export interface OrgizePropertyProfileDto {
+  inheritance: OrgizePropertyInheritanceDto;
+  inheritedKeys: string[];
+  allowedValues: OrgizePropertyAllowedValueRecordDto[];
+}
+
+export interface OrgizePropertyProfileResponseDto {
+  schemaVersion: 1;
+  profile: OrgizePropertyProfileDto;
+}
+
+export type OrgizeRefileOutlinePathModeDto =
+  | "none"
+  | "outline"
+  | "file"
+  | "fullFilePath"
+  | "bufferName"
+  | "title";
+
+export type OrgizeRefileTargetSpecKindDto =
+  | "all"
+  | "tag"
+  | "todo"
+  | "level"
+  | "maxLevel"
+  | "regexp";
+
+export interface OrgizeRefileTargetSpecDto {
+  kind: OrgizeRefileTargetSpecKindDto;
+  value?: string | null;
+}
+
+export interface OrgizeRefileTargetReceiptDto {
+  spec: OrgizeRefileTargetSpecDto;
+  message: string;
+}
+
+export interface OrgizeRefileTargetDto {
+  sourceFile?: string | null;
+  source: OrgizeSourceRangeDto;
+  level: number;
+  title: string;
+  outlinePath: string[];
+  display: string;
+  receipts: OrgizeRefileTargetReceiptDto[];
+}
+
+export type OrgizeRefileWarningKindDto =
+  | "unsupportedRegexp"
+  | "duplicateDisplay"
+  | "sourceNotFound"
+  | "targetNotFound"
+  | "ambiguousSource"
+  | "ambiguousTarget"
+  | "parentNotFound"
+  | "ambiguousParent"
+  | "sameSourceAndTarget"
+  | "targetInsideSource"
+  | "copyMayDuplicateId";
+
+export interface OrgizeRefileWarningDto {
+  kind: OrgizeRefileWarningKindDto;
+  message: string;
+}
+
+export interface OrgizeRefileTargetsRequestDto {
+  sourceFile?: string | null;
+  outlinePathMode?: OrgizeRefileOutlinePathModeDto | null;
+  specs?: OrgizeRefileTargetSpecDto[] | null;
+}
+
+export interface OrgizeRefileTargetIndexResponseDto {
+  schemaVersion: 1;
+  sourceFile?: string | null;
+  outlinePathMode: OrgizeRefileOutlinePathModeDto;
+  specs: OrgizeRefileTargetSpecDto[];
+  targets: OrgizeRefileTargetDto[];
+  warnings: OrgizeRefileWarningDto[];
+}
+
+export type OrgizeRefileActionDto = "move" | "copy" | "goto";
+
+export type OrgizeRefileInsertPositionDto = "lastChild" | "firstChild";
+
+export type OrgizeRefileParentCreationModeDto = "never" | "plan" | "confirm";
+
+export interface OrgizeRefilePlanRequestDto {
+  sourceFile?: string | null;
+  sourceOutlinePath: string[];
+  targetOutlinePath: string[];
+  action?: OrgizeRefileActionDto | null;
+  insertPosition?: OrgizeRefileInsertPositionDto | null;
+  parentCreation?: OrgizeRefileParentCreationModeDto | "allow" | null;
+}
+
+export interface OrgizeRefilePlanSectionDto {
+  sourceFile?: string | null;
+  source: OrgizeSourceRangeDto;
+  level: number;
+  title: string;
+  outlinePath: string[];
+  localIds: string[];
+}
+
+export interface OrgizeRefilePlanReceiptDto {
+  kind:
+    | "sourceResolved"
+    | "targetResolved"
+    | "insertPositionResolved"
+    | "parentCreationPlanned"
+    | "parentCreationRequiresConfirmation"
+    | "nonMutating";
+  message: string;
+}
+
+export interface OrgizeRefileCreateParentNodeDto {
+  title: string;
+  level: number;
+  outlinePath: string[];
+  display: string;
+}
+
+export interface OrgizeRefileCreateParentPlanDto {
+  sourceFile?: string | null;
+  existingParent: OrgizeRefileTargetDto;
+  targetOutlinePath: string[];
+  nodes: OrgizeRefileCreateParentNodeDto[];
+  requiresConfirmation: boolean;
+}
+
+export interface OrgizeRefilePlanDto {
+  sourceFile?: string | null;
+  action: OrgizeRefileActionDto;
+  insertPosition: OrgizeRefileInsertPositionDto;
+  parentCreation: OrgizeRefileParentCreationModeDto;
+  source?: OrgizeRefilePlanSectionDto | null;
+  target?: OrgizeRefileTargetDto | null;
+  createdTarget?: OrgizeRefileCreateParentPlanDto | null;
+  receipts: OrgizeRefilePlanReceiptDto[];
+  warnings: OrgizeRefileWarningDto[];
+}
+
+export interface OrgizeRefilePlanResponseDto {
+  schemaVersion: 1;
+  plan: OrgizeRefilePlanDto;
+}
+
+export interface OrgizeOrgDurationDto {
+  raw: string;
+  totalSeconds: number;
+  totalMinutes: number;
+}
+
+export interface OrgizeProgressTodoSummaryDto {
+  total: number;
+  done: number;
+  open: number;
+}
+
+export interface OrgizeProgressCheckboxSummaryDto {
+  total: number;
+  checked: number;
+  unchecked: number;
+  partial: number;
+}
+
+export interface OrgizeProgressStatisticCookieDto {
+  source: OrgizeSourceRangeDto;
+  raw: string;
+  kind: "fraction" | "percent" | "unknown";
+  done?: number | null;
+  total?: number | null;
+  percent?: number | null;
+}
+
+export interface OrgizeProgressEffortSummaryDto {
+  local?: OrgizeOrgDurationDto | null;
+  subtreeTotalSeconds: number;
+}
+
+export interface OrgizeTaskDependencyRecordDto {
+  source: OrgizeSourceRangeDto;
+  kind: "openDescendantTodo" | "openCheckbox" | "orderedProperty";
+  count: number;
+  message: string;
+}
+
+export interface OrgizeTaskBlockerTaskDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+}
+
+export interface OrgizeTaskBlockerParentDto {
+  source: OrgizeSourceRangeDto;
+  orderedPropertySource: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+}
+
+export interface OrgizeTaskBlockerRecordDto {
+  kind: "orderedPreviousSibling";
+  blocked: OrgizeTaskBlockerTaskDto;
+  blocker: OrgizeTaskBlockerTaskDto;
+  parent: OrgizeTaskBlockerParentDto;
+  message: string;
+}
+
+export interface OrgizeTaskBlockersResponseDto {
+  schemaVersion: 1;
+  records: OrgizeTaskBlockerRecordDto[];
+}
+
+export interface OrgizeProgressStatsRecordDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  todo: "none" | "todo" | "done";
+  descendantTodos: OrgizeProgressTodoSummaryDto;
+  checkboxes: OrgizeProgressCheckboxSummaryDto;
+  statisticCookies: OrgizeProgressStatisticCookieDto[];
+  effort: OrgizeProgressEffortSummaryDto;
+  dependencies: OrgizeTaskDependencyRecordDto[];
+}
+
+export interface OrgizeProgressStatsResponseDto {
+  schemaVersion: 1;
+  records: OrgizeProgressStatsRecordDto[];
+}
+
+export interface OrgizeClockSummaryDto {
+  entries: number;
+  closedEntries: number;
+  runningEntries: number;
+  unparsedEntries: number;
+  totalSeconds: number;
+}
+
+export type OrgizeClockEffortStatusDto =
+  | "noEffort"
+  | "underEffort"
+  | "onEffort"
+  | "overEffort";
+
+export interface OrgizeClockEffortSummaryDto {
+  local?: OrgizeOrgDurationDto | null;
+  subtreeTotalSeconds: number;
+  deltaSeconds: number;
+  status: OrgizeClockEffortStatusDto;
+}
+
+export interface OrgizeClockRollupRecordDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  localClock: OrgizeClockSummaryDto;
+  subtreeClock: OrgizeClockSummaryDto;
+  effort: OrgizeClockEffortSummaryDto;
+}
+
+export interface OrgizeClockRollupResponseDto {
+  schemaVersion: 1;
+  records: OrgizeClockRollupRecordDto[];
+}
+
+export interface OrgizeClockIssueProfileRequestDto {
+  maxDurationSeconds?: number | null;
+  minDurationSeconds?: number | null;
+  maxGapSeconds?: number | null;
+  gapOkAroundMinutes?: number[];
+}
+
+export type OrgizeClockIssueKindDto =
+  | "invalidClock"
+  | "invalidDuration"
+  | "invalidRange"
+  | "noEndTime"
+  | "longDuration"
+  | "shortDuration"
+  | "overlap"
+  | "gap";
+
+export interface OrgizeClockIssueClockDto {
+  source: OrgizeSourceRangeDto;
+  raw: string;
+  start?: OrgizeClockTableTimeBoundDto | null;
+  end?: OrgizeClockTableTimeBoundDto | null;
+  durationSeconds?: number | null;
+}
+
+export interface OrgizeClockIssueFindingDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  kind: OrgizeClockIssueKindDto;
+  message: string;
+  clock: OrgizeClockIssueClockDto;
+  previousClock?: OrgizeClockIssueClockDto | null;
+  durationSeconds?: number | null;
+  thresholdSeconds?: number | null;
+}
+
+export interface OrgizeClockIssuesResponseDto {
+  schemaVersion: 1;
+  findings: OrgizeClockIssueFindingDto[];
+}
+
+export interface OrgizeClockTableParameterDto {
+  key: string;
+  value?: string | null;
+  raw: string;
+}
+
+export type OrgizeClockTableScopeKindDto =
+  | "file"
+  | "subtree"
+  | "tree"
+  | "treeLevel"
+  | "agenda"
+  | "agendaWithArchives"
+  | "fileWithArchives"
+  | "nil"
+  | "external"
+  | "unknown";
+
+export interface OrgizeClockTableScopeDto {
+  kind: OrgizeClockTableScopeKindDto;
+  value?: string | null;
+}
+
+export interface OrgizeClockTableTimeBoundDto {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+}
+
+export interface OrgizeClockTableTimeWindowDto {
+  source: "block" | "tstartTend";
+  start?: OrgizeClockTableTimeBoundDto | null;
+  endExclusive?: OrgizeClockTableTimeBoundDto | null;
+}
+
+export interface OrgizeClockTableMatchFilterDto {
+  expression: string;
+}
+
+export interface OrgizeClockTablePropertyColumnsDto {
+  names: string[];
+  inherit: boolean;
+}
+
+export interface OrgizeClockTablePropertyValueDto {
+  name: string;
+  value?: string | null;
+  inherited: boolean;
+}
+
+export interface OrgizeClockTableRowDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  tableLevel: number;
+  title: string;
+  clock: OrgizeClockSummaryDto;
+  effortTotalSeconds: number;
+  effortDeltaSeconds: number;
+  effortStatus: OrgizeClockEffortStatusDto;
+  propertyValues: OrgizeClockTablePropertyValueDto[];
+}
+
+export type OrgizeClockTableWarningKindDto =
+  | "unsupportedScope"
+  | "timeRangePreserved"
+  | "blockRangePreserved"
+  | "matchPreserved"
+  | "propertiesPreserved"
+  | "stepPreserved";
+
+export interface OrgizeClockTableWarningDto {
+  kind: OrgizeClockTableWarningKindDto;
+  message: string;
+}
+
+export interface OrgizeClockTablePlanDto {
+  source: OrgizeSourceRangeDto;
+  name: string;
+  parameters: OrgizeClockTableParameterDto[];
+  scope: OrgizeClockTableScopeDto;
+  maxLevel: number;
+  tstart?: string | null;
+  tend?: string | null;
+  timeWindow?: OrgizeClockTableTimeWindowDto | null;
+  matchFilter?: OrgizeClockTableMatchFilterDto | null;
+  propertyColumns?: OrgizeClockTablePropertyColumnsDto | null;
+  rows: OrgizeClockTableRowDto[];
+  warnings: OrgizeClockTableWarningDto[];
+}
+
+export interface OrgizeClockTablePlansResponseDto {
+  schemaVersion: 1;
+  plans: OrgizeClockTablePlanDto[];
+}
+
 export interface OrgizeLintFindingDto {
   code: string;
   severity: "error" | "warning";
@@ -522,8 +1127,15 @@ export interface OrgizeSnapshotDto {
   attachments: OrgizeAttachmentRecordDto[];
   sourceBlocks: OrgizeSourceBlockRecordDto[];
   columnViews: OrgizeColumnViewRecordDto[];
+  dynamicBlocks: OrgizeDynamicBlockRecordDto[];
+  propertyProfile: OrgizePropertyProfileDto;
+  refileTargets: OrgizeRefileTargetDto[];
   includeExpansion: OrgizeIncludeExpansionEntryDto[];
   datetree: OrgizeDateTreeEntryDto[];
+  progressStats: OrgizeProgressStatsRecordDto[];
+  clockRollups: OrgizeClockRollupRecordDto[];
+  clockTablePlans: OrgizeClockTablePlanDto[];
+  clockIssues: OrgizeClockIssueFindingDto[];
   lint: OrgizeLintFindingDto[];
 }
 
@@ -533,12 +1145,23 @@ export type OrgizeProjectionName =
   | "lint"
   | "sectionIndex"
   | "sparseTree"
+  | "agendaView"
+  | "agendaBlock"
   | "viewIndex"
   | "attachments"
   | "sourceBlocks"
   | "columnViews"
+  | "dynamicBlocks"
+  | "propertyProfile"
+  | "refileTargets"
+  | "refilePlan"
   | "includeExpansion"
   | "datetree"
+  | "progressStats"
+  | "clockRollups"
+  | "clockTablePlans"
+  | "clockIssues"
+  | "taskBlockers"
   | "snapshot";
 
 export type OrgizeProjectionDto =
@@ -547,10 +1170,21 @@ export type OrgizeProjectionDto =
   | OrgizeLintResponseDto
   | OrgizeSectionIndexResponseDto
   | OrgizeSparseTreeResponseDto
+  | OrgizeAgendaViewResponseDto
+  | OrgizeAgendaBlockViewResponseDto
   | OrgizeViewIndexResponseDto
   | OrgizeAttachmentsResponseDto
   | OrgizeSourceBlocksResponseDto
   | OrgizeColumnViewsResponseDto
+  | OrgizeDynamicBlocksResponseDto
+  | OrgizePropertyProfileResponseDto
+  | OrgizeRefileTargetIndexResponseDto
+  | OrgizeRefilePlanResponseDto
   | OrgizeIncludeExpansionResponseDto
   | OrgizeDateTreeResponseDto
+  | OrgizeProgressStatsResponseDto
+  | OrgizeClockRollupResponseDto
+  | OrgizeClockTablePlansResponseDto
+  | OrgizeClockIssuesResponseDto
+  | OrgizeTaskBlockersResponseDto
   | OrgizeSnapshotDto;

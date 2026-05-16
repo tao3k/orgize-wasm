@@ -1,20 +1,32 @@
 //! JSON DTO projection entrypoints used by wasm-bindgen methods.
 
 use crate::{
+    dto_agenda::{agenda_block_view_response, agenda_view_response},
+    dto_clock::{
+        clock_issue_findings, clock_issues_response, clock_rollup_records, clock_rollups_response,
+        clock_table_plans, clock_table_plans_response,
+    },
     dto_common::to_json,
     dto_document::{
         column_view_records, column_views_response, datetree_entries, datetree_response,
         document_metadata, include_expansion_entries, include_expansion_response, outline_node,
-        source_block_records, source_blocks_response,
+        progress_stats_records, progress_stats_response, source_block_records,
+        source_blocks_response, task_blockers_response,
     },
+    dto_dynamic_block::{dynamic_block_records, dynamic_blocks_response},
     dto_index::{
         attachment_records, attachments_response, lint_findings, lint_response,
         section_index_record, section_index_records, section_index_response, sparse_tree_response,
         view_index_response,
     },
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
+    dto_property_profile::{property_profile, property_profile_response},
+    dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
 };
-use orgize::ast::{Document, IncludeExpansionOptions, ParsedAnnotation, SparseTreeQuery};
+use orgize::ast::{
+    AgendaBlockViewQuery, AgendaViewQuery, ClockIssueProfile, Document, IncludeExpansionOptions,
+    ParsedAnnotation, RefilePlanRequest, RefileTargetQuery, SparseTreeQuery,
+};
 
 pub(crate) fn outline_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&WasmOutlineResponse {
@@ -46,6 +58,41 @@ pub(crate) fn sparse_tree_json(
     text: Option<&str>,
     include_archived: Option<bool>,
 ) -> Result<String, String> {
+    sparse_tree_json_with_options(
+        document,
+        source_file,
+        match_expression,
+        text,
+        include_archived,
+        false,
+    )
+}
+
+pub(crate) fn sparse_tree_explain_json(
+    document: &Document<ParsedAnnotation>,
+    source_file: Option<&str>,
+    match_expression: Option<&str>,
+    text: Option<&str>,
+    include_archived: Option<bool>,
+) -> Result<String, String> {
+    sparse_tree_json_with_options(
+        document,
+        source_file,
+        match_expression,
+        text,
+        include_archived,
+        true,
+    )
+}
+
+fn sparse_tree_json_with_options(
+    document: &Document<ParsedAnnotation>,
+    source_file: Option<&str>,
+    match_expression: Option<&str>,
+    text: Option<&str>,
+    include_archived: Option<bool>,
+    explain_skips: bool,
+) -> Result<String, String> {
     let mut query = SparseTreeQuery::new();
     if let Some(source_file) = source_file {
         query = query.source_file(source_file);
@@ -61,9 +108,26 @@ pub(crate) fn sparse_tree_json(
             .match_expression(match_expression)
             .map_err(|err| err.to_string())?;
     }
+    if explain_skips {
+        query = query.explain_skips(true);
+    }
     Ok(to_json(&sparse_tree_response(
         &document.sparse_tree_projection(&query),
     )))
+}
+
+pub(crate) fn agenda_view_json(
+    document: &Document<ParsedAnnotation>,
+    query: &AgendaViewQuery,
+) -> String {
+    to_json(&agenda_view_response(document, query))
+}
+
+pub(crate) fn agenda_block_json(
+    document: &Document<ParsedAnnotation>,
+    query: &AgendaBlockViewQuery,
+) -> String {
+    to_json(&agenda_block_view_response(document, query))
 }
 
 pub(crate) fn view_index_json(
@@ -89,6 +153,28 @@ pub(crate) fn column_views_json(document: &Document<ParsedAnnotation>) -> String
     to_json(&column_views_response(document))
 }
 
+pub(crate) fn dynamic_blocks_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&dynamic_blocks_response(document))
+}
+
+pub(crate) fn property_profile_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&property_profile_response(document))
+}
+
+pub(crate) fn refile_targets_json(
+    document: &Document<ParsedAnnotation>,
+    query: &RefileTargetQuery,
+) -> String {
+    to_json(&refile_target_index_response(document, query))
+}
+
+pub(crate) fn refile_plan_json(
+    document: &Document<ParsedAnnotation>,
+    request: &RefilePlanRequest,
+) -> String {
+    to_json(&refile_plan_response(document, request))
+}
+
 pub(crate) fn include_expansion_json(
     document: &Document<ParsedAnnotation>,
     base_dir: Option<&str>,
@@ -100,6 +186,29 @@ pub(crate) fn datetree_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&datetree_response(document))
 }
 
+pub(crate) fn progress_stats_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&progress_stats_response(document))
+}
+
+pub(crate) fn clock_rollups_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&clock_rollups_response(document))
+}
+
+pub(crate) fn clock_table_plans_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&clock_table_plans_response(document))
+}
+
+pub(crate) fn clock_issues_json(
+    document: &Document<ParsedAnnotation>,
+    profile: &ClockIssueProfile,
+) -> String {
+    to_json(&clock_issues_response(document, profile))
+}
+
+pub(crate) fn task_blockers_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&task_blockers_response(document))
+}
+
 pub(crate) fn snapshot_json(
     document: &Document<ParsedAnnotation>,
     source: &str,
@@ -108,6 +217,10 @@ pub(crate) fn snapshot_json(
     let records = section_index_records(document, source_file);
     let lint = orgize::lint::lint_document(document, source);
     let include_options = IncludeExpansionOptions::default();
+    let mut refile_query = RefileTargetQuery::new();
+    if let Some(source_file) = source_file {
+        refile_query = refile_query.source_file(source_file);
+    }
     to_json(&WasmSnapshotResponse {
         schema_version: 1,
         metadata: document_metadata(document),
@@ -116,8 +229,15 @@ pub(crate) fn snapshot_json(
         attachments: attachment_records(&records),
         source_blocks: source_block_records(document),
         column_views: column_view_records(document),
+        dynamic_blocks: dynamic_block_records(document),
+        property_profile: property_profile(document),
+        refile_targets: refile_targets(document, &refile_query),
         include_expansion: include_expansion_entries(document, &include_options),
         datetree: datetree_entries(document),
+        progress_stats: progress_stats_records(document),
+        clock_rollups: clock_rollup_records(document),
+        clock_table_plans: clock_table_plans(document),
+        clock_issues: clock_issue_findings(document, &ClockIssueProfile::org_default()),
         lint: lint_findings(&lint.findings),
     })
 }

@@ -2,8 +2,8 @@
 
 use crate::{
     dto_common::{
-        annotation_source, attachment_directory, priority, section_source, semantic_property,
-        source_position, target_kind, todo_state,
+        annotation_source, attachment_directory, org_duration, priority, section_source,
+        semantic_property, source_position, target_kind, todo_state,
     },
     dto_model::{
         WasmArchive, WasmAttachmentState, WasmColumnViewColumn, WasmColumnViewRecord,
@@ -11,17 +11,22 @@ use crate::{
         WasmExportSettings, WasmFootnoteEntry, WasmIncludeDirective, WasmIncludeExpansionEntry,
         WasmIncludeExpansionMode, WasmIncludeExpansionResponse, WasmIncludeLineSelection,
         WasmIncludeOption, WasmKeyword, WasmKeywordAttribute, WasmLinkAbbreviation,
-        WasmMacroDefinition, WasmMetadataResponse, WasmOutlineNode, WasmSourceBlockCodeRef,
+        WasmMacroDefinition, WasmMetadataResponse, WasmOutlineNode, WasmProgressCheckboxSummary,
+        WasmProgressEffortSummary, WasmProgressStatisticCookie, WasmProgressStatsRecord,
+        WasmProgressStatsResponse, WasmProgressTodoSummary, WasmSourceBlockCodeRef,
         WasmSourceBlockHeaderArg, WasmSourceBlockHeaderVar, WasmSourceBlockRecord,
-        WasmSourceBlockResult, WasmSourceBlockTangle, WasmSourceBlocksResponse, WasmSourceRange,
-        WasmTargetDefinition,
+        WasmSourceBlockResult, WasmSourceBlockTangle, WasmSourceBlocksResponse,
+        WasmTargetDefinition, WasmTaskBlockerParent, WasmTaskBlockerRecord, WasmTaskBlockerTask,
+        WasmTaskBlockersResponse, WasmTaskDependencyRecord,
     },
+    dto_shared_model::WasmSourceRange,
 };
 use orgize::ast::{
     ColumnViewRecord, ColumnViewScope, ColumnViewSource, DateTreeEntry, Document, IncludeDirective,
     IncludeExpansionMode, IncludeExpansionOptions, IncludeLineSelection, ParsedAnnotation, Section,
     SourceBlockHeaderArgKind, SourceBlockHeaderArgSource, SourceBlockRecord, SourceBlockRecordKind,
-    SourceBlockResultKind, SourceBlockSource, SourceBlockTangleMode,
+    SourceBlockResultKind, SourceBlockSource, SourceBlockTangleMode, TaskBlockerRecord,
+    TaskBlockerTask,
 };
 
 pub(crate) fn outline_node(section: &Section<ParsedAnnotation>) -> WasmOutlineNode {
@@ -210,6 +215,44 @@ pub(crate) fn datetree_entries(document: &Document<ParsedAnnotation>) -> Vec<Was
         .datetree_entries()
         .iter()
         .map(datetree_entry)
+        .collect()
+}
+
+pub(crate) fn progress_stats_response(
+    document: &Document<ParsedAnnotation>,
+) -> WasmProgressStatsResponse {
+    WasmProgressStatsResponse {
+        schema_version: 1,
+        records: progress_stats_records(document),
+    }
+}
+
+pub(crate) fn progress_stats_records(
+    document: &Document<ParsedAnnotation>,
+) -> Vec<WasmProgressStatsRecord> {
+    document
+        .progress_stats_records()
+        .iter()
+        .map(progress_stats_record)
+        .collect()
+}
+
+pub(crate) fn task_blockers_response(
+    document: &Document<ParsedAnnotation>,
+) -> WasmTaskBlockersResponse {
+    WasmTaskBlockersResponse {
+        schema_version: 1,
+        records: task_blocker_records(document),
+    }
+}
+
+pub(crate) fn task_blocker_records(
+    document: &Document<ParsedAnnotation>,
+) -> Vec<WasmTaskBlockerRecord> {
+    document
+        .task_blocker_records()
+        .iter()
+        .map(task_blocker_record)
         .collect()
 }
 
@@ -424,6 +467,80 @@ fn datetree_entry(entry: &DateTreeEntry) -> WasmDateTreeEntry {
         month_title: entry.month_title.clone(),
         day_title: entry.day_title.clone(),
         outline_path: entry.outline_path.clone(),
+    }
+}
+
+fn progress_stats_record(record: &orgize::ast::ProgressStatsRecord) -> WasmProgressStatsRecord {
+    WasmProgressStatsRecord {
+        source: section_source(&record.source),
+        outline_path: record.outline_path.clone(),
+        level: record.level,
+        title: record.title.clone(),
+        todo: record.todo.as_str(),
+        descendant_todos: WasmProgressTodoSummary {
+            total: record.descendant_todos.total,
+            done: record.descendant_todos.done,
+            open: record.descendant_todos.open,
+        },
+        checkboxes: WasmProgressCheckboxSummary {
+            total: record.checkboxes.total,
+            checked: record.checkboxes.checked,
+            unchecked: record.checkboxes.unchecked,
+            partial: record.checkboxes.partial,
+        },
+        statistic_cookies: record
+            .statistic_cookies
+            .iter()
+            .map(|cookie| WasmProgressStatisticCookie {
+                source: section_source(&cookie.source),
+                raw: cookie.raw.clone(),
+                kind: cookie.kind.as_str(),
+                done: cookie.done,
+                total: cookie.total,
+                percent: cookie.percent,
+            })
+            .collect(),
+        effort: WasmProgressEffortSummary {
+            local: record.effort.local.as_ref().map(org_duration),
+            subtree_total_seconds: record.effort.subtree_total_seconds,
+        },
+        dependencies: record
+            .dependencies
+            .iter()
+            .map(|dependency| WasmTaskDependencyRecord {
+                source: section_source(&dependency.source),
+                kind: dependency.kind.as_str(),
+                count: dependency.count,
+                message: dependency.message.clone(),
+            })
+            .collect(),
+    }
+}
+
+pub(crate) fn task_blocker_record(record: &TaskBlockerRecord) -> WasmTaskBlockerRecord {
+    WasmTaskBlockerRecord {
+        kind: record.kind.as_str(),
+        blocked: task_blocker_task(&record.blocked),
+        blocker: task_blocker_task(&record.blocker),
+        parent: WasmTaskBlockerParent {
+            source: section_source(&record.parent.source),
+            ordered_property_source: section_source(&record.parent.ordered_property_source),
+            outline_path: record.parent.outline_path.clone(),
+            level: record.parent.level,
+            title: record.parent.title.clone(),
+        },
+        message: record.message.clone(),
+    }
+}
+
+fn task_blocker_task(task: &TaskBlockerTask) -> WasmTaskBlockerTask {
+    WasmTaskBlockerTask {
+        source: section_source(&task.source),
+        outline_path: task.outline_path.clone(),
+        level: task.level,
+        title: task.title.clone(),
+        todo: task.todo.as_ref().map(|todo| todo.name.clone()),
+        todo_state: task.todo.as_ref().map(todo_state),
     }
 }
 

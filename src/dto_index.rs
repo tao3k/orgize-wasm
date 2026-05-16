@@ -9,9 +9,11 @@ use crate::{
         WasmArchive, WasmAttachmentRecord, WasmAttachmentState, WasmAttachmentsResponse,
         WasmLifecycleRecord, WasmLink, WasmLintFinding, WasmLintResponse, WasmProperty,
         WasmSectionIndexRecord, WasmSectionIndexResponse, WasmSparseTreeCard, WasmSparseTreeMatch,
-        WasmSparseTreeResponse, WasmTarget, WasmTextSlice, WasmViewIndexRecord,
-        WasmViewIndexResponse, WasmViewPlanning, WasmViewProperty,
+        WasmSparseTreeReceipt, WasmSparseTreeResponse, WasmSparseTreeSkip, WasmTarget,
+        WasmTextSlice, WasmViewIndexRecord, WasmViewIndexResponse, WasmViewPlanning,
+        WasmViewProperty,
     },
+    dto_shared_model::{WasmSourcePosition, WasmSourceRange},
 };
 use orgize::{
     ast::{
@@ -42,7 +44,9 @@ pub(crate) fn section_index_response(records: &[SectionIndexRecord]) -> WasmSect
 pub(crate) fn sparse_tree_response(projection: &SparseTreeProjection) -> WasmSparseTreeResponse {
     WasmSparseTreeResponse {
         schema_version: 1,
+        total_candidates: projection.total_candidates,
         cards: projection.cards.iter().map(sparse_tree_card).collect(),
+        skipped: projection.skipped.iter().map(sparse_tree_skip).collect(),
     }
 }
 
@@ -86,12 +90,12 @@ pub(crate) fn lint_findings(findings: &[LintFinding]) -> Vec<WasmLintFinding> {
                 LintSeverity::Warning => "warning",
             },
             message: finding.message.clone(),
-            source: crate::dto_model::WasmSourceRange {
-                start: crate::dto_model::WasmSourcePosition {
+            source: WasmSourceRange {
+                start: WasmSourcePosition {
                     line: finding.location.start.line,
                     column: finding.location.start.column,
                 },
-                end: crate::dto_model::WasmSourcePosition {
+                end: WasmSourcePosition {
                     line: finding.location.end.line,
                     column: finding.location.end.column,
                 },
@@ -217,6 +221,7 @@ fn sparse_tree_card(card: &orgize::ast::SparseTreeCard) -> WasmSparseTreeCard {
                 value: matched.value.clone(),
             })
             .collect(),
+        receipts: card.receipts.iter().map(sparse_tree_receipt).collect(),
         preview: card.preview.clone(),
         todo: card.todo.as_ref().map(|todo| todo.name.clone()),
         todo_state: card.todo.as_ref().map(todo_state),
@@ -290,6 +295,24 @@ fn sparse_tree_card(card: &orgize::ast::SparseTreeCard) -> WasmSparseTreeCard {
                 raw: record.raw.clone(),
             })
             .collect(),
+    }
+}
+
+fn sparse_tree_skip(skip: &orgize::ast::SparseTreeSkip) -> WasmSparseTreeSkip {
+    WasmSparseTreeSkip {
+        source: section_source(&skip.source),
+        outline_path: skip.outline_path.clone(),
+        level: skip.level,
+        title: skip.title.clone(),
+        reason: skip.reason.as_str(),
+        receipts: skip.receipts.iter().map(sparse_tree_receipt).collect(),
+    }
+}
+
+fn sparse_tree_receipt(receipt: &orgize::ast::SparseTreeReceipt) -> WasmSparseTreeReceipt {
+    WasmSparseTreeReceipt {
+        kind: receipt.kind.as_str(),
+        message: receipt.message.clone(),
     }
 }
 

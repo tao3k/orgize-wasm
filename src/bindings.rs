@@ -1,12 +1,19 @@
 //! `wasm-bindgen` facade for parsing and rendering Org documents.
 
-use crate::dto_projection;
+use crate::{dto_clock_model::WasmClockIssueProfileRequest, dto_projection};
 use orgize::{
-    ast::{AgendaDate, AgendaQuery, AgentMemoryQuery, AgentPlanningQuery, MemoryQuery, ParsedAst},
+    ast::{
+        AgendaBlockViewQuery, AgendaDate, AgendaQuery, AgendaViewQuery, AgendaViewSortDirection,
+        AgendaViewSortKey, AgendaViewSortSpec, AgentMemoryQuery, AgentPlanningQuery,
+        ClockIssueProfile, MemoryQuery, ParsedAst, RefileAction, RefileInsertPosition,
+        RefileOutlinePathMode, RefileParentCreationMode, RefilePlanRequest, RefileTargetQuery,
+        RefileTargetSpec,
+    },
     export::{from_fn, Container, Event},
     rowan::ast::AstNode,
     Org as Inner,
 };
+use serde::Deserialize;
 use std::cell::{Ref, RefCell};
 use std::fmt::Write;
 
@@ -18,6 +25,76 @@ pub struct Org {
     inner: Inner,
     source: String,
     document: RefCell<Option<ParsedAst>>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AgendaViewJsonRequest {
+    start: AgendaViewJsonDate,
+    end: AgendaViewJsonDate,
+    limit: Option<u32>,
+    sort_strategy: Option<Vec<AgendaViewSortSpecJson>>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AgendaViewJsonDate {
+    year: u16,
+    month: u8,
+    day: u8,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AgendaViewSortSpecJson {
+    key: String,
+    direction: String,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AgendaBlockJsonRequest {
+    title: Option<String>,
+    sections: Vec<AgendaBlockSectionJsonRequest>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AgendaBlockSectionJsonRequest {
+    name: String,
+    query: AgendaViewJsonRequest,
+}
+
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RefileTargetsJsonRequest {
+    source_file: Option<String>,
+    outline_path_mode: Option<String>,
+    specs: Option<Vec<RefileTargetSpecJson>>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RefileTargetSpecJson {
+    kind: String,
+    value: Option<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RefilePlanJsonRequest {
+    source_file: Option<String>,
+    source_outline_path: Vec<String>,
+    target_outline_path: Vec<String>,
+    action: Option<String>,
+    insert_position: Option<String>,
+    parent_creation: Option<String>,
+}
+
+impl AgendaViewJsonDate {
+    fn into_agenda_date(self) -> AgendaDate {
+        AgendaDate::new(self.year, self.month, self.day)
+    }
 }
 
 #[wasm_bindgen]
@@ -143,6 +220,49 @@ impl Org {
         .map_err(|error| JsValue::from_str(&error))
     }
 
+    #[wasm_bindgen(js_name = sparseTreeExplainJson)]
+    pub fn sparse_tree_explain_json(
+        &self,
+        source_file: Option<String>,
+        match_expression: Option<String>,
+        text: Option<String>,
+        include_archived: Option<bool>,
+    ) -> Result<String, JsValue> {
+        let document = self.document();
+        dto_projection::sparse_tree_explain_json(
+            &document,
+            source_file.as_deref(),
+            match_expression.as_deref(),
+            text.as_deref(),
+            include_archived,
+        )
+        .map_err(|error| JsValue::from_str(&error))
+    }
+
+    #[wasm_bindgen(js_name = agendaViewJson)]
+    pub fn agenda_view_json(&self, request_json: &str) -> Result<String, JsValue> {
+        let request: AgendaViewJsonRequest = serde_json::from_str(request_json)
+            .map_err(|error| JsValue::from_str(&format!("invalid agenda view request: {error}")))?;
+        let document = self.document();
+        Ok(dto_projection::agenda_view_json(
+            &document,
+            &request.into_query()?,
+        ))
+    }
+
+    #[wasm_bindgen(js_name = agendaBlockJson)]
+    pub fn agenda_block_json(&self, request_json: &str) -> Result<String, JsValue> {
+        let request: AgendaBlockJsonRequest =
+            serde_json::from_str(request_json).map_err(|error| {
+                JsValue::from_str(&format!("invalid agenda block request: {error}"))
+            })?;
+        let document = self.document();
+        Ok(dto_projection::agenda_block_json(
+            &document,
+            &request.into_query()?,
+        ))
+    }
+
     #[wasm_bindgen(js_name = viewIndexJson)]
     pub fn view_index_json(&self, source_file: Option<String>) -> String {
         let document = self.document();
@@ -167,6 +287,39 @@ impl Org {
         dto_projection::column_views_json(&document)
     }
 
+    #[wasm_bindgen(js_name = dynamicBlocksJson)]
+    pub fn dynamic_blocks_json(&self) -> String {
+        let document = self.document();
+        dto_projection::dynamic_blocks_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = propertyProfileJson)]
+    pub fn property_profile_json(&self) -> String {
+        let document = self.document();
+        dto_projection::property_profile_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = refileTargetsJson)]
+    pub fn refile_targets_json(&self, request_json: Option<String>) -> Result<String, JsValue> {
+        let request = parse_optional_refile_targets_request(request_json.as_deref())?;
+        let document = self.document();
+        Ok(dto_projection::refile_targets_json(
+            &document,
+            &request.into_query()?,
+        ))
+    }
+
+    #[wasm_bindgen(js_name = refilePlanJson)]
+    pub fn refile_plan_json(&self, request_json: &str) -> Result<String, JsValue> {
+        let request: RefilePlanJsonRequest = serde_json::from_str(request_json)
+            .map_err(|error| JsValue::from_str(&format!("invalid refile plan request: {error}")))?;
+        let document = self.document();
+        Ok(dto_projection::refile_plan_json(
+            &document,
+            &request.into_plan_request()?,
+        ))
+    }
+
     #[wasm_bindgen(js_name = includeExpansionJson)]
     pub fn include_expansion_json(&self, base_dir: Option<String>) -> String {
         let document = self.document();
@@ -177,6 +330,40 @@ impl Org {
     pub fn datetree_json(&self) -> String {
         let document = self.document();
         dto_projection::datetree_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = progressStatsJson)]
+    pub fn progress_stats_json(&self) -> String {
+        let document = self.document();
+        dto_projection::progress_stats_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = clockRollupsJson)]
+    pub fn clock_rollups_json(&self) -> String {
+        let document = self.document();
+        dto_projection::clock_rollups_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = clockTablePlansJson)]
+    pub fn clock_table_plans_json(&self) -> String {
+        let document = self.document();
+        dto_projection::clock_table_plans_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = clockIssuesJson)]
+    pub fn clock_issues_json(&self, request_json: Option<String>) -> Result<String, JsValue> {
+        let request = parse_optional_clock_issue_request(request_json.as_deref())?;
+        let document = self.document();
+        Ok(dto_projection::clock_issues_json(
+            &document,
+            &request.into_profile(),
+        ))
+    }
+
+    #[wasm_bindgen(js_name = taskBlockersJson)]
+    pub fn task_blockers_json(&self) -> String {
+        let document = self.document();
+        dto_projection::task_blockers_json(&document)
     }
 
     #[wasm_bindgen(js_name = snapshotJson)]
@@ -278,6 +465,225 @@ impl Org {
     #[wasm_bindgen(getter, js_name = "gitHash")]
     pub fn git_hash() -> String {
         env!("CARGO_GIT_HASH").into()
+    }
+}
+
+impl AgendaViewJsonRequest {
+    fn into_query(self) -> Result<AgendaViewQuery, JsValue> {
+        let mut query = AgendaViewQuery::new(AgendaQuery::new(
+            self.start.into_agenda_date(),
+            self.end.into_agenda_date(),
+        ));
+        if let Some(limit) = self.limit {
+            query = query.limit(limit as usize);
+        }
+        for sort_spec in self.sort_strategy.unwrap_or_default() {
+            query = query.sort_by(sort_spec.into_spec()?);
+        }
+        Ok(query)
+    }
+}
+
+impl AgendaViewSortSpecJson {
+    fn into_spec(self) -> Result<AgendaViewSortSpec, JsValue> {
+        Ok(AgendaViewSortSpec::new(
+            agenda_view_sort_key(&self.key)?,
+            agenda_view_sort_direction(&self.direction)?,
+        ))
+    }
+}
+
+impl AgendaBlockJsonRequest {
+    fn into_query(self) -> Result<AgendaBlockViewQuery, JsValue> {
+        let mut query =
+            AgendaBlockViewQuery::new(self.title.unwrap_or_else(|| "Agenda block".to_string()));
+        for section in self.sections {
+            query = query.section(section.name, section.query.into_query()?);
+        }
+        Ok(query)
+    }
+}
+
+impl RefileTargetsJsonRequest {
+    fn into_query(self) -> Result<RefileTargetQuery, JsValue> {
+        let mut query = RefileTargetQuery::new();
+        if let Some(source_file) = self.source_file {
+            query = query.source_file(source_file);
+        }
+        if let Some(mode) = self.outline_path_mode {
+            query = query.outline_path_mode(refile_outline_path_mode(&mode)?);
+        }
+        for spec in self.specs.unwrap_or_default() {
+            query = query.spec(spec.into_spec()?);
+        }
+        Ok(query)
+    }
+}
+
+impl RefileTargetSpecJson {
+    fn into_spec(self) -> Result<RefileTargetSpec, JsValue> {
+        let value = self.value.unwrap_or_default();
+        match self.kind.as_str() {
+            "all" => Ok(RefileTargetSpec::All),
+            "tag" => Ok(RefileTargetSpec::Tag(value)),
+            "todo" => Ok(RefileTargetSpec::Todo(value)),
+            "level" => parse_refile_level("level", &value).map(RefileTargetSpec::Level),
+            "maxLevel" => parse_refile_level("maxLevel", &value).map(RefileTargetSpec::MaxLevel),
+            "regexp" => Ok(RefileTargetSpec::Regexp(value)),
+            other => Err(JsValue::from_str(&format!(
+                "invalid refile target spec kind: {other}"
+            ))),
+        }
+    }
+}
+
+impl RefilePlanJsonRequest {
+    fn into_plan_request(self) -> Result<RefilePlanRequest, JsValue> {
+        let mut request =
+            RefilePlanRequest::new(self.source_outline_path, self.target_outline_path);
+        if let Some(source_file) = self.source_file {
+            request = request.source_file(source_file);
+        }
+        if let Some(action) = self.action {
+            request = request.action(refile_action(&action)?);
+        }
+        if let Some(insert_position) = self.insert_position {
+            request = request.insert_position(refile_insert_position(&insert_position)?);
+        }
+        if let Some(parent_creation) = self.parent_creation {
+            request = request.parent_creation(refile_parent_creation(&parent_creation)?);
+        }
+        Ok(request)
+    }
+}
+
+impl WasmClockIssueProfileRequest {
+    fn into_profile(self) -> ClockIssueProfile {
+        let mut profile = ClockIssueProfile::org_default();
+        if let Some(value) = self.max_duration_seconds {
+            profile = match value {
+                Some(seconds) => profile.max_duration_seconds(seconds),
+                None => profile.without_max_duration(),
+            };
+        }
+        if let Some(value) = self.min_duration_seconds {
+            profile = match value {
+                Some(seconds) => profile.min_duration_seconds(seconds),
+                None => profile.without_min_duration(),
+            };
+        }
+        if let Some(value) = self.max_gap_seconds {
+            profile = match value {
+                Some(seconds) => profile.max_gap_seconds(seconds),
+                None => profile.without_max_gap(),
+            };
+        }
+        if let Some(minutes) = self.gap_ok_around_minutes {
+            profile = profile.gap_ok_around_minutes(minutes);
+        }
+        profile
+    }
+}
+
+fn agenda_view_sort_key(value: &str) -> Result<AgendaViewSortKey, JsValue> {
+    match value {
+        "displayDate" | "display-date" => Ok(AgendaViewSortKey::DisplayDate),
+        "time" => Ok(AgendaViewSortKey::Time),
+        "kind" => Ok(AgendaViewSortKey::Kind),
+        "level" => Ok(AgendaViewSortKey::Level),
+        "title" | "alpha" => Ok(AgendaViewSortKey::Title),
+        "targetDate" | "target-date" | "timestamp" => Ok(AgendaViewSortKey::TargetDate),
+        "scheduledDate" | "scheduled-date" | "scheduled" => Ok(AgendaViewSortKey::ScheduledDate),
+        "deadlineDate" | "deadline-date" | "deadline" => Ok(AgendaViewSortKey::DeadlineDate),
+        "priority" => Ok(AgendaViewSortKey::Priority),
+        "category" => Ok(AgendaViewSortKey::Category),
+        "todoState" | "todo-state" | "todo" => Ok(AgendaViewSortKey::TodoState),
+        other => Err(JsValue::from_str(&format!(
+            "invalid agenda view sort key: {other}"
+        ))),
+    }
+}
+
+fn agenda_view_sort_direction(value: &str) -> Result<AgendaViewSortDirection, JsValue> {
+    match value {
+        "up" => Ok(AgendaViewSortDirection::Up),
+        "down" => Ok(AgendaViewSortDirection::Down),
+        "keep" => Ok(AgendaViewSortDirection::Keep),
+        other => Err(JsValue::from_str(&format!(
+            "invalid agenda view sort direction: {other}"
+        ))),
+    }
+}
+
+fn parse_optional_refile_targets_request(
+    request_json: Option<&str>,
+) -> Result<RefileTargetsJsonRequest, JsValue> {
+    let Some(request_json) = request_json.map(str::trim).filter(|text| !text.is_empty()) else {
+        return Ok(RefileTargetsJsonRequest::default());
+    };
+    serde_json::from_str(request_json)
+        .map_err(|error| JsValue::from_str(&format!("invalid refile targets request: {error}")))
+}
+
+fn parse_optional_clock_issue_request(
+    request_json: Option<&str>,
+) -> Result<WasmClockIssueProfileRequest, JsValue> {
+    let Some(request_json) = request_json.map(str::trim).filter(|text| !text.is_empty()) else {
+        return Ok(WasmClockIssueProfileRequest::default());
+    };
+    serde_json::from_str(request_json)
+        .map_err(|error| JsValue::from_str(&format!("invalid clock issue request: {error}")))
+}
+
+fn parse_refile_level(kind: &str, value: &str) -> Result<usize, JsValue> {
+    value.parse::<usize>().map_err(|error| {
+        JsValue::from_str(&format!("invalid refile {kind} value `{value}`: {error}"))
+    })
+}
+
+fn refile_outline_path_mode(value: &str) -> Result<RefileOutlinePathMode, JsValue> {
+    match value {
+        "none" => Ok(RefileOutlinePathMode::None),
+        "outline" => Ok(RefileOutlinePathMode::Outline),
+        "file" => Ok(RefileOutlinePathMode::File),
+        "fullFilePath" => Ok(RefileOutlinePathMode::FullFilePath),
+        "bufferName" => Ok(RefileOutlinePathMode::BufferName),
+        "title" => Ok(RefileOutlinePathMode::Title),
+        other => Err(JsValue::from_str(&format!(
+            "invalid refile outline path mode: {other}"
+        ))),
+    }
+}
+
+fn refile_action(value: &str) -> Result<RefileAction, JsValue> {
+    match value {
+        "move" => Ok(RefileAction::Move),
+        "copy" => Ok(RefileAction::Copy),
+        "goto" => Ok(RefileAction::Goto),
+        other => Err(JsValue::from_str(&format!(
+            "invalid refile action: {other}"
+        ))),
+    }
+}
+
+fn refile_insert_position(value: &str) -> Result<RefileInsertPosition, JsValue> {
+    match value {
+        "lastChild" => Ok(RefileInsertPosition::LastChild),
+        "firstChild" => Ok(RefileInsertPosition::FirstChild),
+        other => Err(JsValue::from_str(&format!(
+            "invalid refile insert position: {other}"
+        ))),
+    }
+}
+
+fn refile_parent_creation(value: &str) -> Result<RefileParentCreationMode, JsValue> {
+    match value {
+        "never" => Ok(RefileParentCreationMode::Never),
+        "plan" | "allow" => Ok(RefileParentCreationMode::Plan),
+        "confirm" => Ok(RefileParentCreationMode::Confirm),
+        other => Err(JsValue::from_str(&format!(
+            "invalid refile parent creation mode: {other}"
+        ))),
     }
 }
 

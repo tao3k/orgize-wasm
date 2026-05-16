@@ -39,6 +39,25 @@ Capture row.
     );
     assert_eq!(snapshot["includeExpansion"][0]["minLevel"], 2);
     assert_eq!(snapshot["datetree"][0]["date"], "2026-05-15");
+    assert_eq!(snapshot["progressStats"][0]["title"], "2026");
+    assert_eq!(snapshot["clockRollups"][0]["title"], "2026");
+    assert_eq!(
+        snapshot["clockRollups"][0]["subtreeClock"]["totalSeconds"],
+        0
+    );
+    assert!(snapshot["dynamicBlocks"].as_array().unwrap().is_empty());
+    assert_eq!(snapshot["propertyProfile"]["inheritance"], "all");
+    assert_eq!(
+        snapshot["propertyProfile"]["allowedValues"][0]["descriptorKey"],
+        "VISIBILITY_ALL"
+    );
+    assert_eq!(snapshot["refileTargets"][0]["title"], "2026");
+    assert_eq!(
+        snapshot["refileTargets"][0]["receipts"][0]["spec"]["kind"],
+        "level"
+    );
+    assert!(snapshot["clockTablePlans"].as_array().unwrap().is_empty());
+    assert!(snapshot["clockIssues"].as_array().unwrap().is_empty());
 }
 
 #[test]
@@ -86,6 +105,107 @@ Value src_sh[:exports both]{echo hi}
         datetree["records"][0]["outlinePath"][2],
         "2026-05-15 Friday"
     );
+}
+
+#[test]
+fn wasm_progress_stats_contract_exposes_agent_planning_rollups() {
+    let org = Org::parse(
+        r#"* TODO Parent [1/2] [50%]
+:PROPERTIES:
+:Effort: 1:00
+:ORDERED: t
+:END:
+- [X] done item
+- [ ] open item
+** DONE Child done
+:PROPERTIES:
+:Effort: 0:30
+:END:
+** TODO Child open
+- [-] partial item
+"#,
+    );
+    let progress_stats: Value =
+        serde_json::from_str(&org.progress_stats_json()).expect("progress stats JSON should parse");
+    let records = progress_stats["records"]
+        .as_array()
+        .expect("progress stats records should be an array");
+
+    assert_eq!(progress_stats["schemaVersion"], 1);
+    assert_eq!(records.len(), 3);
+    assert_eq!(records[0]["title"], "Parent [1/2] [50%]");
+    assert_eq!(records[0]["todo"], "todo");
+    assert_eq!(records[0]["descendantTodos"]["total"], 2);
+    assert_eq!(records[0]["descendantTodos"]["done"], 1);
+    assert_eq!(records[0]["descendantTodos"]["open"], 1);
+    assert_eq!(records[0]["checkboxes"]["total"], 3);
+    assert_eq!(records[0]["checkboxes"]["checked"], 1);
+    assert_eq!(records[0]["checkboxes"]["unchecked"], 1);
+    assert_eq!(records[0]["checkboxes"]["partial"], 1);
+    assert_eq!(records[0]["statisticCookies"][0]["kind"], "fraction");
+    assert_eq!(records[0]["statisticCookies"][1]["percent"], 50);
+    assert_eq!(records[0]["effort"]["local"]["raw"], "1:00");
+    assert_eq!(records[0]["effort"]["subtreeTotalSeconds"], 5_400);
+    assert_eq!(records[0]["dependencies"][0]["kind"], "openDescendantTodo");
+    assert_eq!(records[0]["dependencies"][1]["kind"], "openCheckbox");
+    assert_eq!(records[0]["dependencies"][2]["kind"], "orderedProperty");
+    assert_eq!(records[1]["title"], "Child done");
+    assert!(records[1]["dependencies"].as_array().unwrap().is_empty());
+}
+
+#[test]
+fn wasm_task_blockers_contract_exposes_ordered_sibling_evidence() {
+    let org = Org::parse(
+        r#"* TODO Project
+:PROPERTIES:
+:ORDERED: t
+:END:
+** TODO First
+SCHEDULED: <2026-05-15 Fri>
+** TODO Second
+SCHEDULED: <2026-05-15 Fri>
+"#,
+    );
+    let task_blockers: Value =
+        serde_json::from_str(&org.task_blockers_json()).expect("task blockers JSON should parse");
+    let records = task_blockers["records"]
+        .as_array()
+        .expect("task blocker records should be an array");
+
+    assert_eq!(task_blockers["schemaVersion"], 1);
+    assert_eq!(records.len(), 1);
+    assert_eq!(records[0]["kind"], "orderedPreviousSibling");
+    assert_eq!(records[0]["blocked"]["title"], "Second");
+    assert_eq!(records[0]["blocked"]["todoState"], "todo");
+    assert_eq!(records[0]["blocker"]["title"], "First");
+    assert_eq!(records[0]["parent"]["title"], "Project");
+    assert_eq!(
+        records[0]["parent"]["orderedPropertySource"]["start"]["line"],
+        3
+    );
+
+    let agenda_view_request =
+        r#"{"start":{"year":2026,"month":5,"day":15},"end":{"year":2026,"month":5,"day":15}}"#;
+    let agenda_view: Value = serde_json::from_str(
+        &org.agenda_view_json(agenda_view_request)
+            .expect("agenda view JSON should render"),
+    )
+    .expect("agenda view JSON should parse");
+    let cards = agenda_view["cards"]
+        .as_array()
+        .expect("agenda view cards should be an array");
+    let second = cards
+        .iter()
+        .find(|card| card["title"] == "Second")
+        .expect("Second agenda card should exist");
+
+    assert_eq!(second["blockers"][0]["kind"], "orderedPreviousSibling");
+    assert_eq!(second["blockers"][0]["blocker"]["title"], "First");
+    assert!(second["receipts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|receipt| receipt["kind"] == "blockedByOrderedSibling"));
 }
 
 #[test]
@@ -149,13 +269,43 @@ CLOSED: [2026-05-12 Tue]
         .as_array()
         .expect("sparse-tree cards should be an array");
     assert_eq!(sparse_tree["schemaVersion"], 1);
+    assert_eq!(sparse_tree["totalCandidates"], 2);
     assert_eq!(cards.len(), 1);
     assert_eq!(cards[0]["title"], "Agent memory");
     assert_eq!(cards[0]["priority"]["effective"], "A");
     assert_eq!(cards[0]["matches"][0]["kind"], "tag");
+    assert_eq!(cards[0]["receipts"][0]["kind"], "candidate");
+    assert!(cards[0]["receipts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|receipt| receipt["kind"] == "matchExpressionMatched"));
+    assert!(cards[0]["receipts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|receipt| receipt["kind"] == "textMatched"));
     assert_eq!(cards[0]["links"][0]["path"], "id:old-memory");
     assert!(cards[0]["preview"]
         .as_str()
         .unwrap()
         .contains("current memory"));
+
+    let explained: Value = serde_json::from_str(
+        &org.sparse_tree_explain_json(
+            Some("memory.org".to_string()),
+            Some(r#"+agent+TODO="TODO""#.to_string()),
+            Some("current memory".to_string()),
+            Some(false),
+        )
+        .expect("sparse-tree explain query should be valid"),
+    )
+    .expect("sparse-tree explain JSON should parse");
+    let skipped = explained["skipped"]
+        .as_array()
+        .expect("sparse-tree skipped rows should be an array");
+    assert_eq!(skipped.len(), 1);
+    assert_eq!(skipped[0]["title"], "Old memory");
+    assert_eq!(skipped[0]["reason"], "archived");
+    assert_eq!(skipped[0]["receipts"][1]["kind"], "skippedArchived");
 }

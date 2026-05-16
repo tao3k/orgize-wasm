@@ -3,9 +3,9 @@
 use crate::dto_model::{
     WasmAttachmentDirectory, WasmAttachmentDirectorySource, WasmAttachmentLink,
     WasmAttachmentLinkSearch, WasmFileLink, WasmLinkSearch, WasmPlanning, WasmPriority,
-    WasmPriorityProfile, WasmProperty, WasmSourcePosition, WasmSourceRange, WasmTimestamp,
-    WasmTimestampMoment,
+    WasmPriorityProfile, WasmProperty, WasmTimestamp, WasmTimestampMoment,
 };
+use crate::dto_shared_model::{WasmOrgDuration, WasmSourcePosition, WasmSourceRange};
 use orgize::ast::{
     AttachmentDirectorySource, AttachmentIdPathLayout, AttachmentLink, AttachmentLinkSearch,
     AttachmentLinkSearchKind, FileLink, FileLinkPathKind, LinkSearch, LinkSearchKind,
@@ -40,6 +40,14 @@ pub(crate) fn source_position(position: SourcePosition) -> WasmSourcePosition {
     WasmSourcePosition {
         line: position.line,
         column: position.column,
+    }
+}
+
+pub(crate) fn org_duration(duration: &orgize::ast::OrgDuration) -> WasmOrgDuration {
+    WasmOrgDuration {
+        raw: duration.raw.clone(),
+        total_seconds: duration.total_seconds,
+        total_minutes: duration.total_minutes(),
     }
 }
 

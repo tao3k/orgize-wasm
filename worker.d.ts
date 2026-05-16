@@ -1,4 +1,7 @@
 import type {
+  OrgizeAgendaBlockJsonRequestDto,
+  OrgizeAgendaViewJsonRequestDto,
+  OrgizeClockIssueProfileRequestDto,
   OrgizeProjectionDto,
   OrgizeProjectionName,
 } from "./dto.js";
@@ -23,6 +26,9 @@ export interface OrgizeWorkerBaseRequest {
   sparseTreeMatch?: string;
   sparseTreeText?: string;
   sparseTreeIncludeArchived?: boolean;
+  agendaView?: OrgizeAgendaViewJsonRequestDto;
+  agendaBlock?: OrgizeAgendaBlockJsonRequestDto;
+  clockIssueProfile?: OrgizeClockIssueProfileRequestDto;
 }
 
 export interface OrgizeWorkerInitRequest extends OrgizeWorkerBaseRequest {

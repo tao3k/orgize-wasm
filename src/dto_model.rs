@@ -1,5 +1,10 @@
 //! Stable TypeScript-facing DTO models for browser projections.
 
+use crate::dto_clock_model::{WasmClockIssueFinding, WasmClockRollupRecord, WasmClockTablePlan};
+use crate::dto_dynamic_block_model::WasmDynamicBlockRecord;
+use crate::dto_property_profile_model::WasmPropertyProfile;
+use crate::dto_refile_model::WasmRefileTarget;
+use crate::dto_shared_model::{WasmOrgDuration, WasmSourceRange};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -42,7 +47,37 @@ pub(crate) struct WasmSectionIndexResponse {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct WasmSparseTreeResponse {
     pub(crate) schema_version: u8,
+    pub(crate) total_candidates: usize,
     pub(crate) cards: Vec<WasmSparseTreeCard>,
+    pub(crate) skipped: Vec<WasmSparseTreeSkip>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaViewResponse {
+    pub(crate) schema_version: u8,
+    pub(crate) total_candidates: usize,
+    pub(crate) limit: Option<usize>,
+    pub(crate) sort_strategy: Vec<WasmAgendaViewSortSpec>,
+    pub(crate) cards: Vec<WasmAgendaViewCard>,
+    pub(crate) skipped: Vec<WasmAgendaViewSkip>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaBlockViewResponse {
+    pub(crate) schema_version: u8,
+    pub(crate) title: String,
+    pub(crate) total_candidates: usize,
+    pub(crate) sections: Vec<WasmAgendaBlockSectionPlan>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaBlockSectionPlan {
+    pub(crate) index: usize,
+    pub(crate) name: String,
+    pub(crate) plan: WasmAgendaViewResponse,
 }
 
 #[derive(Serialize)]
@@ -89,6 +124,20 @@ pub(crate) struct WasmDateTreeResponse {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct WasmProgressStatsResponse {
+    pub(crate) schema_version: u8,
+    pub(crate) records: Vec<WasmProgressStatsRecord>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTaskBlockersResponse {
+    pub(crate) schema_version: u8,
+    pub(crate) records: Vec<WasmTaskBlockerRecord>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct WasmSnapshotResponse {
     pub(crate) schema_version: u8,
     pub(crate) metadata: WasmMetadataResponse,
@@ -97,25 +146,16 @@ pub(crate) struct WasmSnapshotResponse {
     pub(crate) attachments: Vec<WasmAttachmentRecord>,
     pub(crate) source_blocks: Vec<WasmSourceBlockRecord>,
     pub(crate) column_views: Vec<WasmColumnViewRecord>,
+    pub(crate) dynamic_blocks: Vec<WasmDynamicBlockRecord>,
+    pub(crate) property_profile: WasmPropertyProfile,
+    pub(crate) refile_targets: Vec<WasmRefileTarget>,
     pub(crate) include_expansion: Vec<WasmIncludeExpansionEntry>,
     pub(crate) datetree: Vec<WasmDateTreeEntry>,
+    pub(crate) progress_stats: Vec<WasmProgressStatsRecord>,
+    pub(crate) clock_rollups: Vec<WasmClockRollupRecord>,
+    pub(crate) clock_table_plans: Vec<WasmClockTablePlan>,
+    pub(crate) clock_issues: Vec<WasmClockIssueFinding>,
     pub(crate) lint: Vec<WasmLintFinding>,
-}
-
-#[derive(Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourcePosition {
-    pub(crate) line: usize,
-    pub(crate) column: usize,
-}
-
-#[derive(Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceRange {
-    pub(crate) start: WasmSourcePosition,
-    pub(crate) end: WasmSourcePosition,
-    pub(crate) range_start: u32,
-    pub(crate) range_end: u32,
 }
 
 #[derive(Serialize)]
@@ -170,6 +210,7 @@ pub(crate) struct WasmSparseTreeCard {
     pub(crate) level: usize,
     pub(crate) title: String,
     pub(crate) matches: Vec<WasmSparseTreeMatch>,
+    pub(crate) receipts: Vec<WasmSparseTreeReceipt>,
     pub(crate) preview: Option<String>,
     pub(crate) todo: Option<String>,
     pub(crate) todo_state: Option<&'static str>,
@@ -189,11 +230,174 @@ pub(crate) struct WasmSparseTreeCard {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSparseTreeSkip {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) outline_path: Vec<String>,
+    pub(crate) level: usize,
+    pub(crate) title: String,
+    pub(crate) reason: &'static str,
+    pub(crate) receipts: Vec<WasmSparseTreeReceipt>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct WasmSparseTreeMatch {
     pub(crate) source: WasmSourceRange,
     pub(crate) kind: &'static str,
     pub(crate) key: Option<String>,
     pub(crate) value: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSparseTreeReceipt {
+    pub(crate) kind: &'static str,
+    pub(crate) message: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaViewCard {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) sorted_position: usize,
+    pub(crate) kind: &'static str,
+    pub(crate) display_date: String,
+    pub(crate) target_date: String,
+    pub(crate) target_end_date: Option<String>,
+    pub(crate) time: Option<String>,
+    pub(crate) end_time: Option<String>,
+    pub(crate) title: String,
+    pub(crate) category: Option<String>,
+    pub(crate) todo: Option<String>,
+    pub(crate) todo_state: Option<&'static str>,
+    pub(crate) effective_tags: Vec<String>,
+    pub(crate) blockers: Vec<WasmTaskBlockerRecord>,
+    pub(crate) sort_keys: Vec<WasmAgendaViewSortValue>,
+    pub(crate) receipts: Vec<WasmAgendaViewReceipt>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaViewSkip {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) sorted_position: usize,
+    pub(crate) title: String,
+    pub(crate) reason: &'static str,
+    pub(crate) limit: Option<usize>,
+    pub(crate) blockers: Vec<WasmTaskBlockerRecord>,
+    pub(crate) sort_keys: Vec<WasmAgendaViewSortValue>,
+    pub(crate) receipts: Vec<WasmAgendaViewReceipt>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaViewSortValue {
+    pub(crate) key: &'static str,
+    pub(crate) value: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaViewSortSpec {
+    pub(crate) key: &'static str,
+    pub(crate) direction: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaViewReceipt {
+    pub(crate) kind: &'static str,
+    pub(crate) message: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmProgressStatsRecord {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) outline_path: Vec<String>,
+    pub(crate) level: usize,
+    pub(crate) title: String,
+    pub(crate) todo: &'static str,
+    pub(crate) descendant_todos: WasmProgressTodoSummary,
+    pub(crate) checkboxes: WasmProgressCheckboxSummary,
+    pub(crate) statistic_cookies: Vec<WasmProgressStatisticCookie>,
+    pub(crate) effort: WasmProgressEffortSummary,
+    pub(crate) dependencies: Vec<WasmTaskDependencyRecord>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmProgressTodoSummary {
+    pub(crate) total: u32,
+    pub(crate) done: u32,
+    pub(crate) open: u32,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmProgressCheckboxSummary {
+    pub(crate) total: u32,
+    pub(crate) checked: u32,
+    pub(crate) unchecked: u32,
+    pub(crate) partial: u32,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmProgressStatisticCookie {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) raw: String,
+    pub(crate) kind: &'static str,
+    pub(crate) done: Option<u32>,
+    pub(crate) total: Option<u32>,
+    pub(crate) percent: Option<u8>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmProgressEffortSummary {
+    pub(crate) local: Option<WasmOrgDuration>,
+    pub(crate) subtree_total_seconds: u64,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTaskDependencyRecord {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) kind: &'static str,
+    pub(crate) count: u32,
+    pub(crate) message: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTaskBlockerRecord {
+    pub(crate) kind: &'static str,
+    pub(crate) blocked: WasmTaskBlockerTask,
+    pub(crate) blocker: WasmTaskBlockerTask,
+    pub(crate) parent: WasmTaskBlockerParent,
+    pub(crate) message: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTaskBlockerTask {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) outline_path: Vec<String>,
+    pub(crate) level: usize,
+    pub(crate) title: String,
+    pub(crate) todo: Option<String>,
+    pub(crate) todo_state: Option<&'static str>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTaskBlockerParent {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) ordered_property_source: WasmSourceRange,
+    pub(crate) outline_path: Vec<String>,
+    pub(crate) level: usize,
+    pub(crate) title: String,
 }
 
 #[derive(Serialize)]

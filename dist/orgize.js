@@ -30,6 +30,54 @@ export class Org {
         }
     }
     /**
+     * @param {string} request_json
+     * @returns {string}
+     */
+    agendaBlockJson(request_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            const ptr0 = passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_agendaBlockJson(this.__wbg_ptr, ptr0, len0);
+            var ptr2 = ret[0];
+            var len2 = ret[1];
+            if (ret[3]) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
+     * @param {string} request_json
+     * @returns {string}
+     */
+    agendaViewJson(request_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            const ptr0 = passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_agendaViewJson(this.__wbg_ptr, ptr0, len0);
+            var ptr2 = ret[0];
+            var len2 = ret[1];
+            if (ret[3]) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
      * @returns {string}
      */
     agentMemory() {
@@ -93,6 +141,60 @@ export class Org {
         }
     }
     /**
+     * @param {string | null} [request_json]
+     * @returns {string}
+     */
+    clockIssuesJson(request_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            var ptr0 = isLikeNone(request_json) ? 0 : passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_clockIssuesJson(this.__wbg_ptr, ptr0, len0);
+            var ptr2 = ret[0];
+            var len2 = ret[1];
+            if (ret[3]) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    clockRollupsJson() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.org_clockRollupsJson(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    clockTablePlansJson() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.org_clockTablePlansJson(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
      * @returns {string}
      */
     columnViewsJson() {
@@ -115,6 +217,21 @@ export class Org {
         let deferred1_1;
         try {
             const ret = wasm.org_datetreeJson(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    dynamicBlocksJson() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.org_dynamicBlocksJson(this.__wbg_ptr);
             deferred1_0 = ret[0];
             deferred1_1 = ret[1];
             return getStringFromWasm0(ret[0], ret[1]);
@@ -272,6 +389,84 @@ export class Org {
         return this;
     }
     /**
+     * @returns {string}
+     */
+    progressStatsJson() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.org_progressStatsJson(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    propertyProfileJson() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.org_propertyProfileJson(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @param {string} request_json
+     * @returns {string}
+     */
+    refilePlanJson(request_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            const ptr0 = passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_refilePlanJson(this.__wbg_ptr, ptr0, len0);
+            var ptr2 = ret[0];
+            var len2 = ret[1];
+            if (ret[3]) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
+     * @param {string | null} [request_json]
+     * @returns {string}
+     */
+    refileTargetsJson(request_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            var ptr0 = isLikeNone(request_json) ? 0 : passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_refileTargetsJson(this.__wbg_ptr, ptr0, len0);
+            var ptr2 = ret[0];
+            var len2 = ret[1];
+            if (ret[3]) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
      * @param {string | null} [source_file]
      * @returns {string}
      */
@@ -344,6 +539,37 @@ export class Org {
      * @param {boolean | null} [include_archived]
      * @returns {string}
      */
+    sparseTreeExplainJson(source_file, match_expression, text, include_archived) {
+        let deferred5_0;
+        let deferred5_1;
+        try {
+            var ptr0 = isLikeNone(source_file) ? 0 : passStringToWasm0(source_file, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len0 = WASM_VECTOR_LEN;
+            var ptr1 = isLikeNone(match_expression) ? 0 : passStringToWasm0(match_expression, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len1 = WASM_VECTOR_LEN;
+            var ptr2 = isLikeNone(text) ? 0 : passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len2 = WASM_VECTOR_LEN;
+            const ret = wasm.org_sparseTreeExplainJson(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, isLikeNone(include_archived) ? 0xFFFFFF : include_archived ? 1 : 0);
+            var ptr4 = ret[0];
+            var len4 = ret[1];
+            if (ret[3]) {
+                ptr4 = 0; len4 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred5_0 = ptr4;
+            deferred5_1 = len4;
+            return getStringFromWasm0(ptr4, len4);
+        } finally {
+            wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
+        }
+    }
+    /**
+     * @param {string | null} [source_file]
+     * @param {string | null} [match_expression]
+     * @param {string | null} [text]
+     * @param {boolean | null} [include_archived]
+     * @returns {string}
+     */
     sparseTreeJson(source_file, match_expression, text, include_archived) {
         let deferred5_0;
         let deferred5_1;
@@ -376,6 +602,21 @@ export class Org {
         let deferred1_1;
         try {
             const ret = wasm.org_syntax(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    taskBlockersJson() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.org_taskBlockersJson(this.__wbg_ptr);
             deferred1_0 = ret[0];
             deferred1_1 = ret[1];
             return getStringFromWasm0(ret[0], ret[1]);
