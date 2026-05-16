@@ -1,6 +1,7 @@
 import type {
   OrgizeAgendaBlockJsonRequestDto,
   OrgizeAgendaViewJsonRequestDto,
+  OrgizeAgentCaptureRequestDto,
   OrgizeClockIssueProfileRequestDto,
   OrgizeProjectionDto,
   OrgizeProjectionName,
@@ -28,6 +29,7 @@ export interface OrgizeWorkerBaseRequest {
   sparseTreeIncludeArchived?: boolean;
   agendaView?: OrgizeAgendaViewJsonRequestDto;
   agendaBlock?: OrgizeAgendaBlockJsonRequestDto;
+  capturePlan?: OrgizeAgentCaptureRequestDto;
   clockIssueProfile?: OrgizeClockIssueProfileRequestDto;
 }
 

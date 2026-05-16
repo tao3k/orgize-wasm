@@ -2,6 +2,7 @@
 
 use crate::{
     dto_agenda::{agenda_block_view_response, agenda_view_response},
+    dto_capture::agent_capture_plan_response,
     dto_clock::{
         clock_issue_findings, clock_issues_response, clock_rollup_records, clock_rollups_response,
         clock_table_plans, clock_table_plans_response,
@@ -24,8 +25,9 @@ use crate::{
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
 };
 use orgize::ast::{
-    AgendaBlockViewQuery, AgendaViewQuery, ClockIssueProfile, Document, IncludeExpansionOptions,
-    ParsedAnnotation, RefilePlanRequest, RefileTargetQuery, SparseTreeQuery,
+    AgendaBlockViewQuery, AgendaViewQuery, AgentCaptureRequest, ClockIssueProfile, Document,
+    IncludeExpansionOptions, ParsedAnnotation, RefilePlanRequest, RefileTargetQuery,
+    SparseTreeQuery,
 };
 
 pub(crate) fn outline_json(document: &Document<ParsedAnnotation>) -> String {
@@ -159,6 +161,10 @@ pub(crate) fn dynamic_blocks_json(document: &Document<ParsedAnnotation>) -> Stri
 
 pub(crate) fn property_profile_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&property_profile_response(document))
+}
+
+pub(crate) fn capture_plan_json(request: &AgentCaptureRequest) -> String {
+    to_json(&agent_capture_plan_response(request))
 }
 
 pub(crate) fn refile_targets_json(

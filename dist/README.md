@@ -106,7 +106,8 @@ readFile(require.resolve("orgize/wasm")).then((bytes) => {
 
 4. The WebAssembly API exposes projection methods that return JSON strings:
    `outlineJson`, `metadataJson`, `lintJson`, `sectionIndexJson`,
-   `sparseTreeJson`, `attachmentsJson`, `sourceBlocksJson`,
+   `sparseTreeJson`, `agendaViewJson`, `agendaBlockJson`,
+   `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`,
    `columnViewsJson`, `includeExpansionJson`, `datetreeJson`, and
    `snapshotJson`. Worker users receive parsed objects;
 

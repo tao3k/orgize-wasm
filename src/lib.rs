@@ -2,6 +2,9 @@
 
 mod bindings;
 mod dto_agenda;
+mod dto_capture;
+mod dto_capture_model;
+mod dto_capture_request;
 mod dto_clock;
 mod dto_clock_model;
 mod dto_common;
@@ -15,6 +18,7 @@ mod dto_property_profile;
 mod dto_property_profile_model;
 mod dto_refile;
 mod dto_refile_model;
+mod dto_refile_request;
 mod dto_shared_model;
 
 pub use bindings::Org;

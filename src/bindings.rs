@@ -1,13 +1,16 @@
 //! `wasm-bindgen` facade for parsing and rendering Org documents.
 
-use crate::{dto_clock_model::WasmClockIssueProfileRequest, dto_projection};
+use crate::{
+    dto_capture_request::AgentCaptureJsonRequest,
+    dto_clock_model::WasmClockIssueProfileRequest,
+    dto_projection,
+    dto_refile_request::{parse_optional_refile_targets_request, parse_refile_plan_request},
+};
 use orgize::{
     ast::{
         AgendaBlockViewQuery, AgendaDate, AgendaQuery, AgendaViewQuery, AgendaViewSortDirection,
         AgendaViewSortKey, AgendaViewSortSpec, AgentMemoryQuery, AgentPlanningQuery,
-        ClockIssueProfile, MemoryQuery, ParsedAst, RefileAction, RefileInsertPosition,
-        RefileOutlinePathMode, RefileParentCreationMode, RefilePlanRequest, RefileTargetQuery,
-        RefileTargetSpec,
+        ClockIssueProfile, MemoryQuery, ParsedAst,
     },
     export::{from_fn, Container, Event},
     rowan::ast::AstNode,
@@ -63,32 +66,6 @@ struct AgendaBlockJsonRequest {
 struct AgendaBlockSectionJsonRequest {
     name: String,
     query: AgendaViewJsonRequest,
-}
-
-#[derive(Default, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RefileTargetsJsonRequest {
-    source_file: Option<String>,
-    outline_path_mode: Option<String>,
-    specs: Option<Vec<RefileTargetSpecJson>>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RefileTargetSpecJson {
-    kind: String,
-    value: Option<String>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RefilePlanJsonRequest {
-    source_file: Option<String>,
-    source_outline_path: Vec<String>,
-    target_outline_path: Vec<String>,
-    action: Option<String>,
-    insert_position: Option<String>,
-    parent_creation: Option<String>,
 }
 
 impl AgendaViewJsonDate {
@@ -299,24 +276,30 @@ impl Org {
         dto_projection::property_profile_json(&document)
     }
 
+    #[wasm_bindgen(js_name = capturePlanJson)]
+    pub fn capture_plan_json(&self, request_json: &str) -> Result<String, JsValue> {
+        let request: AgentCaptureJsonRequest =
+            serde_json::from_str(request_json).map_err(|error| {
+                JsValue::from_str(&format!("invalid capture plan request: {error}"))
+            })?;
+        Ok(dto_projection::capture_plan_json(&request.into_request()?))
+    }
+
     #[wasm_bindgen(js_name = refileTargetsJson)]
     pub fn refile_targets_json(&self, request_json: Option<String>) -> Result<String, JsValue> {
-        let request = parse_optional_refile_targets_request(request_json.as_deref())?;
         let document = self.document();
         Ok(dto_projection::refile_targets_json(
             &document,
-            &request.into_query()?,
+            &parse_optional_refile_targets_request(request_json.as_deref())?,
         ))
     }
 
     #[wasm_bindgen(js_name = refilePlanJson)]
     pub fn refile_plan_json(&self, request_json: &str) -> Result<String, JsValue> {
-        let request: RefilePlanJsonRequest = serde_json::from_str(request_json)
-            .map_err(|error| JsValue::from_str(&format!("invalid refile plan request: {error}")))?;
         let document = self.document();
         Ok(dto_projection::refile_plan_json(
             &document,
-            &request.into_plan_request()?,
+            &parse_refile_plan_request(request_json)?,
         ))
     }
 
@@ -504,59 +487,6 @@ impl AgendaBlockJsonRequest {
     }
 }
 
-impl RefileTargetsJsonRequest {
-    fn into_query(self) -> Result<RefileTargetQuery, JsValue> {
-        let mut query = RefileTargetQuery::new();
-        if let Some(source_file) = self.source_file {
-            query = query.source_file(source_file);
-        }
-        if let Some(mode) = self.outline_path_mode {
-            query = query.outline_path_mode(refile_outline_path_mode(&mode)?);
-        }
-        for spec in self.specs.unwrap_or_default() {
-            query = query.spec(spec.into_spec()?);
-        }
-        Ok(query)
-    }
-}
-
-impl RefileTargetSpecJson {
-    fn into_spec(self) -> Result<RefileTargetSpec, JsValue> {
-        let value = self.value.unwrap_or_default();
-        match self.kind.as_str() {
-            "all" => Ok(RefileTargetSpec::All),
-            "tag" => Ok(RefileTargetSpec::Tag(value)),
-            "todo" => Ok(RefileTargetSpec::Todo(value)),
-            "level" => parse_refile_level("level", &value).map(RefileTargetSpec::Level),
-            "maxLevel" => parse_refile_level("maxLevel", &value).map(RefileTargetSpec::MaxLevel),
-            "regexp" => Ok(RefileTargetSpec::Regexp(value)),
-            other => Err(JsValue::from_str(&format!(
-                "invalid refile target spec kind: {other}"
-            ))),
-        }
-    }
-}
-
-impl RefilePlanJsonRequest {
-    fn into_plan_request(self) -> Result<RefilePlanRequest, JsValue> {
-        let mut request =
-            RefilePlanRequest::new(self.source_outline_path, self.target_outline_path);
-        if let Some(source_file) = self.source_file {
-            request = request.source_file(source_file);
-        }
-        if let Some(action) = self.action {
-            request = request.action(refile_action(&action)?);
-        }
-        if let Some(insert_position) = self.insert_position {
-            request = request.insert_position(refile_insert_position(&insert_position)?);
-        }
-        if let Some(parent_creation) = self.parent_creation {
-            request = request.parent_creation(refile_parent_creation(&parent_creation)?);
-        }
-        Ok(request)
-    }
-}
-
 impl WasmClockIssueProfileRequest {
     fn into_profile(self) -> ClockIssueProfile {
         let mut profile = ClockIssueProfile::org_default();
@@ -615,16 +545,6 @@ fn agenda_view_sort_direction(value: &str) -> Result<AgendaViewSortDirection, Js
     }
 }
 
-fn parse_optional_refile_targets_request(
-    request_json: Option<&str>,
-) -> Result<RefileTargetsJsonRequest, JsValue> {
-    let Some(request_json) = request_json.map(str::trim).filter(|text| !text.is_empty()) else {
-        return Ok(RefileTargetsJsonRequest::default());
-    };
-    serde_json::from_str(request_json)
-        .map_err(|error| JsValue::from_str(&format!("invalid refile targets request: {error}")))
-}
-
 fn parse_optional_clock_issue_request(
     request_json: Option<&str>,
 ) -> Result<WasmClockIssueProfileRequest, JsValue> {
@@ -633,58 +553,6 @@ fn parse_optional_clock_issue_request(
     };
     serde_json::from_str(request_json)
         .map_err(|error| JsValue::from_str(&format!("invalid clock issue request: {error}")))
-}
-
-fn parse_refile_level(kind: &str, value: &str) -> Result<usize, JsValue> {
-    value.parse::<usize>().map_err(|error| {
-        JsValue::from_str(&format!("invalid refile {kind} value `{value}`: {error}"))
-    })
-}
-
-fn refile_outline_path_mode(value: &str) -> Result<RefileOutlinePathMode, JsValue> {
-    match value {
-        "none" => Ok(RefileOutlinePathMode::None),
-        "outline" => Ok(RefileOutlinePathMode::Outline),
-        "file" => Ok(RefileOutlinePathMode::File),
-        "fullFilePath" => Ok(RefileOutlinePathMode::FullFilePath),
-        "bufferName" => Ok(RefileOutlinePathMode::BufferName),
-        "title" => Ok(RefileOutlinePathMode::Title),
-        other => Err(JsValue::from_str(&format!(
-            "invalid refile outline path mode: {other}"
-        ))),
-    }
-}
-
-fn refile_action(value: &str) -> Result<RefileAction, JsValue> {
-    match value {
-        "move" => Ok(RefileAction::Move),
-        "copy" => Ok(RefileAction::Copy),
-        "goto" => Ok(RefileAction::Goto),
-        other => Err(JsValue::from_str(&format!(
-            "invalid refile action: {other}"
-        ))),
-    }
-}
-
-fn refile_insert_position(value: &str) -> Result<RefileInsertPosition, JsValue> {
-    match value {
-        "lastChild" => Ok(RefileInsertPosition::LastChild),
-        "firstChild" => Ok(RefileInsertPosition::FirstChild),
-        other => Err(JsValue::from_str(&format!(
-            "invalid refile insert position: {other}"
-        ))),
-    }
-}
-
-fn refile_parent_creation(value: &str) -> Result<RefileParentCreationMode, JsValue> {
-    match value {
-        "never" => Ok(RefileParentCreationMode::Never),
-        "plan" | "allow" => Ok(RefileParentCreationMode::Plan),
-        "confirm" => Ok(RefileParentCreationMode::Confirm),
-        other => Err(JsValue::from_str(&format!(
-            "invalid refile parent creation mode: {other}"
-        ))),
-    }
 }
 
 impl Org {

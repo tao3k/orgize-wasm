@@ -32,6 +32,12 @@ SCHEDULED: <2026-05-15 Fri 13:00>
     assert_eq!(cards.len(), 2);
     assert_eq!(cards[0]["title"], "Deadline");
     assert_eq!(cards[0]["kind"], "deadline");
+    assert!(cards[0]["urgency"]["total"].as_i64().unwrap() > 0);
+    assert!(cards[0]["urgency"]["ingredients"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|ingredient| ingredient["kind"] == "deadline"));
     assert_eq!(cards[0]["sortKeys"][0]["key"], "displayDate");
     assert_eq!(cards[0]["receipts"][0]["kind"], "queryMatched");
     assert_eq!(cards[0]["receipts"][2]["kind"], "accepted");
@@ -39,6 +45,7 @@ SCHEDULED: <2026-05-15 Fri 13:00>
     assert_eq!(skipped[0]["title"], "Afternoon");
     assert_eq!(skipped[0]["reason"], "limit");
     assert_eq!(skipped[0]["limit"], 2);
+    assert!(skipped[0]["urgency"]["total"].as_i64().unwrap() > 0);
     assert_eq!(skipped[0]["receipts"][2]["kind"], "skippedLimit");
 }
 

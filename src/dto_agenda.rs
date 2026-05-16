@@ -4,9 +4,9 @@ use crate::{
     dto_common::{section_source, todo_state},
     dto_document::task_blocker_record,
     dto_model::{
-        WasmAgendaBlockSectionPlan, WasmAgendaBlockViewResponse, WasmAgendaViewCard,
-        WasmAgendaViewReceipt, WasmAgendaViewResponse, WasmAgendaViewSkip, WasmAgendaViewSortSpec,
-        WasmAgendaViewSortValue,
+        WasmAgendaBlockSectionPlan, WasmAgendaBlockViewResponse, WasmAgendaUrgencyIngredient,
+        WasmAgendaUrgencyScore, WasmAgendaViewCard, WasmAgendaViewReceipt, WasmAgendaViewResponse,
+        WasmAgendaViewSkip, WasmAgendaViewSortSpec, WasmAgendaViewSortValue,
     },
 };
 use orgize::ast::{
@@ -79,6 +79,7 @@ fn agenda_view_card(card: &orgize::ast::AgendaViewCard) -> WasmAgendaViewCard {
         todo_state: card.todo.as_ref().map(todo_state),
         effective_tags: card.effective_tags.clone(),
         blockers: card.blockers.iter().map(task_blocker_record).collect(),
+        urgency: agenda_urgency_score(&card.urgency),
         sort_keys: card.sort_keys.iter().map(agenda_view_sort_value).collect(),
         receipts: card.receipts.iter().map(agenda_view_receipt).collect(),
     }
@@ -94,8 +95,24 @@ fn agenda_view_skip(skip: &orgize::ast::AgendaViewSkip) -> WasmAgendaViewSkip {
             AgendaViewSkipReason::Limit { limit } => Some(limit),
         },
         blockers: skip.blockers.iter().map(task_blocker_record).collect(),
+        urgency: agenda_urgency_score(&skip.urgency),
         sort_keys: skip.sort_keys.iter().map(agenda_view_sort_value).collect(),
         receipts: skip.receipts.iter().map(agenda_view_receipt).collect(),
+    }
+}
+
+fn agenda_urgency_score(score: &orgize::ast::AgendaUrgencyScore) -> WasmAgendaUrgencyScore {
+    WasmAgendaUrgencyScore {
+        total: score.total,
+        ingredients: score
+            .ingredients
+            .iter()
+            .map(|ingredient| WasmAgendaUrgencyIngredient {
+                kind: ingredient.kind.as_str(),
+                score: ingredient.score,
+                message: ingredient.message.clone(),
+            })
+            .collect(),
     }
 }
 

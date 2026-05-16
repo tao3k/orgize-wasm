@@ -33,6 +33,7 @@ const projectionFor = (
   sparseTreeIncludeArchived,
   agendaView,
   agendaBlock,
+  capturePlan,
   clockIssueProfile
 ) => {
   switch (projection) {
@@ -63,6 +64,11 @@ const projectionFor = (
         throw new Error("agendaBlock projection requires sections");
       }
       return parseJson(org.agendaBlockJson(JSON.stringify(agendaBlock)));
+    case "capturePlan":
+      if (!capturePlan || !capturePlan.kind || !capturePlan.title) {
+        throw new Error("capturePlan projection requires kind and title");
+      }
+      return parseJson(org.capturePlanJson(JSON.stringify(capturePlan)));
     case "clockIssues":
       return parseJson(
         org.clockIssuesJson(
@@ -162,6 +168,7 @@ const handleMessage = async (message) => {
           message.sparseTreeIncludeArchived,
           message.agendaView,
           message.agendaBlock,
+          message.capturePlan,
           message.clockIssueProfile
         );
         break;
@@ -187,6 +194,7 @@ const handleMessage = async (message) => {
           message.sparseTreeIncludeArchived,
           message.agendaView,
           message.agendaBlock,
+          message.capturePlan,
           message.clockIssueProfile
         );
         break;
@@ -202,6 +210,7 @@ const handleMessage = async (message) => {
           message.sparseTreeIncludeArchived,
           message.agendaView,
           message.agendaBlock,
+          message.capturePlan,
           message.clockIssueProfile
         );
         break;

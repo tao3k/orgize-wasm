@@ -449,6 +449,25 @@ export interface OrgizeAgendaViewReceiptDto {
   message: string;
 }
 
+export interface OrgizeAgendaUrgencyIngredientDto {
+  kind:
+    | "priority"
+    | "deadline"
+    | "scheduled"
+    | "todoState"
+    | "timeOfDay"
+    | "tags"
+    | "category"
+    | "occurrence";
+  score: number;
+  message: string;
+}
+
+export interface OrgizeAgendaUrgencyScoreDto {
+  total: number;
+  ingredients: OrgizeAgendaUrgencyIngredientDto[];
+}
+
 export interface OrgizeAgendaViewCardDto {
   source: OrgizeSourceRangeDto;
   sortedPosition: number;
@@ -464,6 +483,7 @@ export interface OrgizeAgendaViewCardDto {
   todoState?: "todo" | "done" | null;
   effectiveTags: string[];
   blockers: OrgizeTaskBlockerRecordDto[];
+  urgency: OrgizeAgendaUrgencyScoreDto;
   sortKeys: OrgizeAgendaViewSortValueDto[];
   receipts: OrgizeAgendaViewReceiptDto[];
 }
@@ -475,6 +495,7 @@ export interface OrgizeAgendaViewSkipDto {
   reason: string;
   limit?: number | null;
   blockers: OrgizeTaskBlockerRecordDto[];
+  urgency: OrgizeAgendaUrgencyScoreDto;
   sortKeys: OrgizeAgendaViewSortValueDto[];
   receipts: OrgizeAgendaViewReceiptDto[];
 }
@@ -704,6 +725,140 @@ export interface OrgizePropertyProfileDto {
 export interface OrgizePropertyProfileResponseDto {
   schemaVersion: 1;
   profile: OrgizePropertyProfileDto;
+}
+
+export type OrgizeAgentCaptureKindDto =
+  | "idea"
+  | "articleNote"
+  | "task"
+  | "decision"
+  | "preference"
+  | "correction"
+  | "memoryCandidate"
+  | "evidence"
+  | "note";
+
+export type OrgizeAgentCaptureTargetKindDto =
+  | "inbox"
+  | "datetree"
+  | "outlinePath"
+  | "currentSection";
+
+export type OrgizeAgentCaptureInsertPositionDto =
+  | "append"
+  | "prepend"
+  | "firstChild"
+  | "lastChild";
+
+export type OrgizeAgentCaptureSourceKindDto =
+  | "conversation"
+  | "url"
+  | "file"
+  | "selection"
+  | "article"
+  | "code"
+  | "other";
+
+export type OrgizeAgentCaptureMemoryPolicyDto =
+  | "none"
+  | "candidate"
+  | "background"
+  | "decision"
+  | "transient"
+  | "supersedes";
+
+export interface OrgizeAgentCaptureDateDto {
+  year: number;
+  month: number;
+  day: number;
+}
+
+export interface OrgizeAgentCaptureTimestampDto
+  extends OrgizeAgentCaptureDateDto {
+  hour?: number | null;
+  minute?: number | null;
+}
+
+export interface OrgizeAgentCaptureTargetRequestDto {
+  kind: OrgizeAgentCaptureTargetKindDto;
+  sourceFile?: string | null;
+  outlinePath?: string[] | null;
+  date?: OrgizeAgentCaptureDateDto | null;
+  insertPosition?: OrgizeAgentCaptureInsertPositionDto | null;
+}
+
+export interface OrgizeAgentCaptureSourceDto {
+  kind?: OrgizeAgentCaptureSourceKindDto | null;
+  actor?: string | null;
+  uri?: string | null;
+  label?: string | null;
+}
+
+export interface OrgizeAgentCapturePropertyDto {
+  key: string;
+  value: string;
+}
+
+export interface OrgizeAgentCaptureLinkDto {
+  url: string;
+  label?: string | null;
+}
+
+export interface OrgizeAgentCaptureRequestDto {
+  kind: OrgizeAgentCaptureKindDto;
+  title: string;
+  body?: string | null;
+  target?: OrgizeAgentCaptureTargetRequestDto | null;
+  source?: OrgizeAgentCaptureSourceDto | null;
+  capturedAt?: OrgizeAgentCaptureTimestampDto | null;
+  tags?: string[] | null;
+  properties?: OrgizeAgentCapturePropertyDto[] | null;
+  quote?: string | null;
+  links?: OrgizeAgentCaptureLinkDto[] | null;
+  memoryPolicy?: OrgizeAgentCaptureMemoryPolicyDto | null;
+  requiresConfirmation?: boolean | null;
+}
+
+export interface OrgizeAgentCaptureTargetDto {
+  kind: OrgizeAgentCaptureTargetKindDto;
+  sourceFile?: string | null;
+  outlinePath: string[];
+  date?: OrgizeAgentCaptureDateDto | null;
+  insertPosition: OrgizeAgentCaptureInsertPositionDto;
+}
+
+export interface OrgizeAgentCaptureReceiptDto {
+  kind:
+    | "nonMutating"
+    | "nativeOrgEntry"
+    | "agentInterpreted"
+    | "sourceProvenance"
+    | "memoryPolicy"
+    | "requiresConfirmation";
+  message: string;
+}
+
+export interface OrgizeAgentCaptureWarningDto {
+  kind:
+    | "emptyTitle"
+    | "emptyBody"
+    | "sanitizedTag"
+    | "sanitizedPropertyKey"
+    | "runtimeOwnedTarget";
+  message: string;
+}
+
+export interface OrgizeAgentCapturePlanDto {
+  target: OrgizeAgentCaptureTargetDto;
+  orgEntry: string;
+  receipts: OrgizeAgentCaptureReceiptDto[];
+  warnings: OrgizeAgentCaptureWarningDto[];
+  requiresConfirmation: boolean;
+}
+
+export interface OrgizeAgentCapturePlanResponseDto {
+  schemaVersion: 1;
+  plan: OrgizeAgentCapturePlanDto;
 }
 
 export type OrgizeRefileOutlinePathModeDto =
@@ -1153,6 +1308,7 @@ export type OrgizeProjectionName =
   | "columnViews"
   | "dynamicBlocks"
   | "propertyProfile"
+  | "capturePlan"
   | "refileTargets"
   | "refilePlan"
   | "includeExpansion"
@@ -1178,6 +1334,7 @@ export type OrgizeProjectionDto =
   | OrgizeColumnViewsResponseDto
   | OrgizeDynamicBlocksResponseDto
   | OrgizePropertyProfileResponseDto
+  | OrgizeAgentCapturePlanResponseDto
   | OrgizeRefileTargetIndexResponseDto
   | OrgizeRefilePlanResponseDto
   | OrgizeIncludeExpansionResponseDto

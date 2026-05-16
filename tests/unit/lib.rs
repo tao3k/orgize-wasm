@@ -1,5 +1,7 @@
 #[path = "dto_agenda.rs"]
 mod dto_agenda;
+#[path = "dto_capture.rs"]
+mod dto_capture;
 #[path = "dto_clock.rs"]
 mod dto_clock;
 #[path = "dto_contract.rs"]

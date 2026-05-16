@@ -272,6 +272,7 @@ pub(crate) struct WasmAgendaViewCard {
     pub(crate) todo_state: Option<&'static str>,
     pub(crate) effective_tags: Vec<String>,
     pub(crate) blockers: Vec<WasmTaskBlockerRecord>,
+    pub(crate) urgency: WasmAgendaUrgencyScore,
     pub(crate) sort_keys: Vec<WasmAgendaViewSortValue>,
     pub(crate) receipts: Vec<WasmAgendaViewReceipt>,
 }
@@ -285,8 +286,24 @@ pub(crate) struct WasmAgendaViewSkip {
     pub(crate) reason: &'static str,
     pub(crate) limit: Option<usize>,
     pub(crate) blockers: Vec<WasmTaskBlockerRecord>,
+    pub(crate) urgency: WasmAgendaUrgencyScore,
     pub(crate) sort_keys: Vec<WasmAgendaViewSortValue>,
     pub(crate) receipts: Vec<WasmAgendaViewReceipt>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaUrgencyScore {
+    pub(crate) total: i32,
+    pub(crate) ingredients: Vec<WasmAgendaUrgencyIngredient>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgendaUrgencyIngredient {
+    pub(crate) kind: &'static str,
+    pub(crate) score: i32,
+    pub(crate) message: String,
 }
 
 #[derive(Serialize)]
