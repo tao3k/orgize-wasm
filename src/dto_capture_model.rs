@@ -14,9 +14,25 @@ pub(crate) struct WasmAgentCapturePlanResponse {
 pub(crate) struct WasmAgentCapturePlan {
     pub(crate) target: WasmAgentCaptureTarget,
     pub(crate) org_entry: String,
+    pub(crate) application: WasmAgentCaptureApplication,
     pub(crate) receipts: Vec<WasmAgentCaptureReceipt>,
     pub(crate) warnings: Vec<WasmAgentCaptureWarning>,
     pub(crate) requires_confirmation: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgentCaptureApplication {
+    pub(crate) action: &'static str,
+    pub(crate) target: WasmAgentCaptureTarget,
+    pub(crate) preconditions: Vec<WasmAgentCaptureApplicationPrecondition>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmAgentCaptureApplicationPrecondition {
+    pub(crate) kind: &'static str,
+    pub(crate) message: String,
 }
 
 #[derive(Serialize)]

@@ -767,6 +767,18 @@ export type OrgizeAgentCaptureMemoryPolicyDto =
   | "transient"
   | "supersedes";
 
+export type OrgizeAgentCaptureApplicationActionDto =
+  | "insertOrgEntry"
+  | "resolveRuntimeTarget";
+
+export type OrgizeAgentCaptureApplicationPreconditionKindDto =
+  | "userConfirmation"
+  | "sourceFileResolution"
+  | "writeLock"
+  | "datetreeResolution"
+  | "outlinePathResolution"
+  | "currentSectionResolution";
+
 export interface OrgizeAgentCaptureDateDto {
   year: number;
   month: number;
@@ -834,7 +846,8 @@ export interface OrgizeAgentCaptureReceiptDto {
     | "agentInterpreted"
     | "sourceProvenance"
     | "memoryPolicy"
-    | "requiresConfirmation";
+    | "requiresConfirmation"
+    | "applicationPlan";
   message: string;
 }
 
@@ -851,9 +864,21 @@ export interface OrgizeAgentCaptureWarningDto {
 export interface OrgizeAgentCapturePlanDto {
   target: OrgizeAgentCaptureTargetDto;
   orgEntry: string;
+  application: OrgizeAgentCaptureApplicationDto;
   receipts: OrgizeAgentCaptureReceiptDto[];
   warnings: OrgizeAgentCaptureWarningDto[];
   requiresConfirmation: boolean;
+}
+
+export interface OrgizeAgentCaptureApplicationDto {
+  action: OrgizeAgentCaptureApplicationActionDto;
+  target: OrgizeAgentCaptureTargetDto;
+  preconditions: OrgizeAgentCaptureApplicationPreconditionDto[];
+}
+
+export interface OrgizeAgentCaptureApplicationPreconditionDto {
+  kind: OrgizeAgentCaptureApplicationPreconditionKindDto;
+  message: string;
 }
 
 export interface OrgizeAgentCapturePlanResponseDto {

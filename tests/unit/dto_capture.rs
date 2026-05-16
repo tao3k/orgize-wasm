@@ -59,11 +59,26 @@ fn wasm_capture_plan_contract_renders_agent_native_org_preview() {
         .as_str()
         .unwrap()
         .contains("[[https://example.test/agent-capture][Agent capture article]]"));
+    assert_eq!(response["plan"]["application"]["action"], "insertOrgEntry");
+    assert_eq!(
+        response["plan"]["application"]["target"]["sourceFile"],
+        "notes/inbox.org"
+    );
+    assert!(response["plan"]["application"]["preconditions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|precondition| precondition["kind"] == "writeLock"));
     assert!(response["plan"]["receipts"]
         .as_array()
         .unwrap()
         .iter()
         .any(|receipt| receipt["kind"] == "nonMutating"));
+    assert!(response["plan"]["receipts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|receipt| receipt["kind"] == "applicationPlan"));
     assert_eq!(
         response["plan"]["warnings"][0]["kind"],
         "sanitizedPropertyKey"

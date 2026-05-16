@@ -1,10 +1,14 @@
 //! Agent capture plan DTO projection.
 
 use crate::dto_capture_model::{
-    WasmAgentCaptureDate, WasmAgentCapturePlan, WasmAgentCapturePlanResponse,
-    WasmAgentCaptureReceipt, WasmAgentCaptureTarget, WasmAgentCaptureWarning,
+    WasmAgentCaptureApplication, WasmAgentCaptureApplicationPrecondition, WasmAgentCaptureDate,
+    WasmAgentCapturePlan, WasmAgentCapturePlanResponse, WasmAgentCaptureReceipt,
+    WasmAgentCaptureTarget, WasmAgentCaptureWarning,
 };
-use orgize::ast::{agent_capture_plan, AgendaDate, AgentCapturePlan, AgentCaptureRequest};
+use orgize::ast::{
+    agent_capture_plan, AgendaDate, AgentCaptureApplication, AgentCapturePlan, AgentCaptureRequest,
+    AgentCaptureTarget,
+};
 
 pub(crate) fn agent_capture_plan_response(
     request: &AgentCaptureRequest,
@@ -25,6 +29,7 @@ fn wasm_agent_capture_plan(plan: &AgentCapturePlan) -> WasmAgentCapturePlan {
             insert_position: plan.target.insert_position.as_str(),
         },
         org_entry: plan.org_entry.clone(),
+        application: wasm_agent_capture_application(&plan.application),
         receipts: plan
             .receipts
             .iter()
@@ -42,6 +47,33 @@ fn wasm_agent_capture_plan(plan: &AgentCapturePlan) -> WasmAgentCapturePlan {
             })
             .collect(),
         requires_confirmation: plan.requires_confirmation,
+    }
+}
+
+fn wasm_agent_capture_application(
+    application: &AgentCaptureApplication,
+) -> WasmAgentCaptureApplication {
+    WasmAgentCaptureApplication {
+        action: application.action.as_str(),
+        target: wasm_agent_capture_target(&application.target),
+        preconditions: application
+            .preconditions
+            .iter()
+            .map(|precondition| WasmAgentCaptureApplicationPrecondition {
+                kind: precondition.kind.as_str(),
+                message: precondition.message.clone(),
+            })
+            .collect(),
+    }
+}
+
+fn wasm_agent_capture_target(target: &AgentCaptureTarget) -> WasmAgentCaptureTarget {
+    WasmAgentCaptureTarget {
+        kind: target.kind.as_str(),
+        source_file: target.source_file.clone(),
+        outline_path: target.outline_path.clone(),
+        date: target.date.map(capture_date),
+        insert_position: target.insert_position.as_str(),
     }
 }
 
