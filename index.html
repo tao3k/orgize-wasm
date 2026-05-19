@@ -26,17 +26,49 @@
         height: 100%;
         margin: 0;
         overflow: hidden;
+        width: 100%;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+      }
+
+      #workspace {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: row;
+        gap: 16px;
+        margin: 16px;
+        min-height: 0;
+        min-width: 0;
+        width: calc(100vw - 32px);
       }
 
       .bordered {
         min-width: 0;
         overflow: hidden;
-        width: 50%;
-        flex: 1;
+        flex: 1 1 0;
         display: flex;
         flex-direction: column;
         border: 1px solid #dbdbdb;
         border-radius: 4px;
+      }
+
+      .output-pane {
+        margin: 0;
+        max-width: none;
+        padding: 0;
+      }
+
+      .rendered-html {
+        margin: 0;
+        max-width: none;
+        min-width: 0;
+        padding: 1.25rem 1.5rem;
       }
 
       #took {
@@ -103,7 +135,7 @@
         color: #b42318;
       }
 
-      .markdown-body a[data-range] {
+      #result a[data-range] {
         color: #485fc7;
         cursor: pointer;
       }
@@ -125,24 +157,21 @@
         white-space: nowrap;
         width: 12rem;
       }
+
+      @media (max-width: 720px) {
+        #workspace {
+          flex-direction: column;
+        }
+      }
     </style>
   </head>
-  <body style="height: 100%; display: flex">
-    <div
-      style="
-        margin: 16px;
-        display: flex;
-        flex-direction: row;
-        flex: 1;
-        min-height: 0;
-        gap: 16px;
-      "
-    >
+  <body>
+    <div id="workspace">
       <div class="bordered">
         <div style="height: 100%" id="editor"></div>
       </div>
 
-      <div class="bordered markdown-body">
+      <div class="bordered output-pane">
         <div id="tabsList">
           <span class="is-active" data-value="html-rendered">
             HTML (rendered)
@@ -194,7 +223,7 @@
           case "html-rendered": {
             const html = injectHeadingClass(org.html());
             result.innerHTML =
-              "<div style='padding:1.25rem 1.5rem'>" + html + "</div>";
+              "<div class='markdown-body rendered-html'>" + html + "</div>";
             renderMathInElement(result, {
               delimiters: [
                 { left: "$$", right: "$$", display: true },
@@ -414,7 +443,7 @@
       ];
 
       return `
-        <div class="feature-overview">
+        <div class="markdown-body feature-overview">
           <h2>Parser v2 Feature Surface</h2>
           <table>
             <tbody>
