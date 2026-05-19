@@ -108,6 +108,43 @@ Value src_sh[:exports both]{echo hi}
 }
 
 #[test]
+fn wasm_org_elements_contract_exposes_tag_vocabulary_and_source_blocks() {
+    let org = Org::parse(
+        r#"#+TAGS: EMACS (e) COURSE (c) EXERCISE (ex) READ(r)
+#+PYTHON: print("explicit host execution only")
+
+* TODO Browser binding :EMACS:READ:
+#+begin_src python :results output :var topic="org-elements"
+print(topic)
+#+end_src
+"#,
+    );
+
+    let metadata: Value =
+        serde_json::from_str(&org.metadata_json()).expect("metadata JSON should parse");
+    assert_eq!(metadata["tagDefinitions"][0]["name"], "EMACS");
+    assert_eq!(metadata["tagDefinitions"][0]["shortcut"], "e");
+    assert_eq!(metadata["tagDefinitions"][2]["shortcut"], "ex");
+    assert_eq!(metadata["tagDefinitions"][3]["shortcut"], "r");
+
+    let payload: Value = serde_json::from_str(&org.org_elements_json()).expect("Org elements JSON");
+    assert_eq!(payload["schemaVersion"], 1);
+    assert_eq!(payload["sections"][0]["title"], "Browser binding");
+    assert_eq!(payload["sections"][0]["todo"], "TODO");
+    assert_eq!(payload["sections"][0]["tags"][0], "EMACS");
+    assert_eq!(payload["sourceBlocks"][0]["language"], "python");
+    assert_eq!(
+        payload["sourceBlocks"][0]["normalizedHeaderArgs"]
+            .as_array()
+            .expect("normalized args")
+            .iter()
+            .find(|arg| arg["kind"] == "var")
+            .and_then(|arg| arg["variable"]["name"].as_str()),
+        Some("topic")
+    );
+}
+
+#[test]
 fn wasm_progress_stats_contract_exposes_agent_planning_rollups() {
     let org = Org::parse(
         r#"* TODO Parent [1/2] [50%]

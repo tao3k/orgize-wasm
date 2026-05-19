@@ -22,6 +22,7 @@ pub(crate) struct WasmMetadataResponse {
     pub(crate) properties: Vec<WasmProperty>,
     pub(crate) keywords: Vec<WasmKeyword>,
     pub(crate) filetags: Vec<String>,
+    pub(crate) tag_definitions: Vec<WasmTagDefinition>,
     pub(crate) export_settings: WasmExportSettings,
     pub(crate) link_abbreviations: Vec<WasmLinkAbbreviation>,
     pub(crate) includes: Vec<WasmIncludeDirective>,
@@ -724,6 +725,14 @@ pub(crate) struct WasmKeyword {
 pub(crate) struct WasmKeywordAttribute {
     pub(crate) key: String,
     pub(crate) value: Option<String>,
+    pub(crate) raw: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTagDefinition {
+    pub(crate) name: String,
+    pub(crate) shortcut: Option<String>,
     pub(crate) raw: String,
 }
 

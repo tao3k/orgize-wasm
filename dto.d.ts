@@ -91,6 +91,12 @@ export interface OrgizeExportSettingsDto {
   expandEntities?: boolean | null;
 }
 
+export interface OrgizeTagDefinitionDto {
+  name: string;
+  shortcut?: string | null;
+  raw: string;
+}
+
 export interface OrgizePropertyDto {
   source: OrgizeSourceRangeDto;
   key: string;
@@ -199,12 +205,48 @@ export interface OrgizeMetadataResponseDto {
   properties: OrgizePropertyDto[];
   keywords: OrgizeKeywordDto[];
   filetags: string[];
+  tagDefinitions: OrgizeTagDefinitionDto[];
   exportSettings: OrgizeExportSettingsDto;
   linkAbbreviations: OrgizeLinkAbbreviationDto[];
   includes: OrgizeIncludeDirectiveDto[];
   macros: OrgizeMacroDefinitionDto[];
   targets: OrgizeTargetDefinitionDto[];
   footnotes: OrgizeFootnoteEntryDto[];
+}
+
+export interface OrgizeOrgElementsSourceRangeDto extends OrgizeSourceRangeDto {
+  raw: string;
+}
+
+export interface OrgizeOrgElementsPropertyDto {
+  source: OrgizeOrgElementsSourceRangeDto;
+  key: string;
+  value: string;
+}
+
+export interface OrgizeOrgElementsSectionDto {
+  source: OrgizeOrgElementsSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+  tags: string[];
+  effectiveTags: string[];
+  anchor?: string | null;
+  isComment: boolean;
+  properties: OrgizeOrgElementsPropertyDto[];
+  effectiveProperties: OrgizeOrgElementsPropertyDto[];
+  children: OrgizeOrgElementsSectionDto[];
+}
+
+export interface OrgizeOrgElementsDto {
+  schemaVersion: 1;
+  metadata: OrgizeKeywordDto[];
+  filetags: string[];
+  tagDefinitions: OrgizeTagDefinitionDto[];
+  sections: OrgizeOrgElementsSectionDto[];
+  sourceBlocks: OrgizeSourceBlockRecordDto[];
 }
 
 export interface OrgizeTimestampMomentDto {
@@ -1371,6 +1413,7 @@ export interface OrgizeSnapshotDto {
 export type OrgizeProjectionName =
   | "outline"
   | "metadata"
+  | "orgElements"
   | "lint"
   | "sectionIndex"
   | "sparseTree"
@@ -1398,6 +1441,7 @@ export type OrgizeProjectionName =
 export type OrgizeProjectionDto =
   | OrgizeOutlineResponseDto
   | OrgizeMetadataResponseDto
+  | OrgizeOrgElementsDto
   | OrgizeLintResponseDto
   | OrgizeSectionIndexResponseDto
   | OrgizeSparseTreeResponseDto

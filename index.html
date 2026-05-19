@@ -182,6 +182,7 @@
           <span data-value="syntax">Syntax</span>
           <span data-value="semantic">Semantic AST</span>
           <span data-value="wasm-dto">WASM DTO</span>
+          <span data-value="org-elements">Org Elements</span>
           <span data-value="agenda">Agenda</span>
           <span data-value="agent-planning">Agent Planning</span>
           <span data-value="agent-memory">Agent Memory</span>
@@ -269,6 +270,13 @@
 
           case "wasm-dto": {
             renderPre(JSON.stringify(JSON.parse(org.snapshotJson()), null, 2));
+            break;
+          }
+
+          case "org-elements": {
+            renderPre(
+              JSON.stringify(JSON.parse(org.orgElementsJson()), null, 2)
+            );
             break;
           }
 
@@ -392,7 +400,7 @@
       const rows = [
         [
           "WASM worker DTO",
-          "`outlineJson`, `metadataJson`, `lintJson`, `sectionIndexJson`, `sparseTreeJson`, `sparseTreeExplainJson`, `agendaViewJson`, `agendaBlockJson`, `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`, `columnViewsJson`, `dynamicBlocksJson`, `propertyProfileJson`, `refileTargetsJson`, `refilePlanJson`, `includeExpansionJson`, `datetreeJson`, `progressStatsJson`, `clockRollupsJson`, `clockTablePlansJson`, `clockIssuesJson`, `taskBlockersJson`, `sddJson`, and `snapshotJson` expose typed browser projections; the worker keeps Rust parsing off the UI thread.",
+          "`outlineJson`, `metadataJson`, `orgElementsJson`, `lintJson`, `sectionIndexJson`, `sparseTreeJson`, `sparseTreeExplainJson`, `agendaViewJson`, `agendaBlockJson`, `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`, `columnViewsJson`, `dynamicBlocksJson`, `propertyProfileJson`, `refileTargetsJson`, `refilePlanJson`, `includeExpansionJson`, `datetreeJson`, `progressStatsJson`, `clockRollupsJson`, `clockTablePlansJson`, `clockIssuesJson`, `taskBlockersJson`, `sddJson`, and `snapshotJson` expose typed browser projections; the worker keeps Rust parsing off the UI thread.",
         ],
         [
           "Public parser API",
@@ -425,6 +433,10 @@
         [
           "SDD",
           "`Document::sdd_status()` projects Org-native architecture nodes, parent edges, lifecycle status, concerns, rationale, and stable IDs for browser/agent inspection.",
+        ],
+        [
+          "Org elements bridge",
+          "`#+TAGS:` vocabulary, source blocks, sections, and `#+PYTHON:` directives project into `orgElementsJson`; native hosts can execute any chosen tool explicitly with the same org-elements payload.",
         ],
         [
           "Attachments",
@@ -494,11 +506,13 @@ See also:
 #+TITLE: *Orgize* parser v2 demo
 #+CATEGORY: wasm-demo
 #+FILETAGS: :browser:wasm:
+#+TAGS: EMACS (e) COURSE (c) ENGLISH SECURITY (s) BOOK (b) EXERCISE (ex) READ(r) MATH (m) NSM LEARN
 #+OPTIONS: H:3 -:t e:nil
 #+SELECT_TAGS: demo
 #+EXCLUDE_TAGS: noexport
 #+LINK: gh https://github.com/%s
 #+LINK: search https://example.test?q=%h
+#+PYTHON: print("explicit host execution only")
 #+MACRO: badge $1 :: $0
 #+INCLUDE: "guide.org" :lines "1-12" :minlevel 2
 #+INCLUDE: ./src/demo.rs src rust :lines "10-"

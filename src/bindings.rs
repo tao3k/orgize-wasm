@@ -172,6 +172,12 @@ impl Org {
         dto_projection::metadata_json(&document)
     }
 
+    #[wasm_bindgen(js_name = orgElementsJson)]
+    pub fn org_elements_json(&self) -> String {
+        let document = self.document();
+        document.org_elements_json()
+    }
+
     #[wasm_bindgen(js_name = lintJson)]
     pub fn lint_json(&self) -> String {
         let document = self.document();

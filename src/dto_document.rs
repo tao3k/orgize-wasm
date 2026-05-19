@@ -15,7 +15,7 @@ use crate::{
         WasmProgressEffortSummary, WasmProgressStatisticCookie, WasmProgressStatsRecord,
         WasmProgressStatsResponse, WasmProgressTodoSummary, WasmSourceBlockCodeRef,
         WasmSourceBlockHeaderArg, WasmSourceBlockHeaderVar, WasmSourceBlockRecord,
-        WasmSourceBlockResult, WasmSourceBlockTangle, WasmSourceBlocksResponse,
+        WasmSourceBlockResult, WasmSourceBlockTangle, WasmSourceBlocksResponse, WasmTagDefinition,
         WasmTargetDefinition, WasmTaskBlockerParent, WasmTaskBlockerRecord, WasmTaskBlockerTask,
         WasmTaskBlockersResponse, WasmTaskDependencyRecord,
     },
@@ -86,6 +86,15 @@ pub(crate) fn document_metadata(document: &Document<ParsedAnnotation>) -> WasmMe
             })
             .collect(),
         filetags: document.filetags.clone(),
+        tag_definitions: document
+            .tag_definitions
+            .iter()
+            .map(|definition| WasmTagDefinition {
+                name: definition.name.clone(),
+                shortcut: definition.shortcut.clone(),
+                raw: definition.raw.clone(),
+            })
+            .collect(),
         export_settings: WasmExportSettings {
             select_tags: document.export_settings.select_tags.clone(),
             exclude_tags: document.export_settings.exclude_tags.clone(),

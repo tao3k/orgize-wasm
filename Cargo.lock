@@ -108,6 +108,7 @@ dependencies = [
  "nom",
  "rowan",
  "rust-lang-project-harness",
+ "serde_json",
 ]
 
 [[package]]

@@ -24,6 +24,7 @@ export const org_lintJson: (a: number) => [number, number];
 export const org_markdown: (a: number) => [number, number];
 export const org_metadataJson: (a: number) => [number, number];
 export const org_org: (a: number) => [number, number];
+export const org_orgElementsJson: (a: number) => [number, number];
 export const org_outlineJson: (a: number) => [number, number];
 export const org_parse: (a: number, b: number) => number;
 export const org_progressStatsJson: (a: number) => [number, number];
