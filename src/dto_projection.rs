@@ -23,6 +23,7 @@ use crate::{
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
     dto_property_profile::{property_profile, property_profile_response},
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
+    dto_sdd::{sdd_records, sdd_response},
 };
 use orgize::ast::{
     AgendaBlockViewQuery, AgendaViewQuery, AgentCaptureRequest, ClockIssueProfile, Document,
@@ -215,6 +216,10 @@ pub(crate) fn task_blockers_json(document: &Document<ParsedAnnotation>) -> Strin
     to_json(&task_blockers_response(document))
 }
 
+pub(crate) fn sdd_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&sdd_response(document))
+}
+
 pub(crate) fn snapshot_json(
     document: &Document<ParsedAnnotation>,
     source: &str,
@@ -244,6 +249,7 @@ pub(crate) fn snapshot_json(
         clock_rollups: clock_rollup_records(document),
         clock_table_plans: clock_table_plans(document),
         clock_issues: clock_issue_findings(document, &ClockIssueProfile::org_default()),
+        sdd: sdd_records(document),
         lint: lint_findings(&lint.findings),
     })
 }

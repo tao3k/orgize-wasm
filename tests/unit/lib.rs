@@ -12,3 +12,5 @@ mod dto_dynamic_block;
 mod dto_property_profile;
 #[path = "dto_refile.rs"]
 mod dto_refile;
+#[path = "dto_sdd.rs"]
+mod dto_sdd;

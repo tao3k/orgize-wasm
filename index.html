@@ -185,6 +185,7 @@
           <span data-value="agenda">Agenda</span>
           <span data-value="agent-planning">Agent Planning</span>
           <span data-value="agent-memory">Agent Memory</span>
+          <span data-value="sdd">SDD</span>
           <span data-value="traverse">Traverse</span>
           <span data-value="features">Parser Features</span>
           <div id="spacer"></div>
@@ -283,6 +284,11 @@
 
           case "agent-memory": {
             renderPre(org.agentMemory());
+            break;
+          }
+
+          case "sdd": {
+            renderPre(org.sdd());
             break;
           }
 
@@ -386,7 +392,7 @@
       const rows = [
         [
           "WASM worker DTO",
-          "`outlineJson`, `metadataJson`, `lintJson`, `sectionIndexJson`, `sparseTreeJson`, `sparseTreeExplainJson`, `agendaViewJson`, `agendaBlockJson`, `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`, `columnViewsJson`, `dynamicBlocksJson`, `propertyProfileJson`, `refileTargetsJson`, `refilePlanJson`, `includeExpansionJson`, `datetreeJson`, `progressStatsJson`, `clockRollupsJson`, `clockTablePlansJson`, `clockIssuesJson`, `taskBlockersJson`, and `snapshotJson` expose typed browser projections; the worker keeps Rust parsing off the UI thread.",
+          "`outlineJson`, `metadataJson`, `lintJson`, `sectionIndexJson`, `sparseTreeJson`, `sparseTreeExplainJson`, `agendaViewJson`, `agendaBlockJson`, `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`, `columnViewsJson`, `dynamicBlocksJson`, `propertyProfileJson`, `refileTargetsJson`, `refilePlanJson`, `includeExpansionJson`, `datetreeJson`, `progressStatsJson`, `clockRollupsJson`, `clockTablePlansJson`, `clockIssuesJson`, `taskBlockersJson`, `sddJson`, and `snapshotJson` expose typed browser projections; the worker keeps Rust parsing off the UI thread.",
         ],
         [
           "Public parser API",
@@ -415,6 +421,10 @@
         [
           "Agent memory",
           "`Document::agent_memory_snapshot()` renders compact memory cards from ordinary Org headings, TODO states, properties, timestamps, drawers, clocks, archive tags, attachments, and links. `MEMxxx` values are output diagnostics, not Org source syntax.",
+        ],
+        [
+          "SDD",
+          "`Document::sdd_status()` projects Org-native architecture nodes, parent edges, lifecycle status, concerns, rationale, and stable IDs for browser/agent inspection.",
         ],
         [
           "Attachments",
@@ -492,6 +502,31 @@ See also:
 #+MACRO: badge $1 :: $0
 #+INCLUDE: "guide.org" :lines "1-12" :minlevel 2
 #+INCLUDE: ./src/demo.rs src rust :lines "10-"
+
+* Browser parser SDD :sdd:
+:PROPERTIES:
+:ID: 018f3f9c-8d3e-7b2a-9c91-4f5b2e7a2c11
+:SDD_KIND: system
+:SDD_STATUS: review
+:SDD_CONCERN: Browser consumers need the same source-grounded parser semantics as Rust hosts.
+:END:
+** WASM projection capability :sdd:
+:PROPERTIES:
+:ID: 018f3f9c-7a91-73b4-b3f2-12c4c4d80d77
+:SDD_KIND: capability
+:SDD_PARENT: [[id:018f3f9c-8d3e-7b2a-9c91-4f5b2e7a2c11][Browser parser SDD]]
+:SDD_CAPABILITY: typed-browser-projections
+:SDD_STATUS: accepted
+:END:
+The SDD tab renders document-local architecture nodes without executing writes.
+** SDD DTO decision :sdd:
+:PROPERTIES:
+:ID: 018f3f9c-4242-72d0-a51d-0ac2c4d80d79
+:SDD_KIND: decision
+:SDD_PARENT: [[id:018f3f9c-7a91-73b4-b3f2-12c4c4d80d77][WASM projection capability]]
+:SDD_RATIONALE: Frontends can inspect SDD structure through sddJson and snapshotJson without reparsing Org in TypeScript.
+:SDD_STATUS: accepted
+:END:
 
 * NEXT Parser v2 semantic AST :demo:
 SCHEDULED: <2026-05-10 Sun 09:30-10:30 +1w> DEADLINE: <2026-05-17 Sun -2d>

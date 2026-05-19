@@ -1092,6 +1092,54 @@ export interface OrgizeTaskBlockersResponseDto {
   records: OrgizeTaskBlockerRecordDto[];
 }
 
+export type OrgizeSddKindDto =
+  | "system"
+  | "capability"
+  | "view"
+  | "decision"
+  | "audit"
+  | string;
+
+export type OrgizeSddStatusDto =
+  | "draft"
+  | "review"
+  | "accepted"
+  | "deprecated"
+  | "superseded"
+  | string;
+
+export interface OrgizeSddParentRefDto {
+  raw: string;
+  targetId?: string | null;
+  label?: string | null;
+}
+
+export interface OrgizeSddNodeRecordDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  kind: OrgizeSddKindDto;
+  kindKnown: boolean;
+  id?: string | null;
+  parent?: OrgizeSddParentRefDto | null;
+  capability?: string | null;
+  viewpoint?: string | null;
+  concern?: string | null;
+  quality?: string | null;
+  rationale?: string | null;
+  slug?: string | null;
+  status?: OrgizeSddStatusDto | null;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+  tags: string[];
+}
+
+export interface OrgizeSddResponseDto {
+  schemaVersion: 1;
+  records: OrgizeSddNodeRecordDto[];
+}
+
 export interface OrgizeProgressStatsRecordDto {
   source: OrgizeSourceRangeDto;
   outlinePath: string[];
@@ -1316,6 +1364,7 @@ export interface OrgizeSnapshotDto {
   clockRollups: OrgizeClockRollupRecordDto[];
   clockTablePlans: OrgizeClockTablePlanDto[];
   clockIssues: OrgizeClockIssueFindingDto[];
+  sdd: OrgizeSddNodeRecordDto[];
   lint: OrgizeLintFindingDto[];
 }
 
@@ -1343,6 +1392,7 @@ export type OrgizeProjectionName =
   | "clockTablePlans"
   | "clockIssues"
   | "taskBlockers"
+  | "sdd"
   | "snapshot";
 
 export type OrgizeProjectionDto =
@@ -1369,4 +1419,5 @@ export type OrgizeProjectionDto =
   | OrgizeClockTablePlansResponseDto
   | OrgizeClockIssuesResponseDto
   | OrgizeTaskBlockersResponseDto
+  | OrgizeSddResponseDto
   | OrgizeSnapshotDto;

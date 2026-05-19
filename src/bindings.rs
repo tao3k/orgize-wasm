@@ -148,6 +148,12 @@ impl Org {
             .to_compact_text("wasm-demo.org")
     }
 
+    pub fn sdd(&self) -> String {
+        self.document()
+            .sdd_status()
+            .to_compact_text("wasm-demo.org")
+    }
+
     pub fn update(&mut self, s: &str) {
         self.source = s.to_string();
         self.inner = Inner::parse(s);
@@ -347,6 +353,12 @@ impl Org {
     pub fn task_blockers_json(&self) -> String {
         let document = self.document();
         dto_projection::task_blockers_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = sddJson)]
+    pub fn sdd_json(&self) -> String {
+        let document = self.document();
+        dto_projection::sdd_json(&document)
     }
 
     #[wasm_bindgen(js_name = snapshotJson)]

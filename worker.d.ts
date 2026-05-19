@@ -17,6 +17,7 @@ export type OrgizeRenderFormat =
   | "agenda"
   | "agentPlanning"
   | "agentMemory"
+  | "sdd"
   | "traverse";
 
 export interface OrgizeWorkerBaseRequest {

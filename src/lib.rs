@@ -19,6 +19,8 @@ mod dto_property_profile_model;
 mod dto_refile;
 mod dto_refile_model;
 mod dto_refile_request;
+mod dto_sdd;
+mod dto_sdd_model;
 mod dto_shared_model;
 
 pub use bindings::Org;

@@ -75,6 +75,8 @@ const projectionFor = (
           clockIssueProfile ? JSON.stringify(clockIssueProfile) : undefined
         )
       );
+    case "sdd":
+      return parseJson(org.sddJson());
     case "viewIndex":
       return parseJson(org.viewIndexJson(sourceFile ?? undefined));
     case "attachments":
@@ -114,6 +116,8 @@ const renderFor = (org, format) => {
       return org.agentPlanning();
     case "agentMemory":
       return org.agentMemory();
+    case "sdd":
+      return org.sdd();
     case "traverse":
       return org.traverse();
     default:
