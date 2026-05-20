@@ -15,6 +15,7 @@ echo load
 <<missing>>
 #+end_src
 
+#+HEADER: :var topic="demo" :results drawer
 #+begin_src sh :var rows=load_data :var scoped=load_data(limit=1) :var literal=42 :var quoted="load_data" :var missing=missing_call()
 echo "$rows"
 #+end_src
@@ -26,6 +27,25 @@ Inline call_load_data() and call_missing_inline().
     );
     let payload: Value =
         serde_json::from_str(&org.source_blocks_json()).expect("source blocks JSON should parse");
+    let records = payload["records"].as_array().expect("records");
+    let header_arg_record = records
+        .iter()
+        .find(|record| record["value"].as_str() == Some("echo \"$rows\"\n"))
+        .expect("record with affiliated header args");
+    let header_args = header_arg_record["headerArgs"]
+        .as_array()
+        .expect("source block header args");
+
+    assert!(header_args.iter().any(|arg| {
+        arg["kind"] == "var"
+            && arg["source"] == "explicit"
+            && arg["variable"]["name"] == "topic"
+            && arg["variable"]["assignment"] == "\"demo\""
+    }));
+    assert!(header_args.iter().any(|arg| {
+        arg["key"] == "results" && arg["source"] == "explicit" && arg["value"] == "drawer"
+    }));
+
     let references = payload["references"].as_array().expect("references");
 
     assert_eq!(references.len(), 10);

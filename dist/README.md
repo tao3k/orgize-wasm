@@ -118,10 +118,11 @@ readFile(require.resolve("orgize/wasm")).then((bytes) => {
    `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`,
    `columnViewsJson`, `propertyProfileJson`, `propertyProfileWithSchemasJson`,
    `includeExpansionJson`, `datetreeJson`, `snapshotJson`, and
-   `snapshotWithSchemasJson`. `sourceBlocksJson` includes block records plus
-   non-executing literate references for `#+CALL`, inline `call_name(...)`,
-   source-block `:var` dependencies, and noweb `<<name>>` targets. Worker users
-   receive parsed objects;
+   `snapshotWithSchemasJson`. `sourceBlocksJson` includes block records with
+   `#+HEADER:` / `#+BEGIN_SRC` header arguments plus non-executing literate
+   references for `#+CALL`, inline `call_name(...)`, source-block `:var`
+   dependencies, and noweb `<<name>>` targets. Worker users receive parsed
+   objects;
 
 5. This npm package is primarily aimed at browser demos and high-level
    integrations. If you need a custom Node-only package, build with `napi`.
