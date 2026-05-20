@@ -353,9 +353,11 @@ fn source_block_reference(reference: &SourceBlockReference) -> WasmSourceBlockRe
         source: source_block_source(&reference.source),
         kind: match reference.kind {
             SourceBlockReferenceKind::BabelCall => "babelCall",
+            SourceBlockReferenceKind::HeaderVar => "headerVar",
             SourceBlockReferenceKind::InlineCall => "inlineCall",
             SourceBlockReferenceKind::Noweb => "noweb",
         },
+        variable: reference.variable.clone(),
         target: reference.target.clone(),
         resolved: reference.resolved,
     }

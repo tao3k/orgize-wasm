@@ -229,12 +229,14 @@ declare namespace OrgizeDto {
 
   export type OrgizeSourceBlockReferenceKindDto =
     | "babelCall"
+    | "headerVar"
     | "inlineCall"
     | "noweb";
 
   export interface OrgizeSourceBlockReferenceDto {
     source: OrgizeSourceRangeDto;
     kind: OrgizeSourceBlockReferenceKindDto;
+    variable?: string | null;
     target: string;
     resolved: boolean;
   }

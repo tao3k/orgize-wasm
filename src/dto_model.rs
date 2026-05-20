@@ -644,6 +644,7 @@ pub(crate) struct WasmSourceBlockRecord {
 pub(crate) struct WasmSourceBlockReference {
     pub(crate) source: WasmSourceRange,
     pub(crate) kind: &'static str,
+    pub(crate) variable: Option<String>,
     pub(crate) target: String,
     pub(crate) resolved: bool,
 }
