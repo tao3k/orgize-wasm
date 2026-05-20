@@ -4,7 +4,9 @@ use serde_json::{Value, json};
 #[test]
 fn wasm_source_blocks_contract_exposes_literate_references() {
     let org = Org::parse(
-        r#"#+NAME: load_data
+        r#"#+PROPERTY: header-args :session shared
+#+PROPERTY: header-args:sh :dir ./scripts
+#+NAME: load_data
 #+begin_src sh :noweb-ref setup
 echo load
 #+end_src
@@ -41,6 +43,12 @@ Inline call_load_data() and call_missing_inline().
             && arg["source"] == "explicit"
             && arg["variable"]["name"] == "topic"
             && arg["variable"]["assignment"] == "\"demo\""
+    }));
+    assert!(header_args.iter().any(|arg| {
+        arg["key"] == "session" && arg["source"] == "explicit" && arg["value"] == "shared"
+    }));
+    assert!(header_args.iter().any(|arg| {
+        arg["key"] == "dir" && arg["source"] == "explicit" && arg["value"] == "./scripts"
     }));
     assert!(header_args.iter().any(|arg| {
         arg["key"] == "results" && arg["source"] == "explicit" && arg["value"] == "drawer"
