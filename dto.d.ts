@@ -270,6 +270,8 @@ export interface OrgizeOrgElementsDto {
   sourceBlocks: OrgizeSourceBlockRecordDto[];
 }
 
+export type OrgizeOrgElementsIndexDto = OrgizeOrgElementsIndexNodeDto[];
+
 export interface OrgizeTimestampMomentDto {
   year: number;
   month: number;
@@ -1435,6 +1437,7 @@ export type OrgizeProjectionName =
   | "outline"
   | "metadata"
   | "orgElements"
+  | "orgElementsIndex"
   | "lint"
   | "sectionIndex"
   | "sparseTree"
@@ -1463,6 +1466,7 @@ export type OrgizeProjectionDto =
   | OrgizeOutlineResponseDto
   | OrgizeMetadataResponseDto
   | OrgizeOrgElementsDto
+  | OrgizeOrgElementsIndexDto
   | OrgizeLintResponseDto
   | OrgizeSectionIndexResponseDto
   | OrgizeSparseTreeResponseDto

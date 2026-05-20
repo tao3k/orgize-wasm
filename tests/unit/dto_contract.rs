@@ -153,6 +153,12 @@ print(topic)
         .any(|node| node["category"] == "object"
             && node["kind"] == "link"
             && node["summary"]["path"] == "https://example.test"));
+    let index_only: Value =
+        serde_json::from_str(&org.org_elements_index_json()).expect("Org elements index JSON");
+    assert_eq!(
+        index_only.as_array().expect("index array").len(),
+        payload["index"].as_array().expect("payload index").len()
+    );
     assert_eq!(payload["sourceBlocks"][0]["language"], "python");
     assert_eq!(
         payload["sourceBlocks"][0]["normalizedHeaderArgs"]

@@ -43,6 +43,8 @@ const projectionFor = (
       return parseJson(org.metadataJson());
     case "orgElements":
       return parseJson(org.orgElementsJson());
+    case "orgElementsIndex":
+      return parseJson(org.orgElementsIndexJson());
     case "lint":
       return parseJson(org.lintJson());
     case "sectionIndex":

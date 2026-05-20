@@ -27,6 +27,7 @@ export class Org {
     markdown(): string;
     metadataJson(): string;
     org(): string;
+    orgElementsIndexJson(): string;
     orgElementsJson(): string;
     outlineJson(): string;
     constructor(input: string);
@@ -78,6 +79,7 @@ export interface InitOutput {
     readonly org_markdown: (a: number) => [number, number];
     readonly org_metadataJson: (a: number) => [number, number];
     readonly org_org: (a: number) => [number, number];
+    readonly org_orgElementsIndexJson: (a: number) => [number, number];
     readonly org_orgElementsJson: (a: number) => [number, number];
     readonly org_outlineJson: (a: number) => [number, number];
     readonly org_parse: (a: number, b: number) => number;
