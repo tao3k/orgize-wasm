@@ -120,7 +120,8 @@ readFile(require.resolve("orgize/wasm")).then((bytes) => {
    `includeExpansionJson`, `datetreeJson`, `snapshotJson`, and
    `snapshotWithSchemasJson`. `sourceBlocksJson` includes block records with
    `#+PROPERTY: header-args`, `#+HEADER:`, and `#+BEGIN_SRC` header arguments
-   plus non-executing literate references for `#+CALL`, inline
+   plus non-executing tangle metadata for `:mkdirp`, `:comments`, `:shebang`,
+   and `:noweb`. It also exposes literate references for `#+CALL`, inline
    `call_name(...)`, source-block `:var` dependencies, and noweb `<<name>>`
    targets. Worker users receive parsed objects;
 

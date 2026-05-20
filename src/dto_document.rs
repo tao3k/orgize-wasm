@@ -13,21 +13,25 @@ use crate::{
         WasmIncludeOption, WasmKeyword, WasmKeywordAttribute, WasmLinkAbbreviation,
         WasmMacroDefinition, WasmMetadataResponse, WasmOutlineNode, WasmProgressCheckboxSummary,
         WasmProgressEffortSummary, WasmProgressStatisticCookie, WasmProgressStatsRecord,
-        WasmProgressStatsResponse, WasmProgressTodoSummary, WasmSourceBlockCodeRef,
-        WasmSourceBlockHeaderArg, WasmSourceBlockHeaderVar, WasmSourceBlockRecord,
-        WasmSourceBlockReference, WasmSourceBlockResult, WasmSourceBlockTangle,
-        WasmSourceBlocksResponse, WasmTagDefinition, WasmTargetDefinition, WasmTaskBlockerParent,
-        WasmTaskBlockerRecord, WasmTaskBlockerTask, WasmTaskBlockersResponse,
-        WasmTaskDependencyRecord,
+        WasmProgressStatsResponse, WasmProgressTodoSummary, WasmTagDefinition,
+        WasmTargetDefinition, WasmTaskBlockerParent, WasmTaskBlockerRecord, WasmTaskBlockerTask,
+        WasmTaskBlockersResponse, WasmTaskDependencyRecord,
     },
     dto_shared_model::WasmSourceRange,
+    dto_source_block_model::{
+        WasmSourceBlockCodeRef, WasmSourceBlockHeaderArg, WasmSourceBlockHeaderVar,
+        WasmSourceBlockRecord, WasmSourceBlockReference, WasmSourceBlockResult,
+        WasmSourceBlockTangle, WasmSourceBlockTangleComments, WasmSourceBlockTangleMkdirp,
+        WasmSourceBlockTangleNoweb, WasmSourceBlocksResponse,
+    },
 };
 use orgize::ast::{
     ColumnViewRecord, ColumnViewScope, ColumnViewSource, DateTreeEntry, Document, IncludeDirective,
     IncludeExpansionMode, IncludeExpansionOptions, IncludeLineSelection, ParsedAnnotation, Section,
     SourceBlockHeaderArgKind, SourceBlockHeaderArgSource, SourceBlockRecord, SourceBlockRecordKind,
     SourceBlockReference, SourceBlockReferenceKind, SourceBlockResultKind, SourceBlockSource,
-    SourceBlockTangleMode, TaskBlockerRecord, TaskBlockerTask,
+    SourceBlockTangleCommentsMode, SourceBlockTangleMode, SourceBlockTangleNowebMode,
+    TaskBlockerRecord, TaskBlockerTask,
 };
 
 pub(crate) fn outline_node(section: &Section<ParsedAnnotation>) -> WasmOutlineNode {
@@ -326,12 +330,21 @@ fn source_block_record(record: &SourceBlockRecord) -> WasmSourceBlockRecord {
             .collect(),
         tangle: record.tangle.as_ref().map(|tangle| WasmSourceBlockTangle {
             raw: tangle.raw.clone(),
-            mode: match tangle.mode {
-                SourceBlockTangleMode::Yes => "yes",
-                SourceBlockTangleMode::No => "no",
-                SourceBlockTangleMode::File => "file",
-            },
+            mode: source_block_tangle_mode(tangle.mode),
             target: tangle.target.clone(),
+            mkdirp: WasmSourceBlockTangleMkdirp {
+                raw: tangle.mkdirp.raw.clone(),
+                enabled: tangle.mkdirp.enabled,
+            },
+            comments: WasmSourceBlockTangleComments {
+                raw: tangle.comments.raw.clone(),
+                mode: source_block_tangle_comments_mode(tangle.comments.mode),
+            },
+            shebang: tangle.shebang.clone(),
+            noweb: WasmSourceBlockTangleNoweb {
+                raw: tangle.noweb.raw.clone(),
+                mode: source_block_tangle_noweb_mode(tangle.noweb.mode),
+            },
         }),
         result: record.result.as_ref().map(|result| WasmSourceBlockResult {
             source: source_block_source(&result.source),
@@ -625,5 +638,33 @@ fn source_block_header_arg_source(source: SourceBlockHeaderArgSource) -> &'stati
     match source {
         SourceBlockHeaderArgSource::Explicit => "explicit",
         SourceBlockHeaderArgSource::Default => "default",
+    }
+}
+
+fn source_block_tangle_mode(mode: SourceBlockTangleMode) -> &'static str {
+    match mode {
+        SourceBlockTangleMode::Yes => "yes",
+        SourceBlockTangleMode::No => "no",
+        SourceBlockTangleMode::File => "file",
+    }
+}
+
+fn source_block_tangle_comments_mode(mode: SourceBlockTangleCommentsMode) -> &'static str {
+    match mode {
+        SourceBlockTangleCommentsMode::No => "no",
+        SourceBlockTangleCommentsMode::Link => "link",
+        SourceBlockTangleCommentsMode::Yes => "yes",
+        SourceBlockTangleCommentsMode::Org => "org",
+        SourceBlockTangleCommentsMode::Both => "both",
+        SourceBlockTangleCommentsMode::Noweb => "noweb",
+        SourceBlockTangleCommentsMode::Other => "other",
+    }
+}
+
+fn source_block_tangle_noweb_mode(mode: SourceBlockTangleNowebMode) -> &'static str {
+    match mode {
+        SourceBlockTangleNowebMode::Disabled => "disabled",
+        SourceBlockTangleNowebMode::Expand => "expand",
+        SourceBlockTangleNowebMode::Strip => "strip",
     }
 }

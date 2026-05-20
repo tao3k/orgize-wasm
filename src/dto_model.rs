@@ -9,6 +9,7 @@ use crate::dto_refile_model::WasmRefileTarget;
 use crate::dto_runtime_model::WasmRuntimeMetadataResponse;
 use crate::dto_sdd_model::WasmSddNodeRecord;
 use crate::dto_shared_model::{WasmOrgDuration, WasmSourceRange};
+use crate::dto_source_block_model::WasmSourceBlockRecord;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -97,14 +98,6 @@ pub(crate) struct WasmViewIndexResponse {
 pub(crate) struct WasmAttachmentsResponse {
     pub(crate) schema_version: u8,
     pub(crate) records: Vec<WasmAttachmentRecord>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlocksResponse {
-    pub(crate) schema_version: u8,
-    pub(crate) records: Vec<WasmSourceBlockRecord>,
-    pub(crate) references: Vec<WasmSourceBlockReference>,
 }
 
 #[derive(Serialize)]
@@ -622,79 +615,6 @@ pub(crate) struct WasmAttachmentRecord {
     pub(crate) outline_path: Vec<String>,
     pub(crate) directory: Option<WasmAttachmentDirectory>,
     pub(crate) links: Vec<WasmAttachmentLink>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockRecord {
-    pub(crate) source: WasmSourceRange,
-    pub(crate) kind: &'static str,
-    pub(crate) name: Option<String>,
-    pub(crate) language: Option<String>,
-    pub(crate) parameters: Option<String>,
-    pub(crate) header_args: Vec<WasmSourceBlockHeaderArg>,
-    pub(crate) code_refs: Vec<WasmSourceBlockCodeRef>,
-    pub(crate) tangle: Option<WasmSourceBlockTangle>,
-    pub(crate) result: Option<WasmSourceBlockResult>,
-    pub(crate) value: String,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockReference {
-    pub(crate) source: WasmSourceRange,
-    pub(crate) kind: &'static str,
-    pub(crate) variable: Option<String>,
-    pub(crate) target: String,
-    pub(crate) resolved: bool,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockHeaderArg {
-    pub(crate) key: String,
-    pub(crate) value: Option<String>,
-    pub(crate) raw: String,
-    pub(crate) kind: &'static str,
-    pub(crate) source: &'static str,
-    pub(crate) tokens: Vec<String>,
-    pub(crate) variable: Option<WasmSourceBlockHeaderVar>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockHeaderVar {
-    pub(crate) name: String,
-    pub(crate) assignment: Option<String>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockCodeRef {
-    pub(crate) line: usize,
-    pub(crate) column: usize,
-    pub(crate) end_column: usize,
-    pub(crate) name: String,
-    pub(crate) raw: String,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockTangle {
-    pub(crate) raw: String,
-    pub(crate) mode: &'static str,
-    pub(crate) target: Option<String>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct WasmSourceBlockResult {
-    pub(crate) source: WasmSourceRange,
-    pub(crate) kind: &'static str,
-    pub(crate) hash: Option<String>,
-    pub(crate) name: Option<String>,
-    pub(crate) keyword_value: String,
-    pub(crate) value: String,
 }
 
 #[derive(Serialize)]

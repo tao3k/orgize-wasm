@@ -1,0 +1,110 @@
+//! Stable TypeScript-facing DTO models for source-block projections.
+
+use crate::dto_shared_model::WasmSourceRange;
+use serde::Serialize;
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlocksResponse {
+    pub(crate) schema_version: u8,
+    pub(crate) records: Vec<WasmSourceBlockRecord>,
+    pub(crate) references: Vec<WasmSourceBlockReference>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockRecord {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) kind: &'static str,
+    pub(crate) name: Option<String>,
+    pub(crate) language: Option<String>,
+    pub(crate) parameters: Option<String>,
+    pub(crate) header_args: Vec<WasmSourceBlockHeaderArg>,
+    pub(crate) code_refs: Vec<WasmSourceBlockCodeRef>,
+    pub(crate) tangle: Option<WasmSourceBlockTangle>,
+    pub(crate) result: Option<WasmSourceBlockResult>,
+    pub(crate) value: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockReference {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) kind: &'static str,
+    pub(crate) variable: Option<String>,
+    pub(crate) target: String,
+    pub(crate) resolved: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockHeaderArg {
+    pub(crate) key: String,
+    pub(crate) value: Option<String>,
+    pub(crate) raw: String,
+    pub(crate) kind: &'static str,
+    pub(crate) source: &'static str,
+    pub(crate) tokens: Vec<String>,
+    pub(crate) variable: Option<WasmSourceBlockHeaderVar>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockHeaderVar {
+    pub(crate) name: String,
+    pub(crate) assignment: Option<String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockCodeRef {
+    pub(crate) line: usize,
+    pub(crate) column: usize,
+    pub(crate) end_column: usize,
+    pub(crate) name: String,
+    pub(crate) raw: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockTangle {
+    pub(crate) raw: String,
+    pub(crate) mode: &'static str,
+    pub(crate) target: Option<String>,
+    pub(crate) mkdirp: WasmSourceBlockTangleMkdirp,
+    pub(crate) comments: WasmSourceBlockTangleComments,
+    pub(crate) shebang: Option<String>,
+    pub(crate) noweb: WasmSourceBlockTangleNoweb,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockTangleMkdirp {
+    pub(crate) raw: String,
+    pub(crate) enabled: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockTangleComments {
+    pub(crate) raw: String,
+    pub(crate) mode: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockTangleNoweb {
+    pub(crate) raw: String,
+    pub(crate) mode: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockResult {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) kind: &'static str,
+    pub(crate) hash: Option<String>,
+    pub(crate) name: Option<String>,
+    pub(crate) keyword_value: String,
+    pub(crate) value: String,
+}

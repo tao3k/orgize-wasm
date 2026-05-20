@@ -7,7 +7,7 @@ fn wasm_source_blocks_contract_exposes_literate_references() {
         r#"#+PROPERTY: header-args :session shared
 #+PROPERTY: header-args:sh :dir ./scripts
 #+NAME: load_data
-#+begin_src sh :noweb-ref setup
+#+begin_src sh :noweb-ref setup :tangle scripts/setup.sh :mkdirp yes :comments noweb :shebang #!/bin/sh :noweb strip-tangle
 echo load
 #+end_src
 
@@ -53,6 +53,12 @@ Inline call_load_data() and call_missing_inline().
     assert!(header_args.iter().any(|arg| {
         arg["key"] == "results" && arg["source"] == "explicit" && arg["value"] == "drawer"
     }));
+    let tangle = records[0]["tangle"].as_object().expect("tangle metadata");
+    assert_eq!(tangle["target"], "scripts/setup.sh");
+    assert_eq!(tangle["mkdirp"]["enabled"], true);
+    assert_eq!(tangle["comments"]["mode"], "noweb");
+    assert_eq!(tangle["shebang"], "#!/bin/sh");
+    assert_eq!(tangle["noweb"]["mode"], "strip");
 
     let references = payload["references"].as_array().expect("references");
 

@@ -203,6 +203,25 @@ declare namespace OrgizeDto {
     raw: string;
     mode: "yes" | "no" | "file";
     target?: string | null;
+    mkdirp: OrgizeSourceBlockTangleMkdirpDto;
+    comments: OrgizeSourceBlockTangleCommentsDto;
+    shebang?: string | null;
+    noweb: OrgizeSourceBlockTangleNowebDto;
+  }
+
+  export interface OrgizeSourceBlockTangleMkdirpDto {
+    raw: string;
+    enabled: boolean;
+  }
+
+  export interface OrgizeSourceBlockTangleCommentsDto {
+    raw: string;
+    mode: "no" | "link" | "yes" | "org" | "both" | "noweb" | "other";
+  }
+
+  export interface OrgizeSourceBlockTangleNowebDto {
+    raw: string;
+    mode: "disabled" | "expand" | "strip";
   }
 
   export interface OrgizeSourceBlockResultDto {
