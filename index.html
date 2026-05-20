@@ -183,6 +183,7 @@
           <span data-value="semantic">Semantic AST</span>
           <span data-value="wasm-dto">WASM DTO</span>
           <span data-value="org-elements">Org Elements</span>
+          <span data-value="attachments">Attachments</span>
           <span data-value="agenda">Agenda</span>
           <span data-value="agent-planning">Agent Planning</span>
           <span data-value="agent-memory">Agent Memory</span>
@@ -284,6 +285,21 @@
           case "org-elements": {
             renderPre(
               JSON.stringify(JSON.parse(org.orgElementsJson()), null, 2)
+            );
+            break;
+          }
+
+          case "attachments": {
+            renderPre(
+              JSON.stringify(
+                JSON.parse(
+                  org.attachmentInventoryJson(
+                    JSON.stringify({ attachIdDir: ".attach" })
+                  )
+                ),
+                null,
+                2
+              )
             );
             break;
           }
@@ -408,7 +424,7 @@
       const rows = [
         [
           "WASM worker DTO",
-          "`outlineJson`, `metadataJson`, `orgElementsJson`, `orgElementsIndexJson`, `orgElementsIndexQueryJson`, `lintJson`, `sectionIndexJson`, `sparseTreeJson`, `sparseTreeExplainJson`, `agendaViewJson`, `agendaBlockJson`, `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`, `columnViewsJson`, `dynamicBlocksJson`, `propertyProfileJson`, `propertyProfileWithSchemasJson`, `refileTargetsJson`, `refilePlanJson`, `includeExpansionJson`, `datetreeJson`, `progressStatsJson`, `clockRollupsJson`, `clockTablePlansJson`, `clockIssuesJson`, `taskBlockersJson`, `sddJson`, `memoryJson`, `cryptJson`, `runtimeMetadataJson`, `snapshotJson`, and `snapshotWithSchemasJson` expose typed browser projections; the worker keeps Rust parsing off the UI thread.",
+          "`outlineJson`, `metadataJson`, `orgElementsJson`, `orgElementsIndexJson`, `orgElementsIndexQueryJson`, `lintJson`, `sectionIndexJson`, `sparseTreeJson`, `sparseTreeExplainJson`, `agendaViewJson`, `agendaBlockJson`, `capturePlanJson`, `attachmentsJson`, `attachmentInventoryJson`, `sourceBlocksJson`, `columnViewsJson`, `dynamicBlocksJson`, `propertyProfileJson`, `propertyProfileWithSchemasJson`, `refileTargetsJson`, `refilePlanJson`, `includeExpansionJson`, `datetreeJson`, `progressStatsJson`, `clockRollupsJson`, `clockTablePlansJson`, `clockIssuesJson`, `taskBlockersJson`, `sddJson`, `memoryJson`, `cryptJson`, `runtimeMetadataJson`, `snapshotJson`, and `snapshotWithSchemasJson` expose typed browser projections; the worker keeps Rust parsing off the UI thread.",
         ],
         [
           "Public parser API",
@@ -448,7 +464,7 @@
         ],
         [
           "Attachments",
-          "`DIR`, deprecated `ATTACH_DIR`, ID-derived attachment directories, `ATTACH` tags, and `attachment:` link search suffixes project into semantic metadata without filesystem access.",
+          "`DIR`, deprecated `ATTACH_DIR`, ID-derived attachment directories, `ATTACH` tags, and `attachment:` link search suffixes project into semantic metadata. `attachmentInventoryJson` adds opt-in display records and non-mutating sync advice for hosted `.attach` trees.",
         ],
         [
           "Blocks and tables",
@@ -651,6 +667,12 @@ Background memory can inform context without driving action by itself.
 :DIR: assets
 :END:
 Attached evidence can be referenced with [[attachment:diagram.png::255]] without changing parser source fidelity.
+
+* Wallpaper attachment context :ATTACH:gallery:
+:PROPERTIES:
+:ID: aabbccdd-0000-4000-8000-000000000000
+:END:
+An ID-backed attachment can point at [[attachment:wallpaper.jpg]] for gallery rendering.
 
 *************** WAIT Inline task :inline:
 SCHEDULED: <2026-05-11 Mon>

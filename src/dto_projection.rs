@@ -2,6 +2,8 @@
 
 use crate::{
     dto_agenda::{agenda_block_view_response, agenda_view_response},
+    dto_attachment_inventory::{attachment_inventory_options, attachment_inventory_response},
+    dto_attachment_inventory_model::WasmAttachmentInventoryRequest,
     dto_capture::agent_capture_plan_response,
     dto_clock::{
         clock_issue_findings, clock_issues_response, clock_rollup_records, clock_rollups_response,
@@ -156,6 +158,16 @@ pub(crate) fn attachments_json(
 ) -> String {
     let records = section_index_records(document, source_file);
     to_json(&attachments_response(&records))
+}
+
+pub(crate) fn attachment_inventory_json(
+    document: &Document<ParsedAnnotation>,
+    request: WasmAttachmentInventoryRequest,
+) -> Result<String, String> {
+    let options = attachment_inventory_options(request)?;
+    Ok(to_json(&attachment_inventory_response(
+        &document.attachment_inventory(&options),
+    )))
 }
 
 pub(crate) fn source_blocks_json(document: &Document<ParsedAnnotation>) -> String {

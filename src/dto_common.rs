@@ -208,7 +208,7 @@ fn file_link_path_kind(kind: FileLinkPathKind) -> &'static str {
     }
 }
 
-fn attachment_directory_source(
+pub(crate) fn attachment_directory_source(
     source: &AttachmentDirectorySource,
 ) -> WasmAttachmentDirectorySource {
     match source {

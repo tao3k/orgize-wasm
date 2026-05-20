@@ -2,6 +2,7 @@ import type {
   OrgizeAgendaBlockJsonRequestDto,
   OrgizeAgendaViewJsonRequestDto,
   OrgizeAgentCaptureRequestDto,
+  OrgizeAttachmentInventoryRequestDto,
   OrgizeClockIssueProfileRequestDto,
   OrgizeMemoryJsonRequestDto,
   OrgizeOrgElementsIndexQueryDto,
@@ -37,6 +38,7 @@ export interface OrgizeWorkerBaseRequest {
   orgElementsIndex?: OrgizeOrgElementsIndexQueryDto;
   clockIssueProfile?: OrgizeClockIssueProfileRequestDto;
   memory?: OrgizeMemoryJsonRequestDto;
+  attachmentInventory?: OrgizeAttachmentInventoryRequestDto;
   propertySchemaRegistry?: OrgizePropertySchemaRegistryRequestDto;
 }
 

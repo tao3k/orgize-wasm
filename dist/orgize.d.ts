@@ -12,6 +12,7 @@ export class Org {
     agendaViewJson(request_json: string): string;
     agentMemory(): string;
     agentPlanning(): string;
+    attachmentInventoryJson(request_json?: string | null): string;
     attachmentsJson(source_file?: string | null): string;
     capturePlanJson(request_json: string): string;
     clockIssuesJson(request_json?: string | null): string;
@@ -68,6 +69,7 @@ export interface InitOutput {
     readonly org_agendaViewJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_agentMemory: (a: number) => [number, number];
     readonly org_agentPlanning: (a: number) => [number, number];
+    readonly org_attachmentInventoryJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_attachmentsJson: (a: number, b: number, c: number) => [number, number];
     readonly org_buildTime: () => [number, number];
     readonly org_capturePlanJson: (a: number, b: number, c: number) => [number, number, number, number];

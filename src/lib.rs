@@ -2,6 +2,8 @@
 
 mod bindings;
 mod dto_agenda;
+mod dto_attachment_inventory;
+mod dto_attachment_inventory_model;
 mod dto_capture;
 mod dto_capture_model;
 mod dto_capture_request;

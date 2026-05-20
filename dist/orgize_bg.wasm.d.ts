@@ -7,6 +7,7 @@ export const org_agendaBlockJson: (a: number, b: number, c: number) => [number, 
 export const org_agendaViewJson: (a: number, b: number, c: number) => [number, number, number, number];
 export const org_agentMemory: (a: number) => [number, number];
 export const org_agentPlanning: (a: number) => [number, number];
+export const org_attachmentInventoryJson: (a: number, b: number, c: number) => [number, number, number, number];
 export const org_attachmentsJson: (a: number, b: number, c: number) => [number, number];
 export const org_buildTime: () => [number, number];
 export const org_capturePlanJson: (a: number, b: number, c: number) => [number, number, number, number];

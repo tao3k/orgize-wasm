@@ -47,6 +47,7 @@ declare namespace OrgizeDto {
     | "agendaBlock"
     | "viewIndex"
     | "attachments"
+    | "attachmentInventory"
     | "sourceBlocks"
     | "columnViews"
     | "dynamicBlocks"
@@ -81,6 +82,7 @@ declare namespace OrgizeDto {
     | OrgizeAgendaBlockViewResponseDto
     | OrgizeViewIndexResponseDto
     | OrgizeAttachmentsResponseDto
+    | OrgizeAttachmentInventoryResponseDto
     | OrgizeSourceBlocksResponseDto
     | OrgizeColumnViewsResponseDto
     | OrgizeDynamicBlocksResponseDto

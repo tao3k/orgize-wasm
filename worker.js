@@ -37,6 +37,7 @@ const projectionFor = (
   orgElementsIndex,
   clockIssueProfile,
   memory,
+  attachmentInventory,
   propertySchemaRegistry
 ) => {
   const schemaRegistryRequest = () =>
@@ -104,6 +105,12 @@ const projectionFor = (
       return parseJson(org.viewIndexJson(sourceFile ?? undefined));
     case "attachments":
       return parseJson(org.attachmentsJson(sourceFile ?? undefined));
+    case "attachmentInventory":
+      return parseJson(
+        org.attachmentInventoryJson(
+          attachmentInventory ? JSON.stringify(attachmentInventory) : undefined
+        )
+      );
     case "sourceBlocks":
       return parseJson(org.sourceBlocksJson());
     case "columnViews":
@@ -208,6 +215,7 @@ const handleMessage = async (message) => {
           message.orgElementsIndex,
           message.clockIssueProfile,
           message.memory,
+          message.attachmentInventory,
           message.propertySchemaRegistry
         );
         break;
@@ -237,6 +245,7 @@ const handleMessage = async (message) => {
           message.orgElementsIndex,
           message.clockIssueProfile,
           message.memory,
+          message.attachmentInventory,
           message.propertySchemaRegistry
         );
         break;
@@ -256,6 +265,7 @@ const handleMessage = async (message) => {
           message.orgElementsIndex,
           message.clockIssueProfile,
           message.memory,
+          message.attachmentInventory,
           message.propertySchemaRegistry
         );
         break;

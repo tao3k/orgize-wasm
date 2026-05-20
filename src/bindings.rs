@@ -1,6 +1,7 @@
 //! `wasm-bindgen` facade for parsing and rendering Org documents.
 
 use crate::{
+    dto_attachment_inventory_model::WasmAttachmentInventoryRequest,
     dto_capture_request::AgentCaptureJsonRequest,
     dto_clock_model::WasmClockIssueProfileRequest,
     dto_projection,
@@ -386,6 +387,23 @@ impl Org {
     pub fn attachments_json(&self, source_file: Option<String>) -> String {
         let document = self.document();
         dto_projection::attachments_json(&document, source_file.as_deref())
+    }
+
+    #[wasm_bindgen(js_name = attachmentInventoryJson)]
+    pub fn attachment_inventory_json(
+        &self,
+        request_json: Option<String>,
+    ) -> Result<String, JsValue> {
+        let request = match request_json {
+            Some(request_json) => serde_json::from_str(&request_json).map_err(|error| {
+                JsValue::from_str(&format!("invalid attachment inventory request: {error}"))
+            })?,
+            None => WasmAttachmentInventoryRequest::default(),
+        };
+        let document = self.document();
+        dto_projection::attachment_inventory_json(&document, request).map_err(|error| {
+            JsValue::from_str(&format!("invalid attachment inventory request: {error}"))
+        })
     }
 
     #[wasm_bindgen(js_name = sourceBlocksJson)]

@@ -1,4 +1,5 @@
 /// <reference path="./dto/core.d.ts" />
+/// <reference path="./dto/attachments.d.ts" />
 /// <reference path="./dto/elements.d.ts" />
 /// <reference path="./dto/source-blocks.d.ts" />
 /// <reference path="./dto/workspace.d.ts" />
@@ -85,6 +86,8 @@ export interface OrgizeViewIndexRecordDto extends OrgizeDto.OrgizeViewIndexRecor
 export interface OrgizeViewIndexResponseDto extends OrgizeDto.OrgizeViewIndexResponseDto {}
 export interface OrgizeAttachmentRecordDto extends OrgizeDto.OrgizeAttachmentRecordDto {}
 export interface OrgizeAttachmentsResponseDto extends OrgizeDto.OrgizeAttachmentsResponseDto {}
+export interface OrgizeAttachmentInventoryRequestDto extends OrgizeDto.OrgizeAttachmentInventoryRequestDto {}
+export interface OrgizeAttachmentInventoryResponseDto extends OrgizeDto.OrgizeAttachmentInventoryResponseDto {}
 export type OrgizeSourceBlockKindDto = OrgizeDto.OrgizeSourceBlockKindDto;
 export type OrgizeSourceBlockHeaderArgKindDto = OrgizeDto.OrgizeSourceBlockHeaderArgKindDto;
 export interface OrgizeSourceBlockHeaderVarDto extends OrgizeDto.OrgizeSourceBlockHeaderVarDto {}
