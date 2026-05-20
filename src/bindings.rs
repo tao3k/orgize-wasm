@@ -7,21 +7,21 @@ use crate::{
     dto_refile_request::{parse_optional_refile_targets_request, parse_refile_plan_request},
 };
 use orgize::{
+    Org as Inner,
     ast::{
         AgendaBlockViewQuery, AgendaDate, AgendaQuery, AgendaViewQuery, AgendaViewSortDirection,
         AgendaViewSortKey, AgendaViewSortSpec, AgentMemoryQuery, AgentPlanningQuery,
         ClockIssueProfile, MemoryQuery, OrgElementsIndexCategory, OrgElementsIndexKind,
         OrgElementsIndexQuery, ParsedAst,
     },
-    export::{from_fn, Container, Event},
+    export::{Container, Event, from_fn},
     rowan::ast::AstNode,
-    Org as Inner,
 };
 use serde::Deserialize;
 use std::cell::{Ref, RefCell};
 use std::fmt::Write;
 
-use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
+use wasm_bindgen::prelude::{JsValue, wasm_bindgen};
 
 #[wasm_bindgen]
 /// WebAssembly wrapper around [`orgize::Org`].
@@ -445,6 +445,12 @@ impl Org {
     pub fn crypt_json(&self) -> String {
         let document = self.document();
         dto_projection::crypt_json(&document)
+    }
+
+    #[wasm_bindgen(js_name = runtimeMetadataJson)]
+    pub fn runtime_metadata_json(&self) -> String {
+        let document = self.document();
+        dto_projection::runtime_metadata_json(&document)
     }
 
     #[wasm_bindgen(js_name = snapshotJson)]

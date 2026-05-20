@@ -38,6 +38,7 @@ export class Org {
     propertyProfileJson(): string;
     refilePlanJson(request_json: string): string;
     refileTargetsJson(request_json?: string | null): string;
+    runtimeMetadataJson(): string;
     sdd(): string;
     sddJson(): string;
     sectionIndexJson(source_file?: string | null): string;
@@ -93,6 +94,7 @@ export interface InitOutput {
     readonly org_propertyProfileJson: (a: number) => [number, number];
     readonly org_refilePlanJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_refileTargetsJson: (a: number, b: number, c: number) => [number, number, number, number];
+    readonly org_runtimeMetadataJson: (a: number) => [number, number];
     readonly org_sdd: (a: number) => [number, number];
     readonly org_sddJson: (a: number) => [number, number];
     readonly org_sectionIndexJson: (a: number, b: number, c: number) => [number, number];

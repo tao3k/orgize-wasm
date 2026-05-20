@@ -51,26 +51,34 @@ CLOSED: [2026-05-18 Mon]
     assert_eq!(cards[0]["decision"]["kind"], "current");
     assert_eq!(cards[0]["title"], "Active agent memory");
     assert_eq!(cards[0]["todoState"], "todo");
-    assert!(cards[0]["evidence"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|item| item["kind"]["code"] == "scheduled"));
-    assert!(cards[0]["authority"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|item| item["kind"] == "temporal"));
-    assert!(memory["evidenceKinds"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|item| item["code"] == "identity"));
-    assert!(memory["authorityKinds"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|item| item["code"] == "background"));
+    assert!(
+        cards[0]["evidence"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["kind"]["code"] == "scheduled")
+    );
+    assert!(
+        cards[0]["authority"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["kind"] == "temporal")
+    );
+    assert!(
+        memory["evidenceKinds"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["code"] == "identity")
+    );
+    assert!(
+        memory["authorityKinds"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["code"] == "background")
+    );
 }
 
 #[test]

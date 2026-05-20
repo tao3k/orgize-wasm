@@ -15,6 +15,7 @@ fn main() {
     rust_lang_project_harness::assert_rust_project_harness_build_clean_from_env_with_config(
         &config,
     );
+    orgize_wasm_build_support::enforce_public_surface_file_shape(env!("CARGO_MANIFEST_DIR"));
 
     {
         let output = Command::new("git")

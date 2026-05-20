@@ -116,11 +116,16 @@ name = "orgize-wasm"
 version = "0.10.0-alpha.7"
 dependencies = [
  "orgize",
+ "orgize-wasm-build-support",
  "rust-lang-project-harness",
  "serde",
  "serde_json",
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "orgize-wasm-build-support"
+version = "0.1.0"
 
 [[package]]
 name = "proc-macro2"

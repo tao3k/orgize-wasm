@@ -29,6 +29,7 @@
   },
   "files": [
     "dist",
+    "dto",
     "dto.d.ts",
     "dto.js",
     "index.html",

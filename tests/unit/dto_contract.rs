@@ -1,5 +1,5 @@
 use orgize_wasm::Org;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[test]
 fn wasm_snapshot_contract_includes_agent_source_projections() {
@@ -137,22 +137,30 @@ print(topic)
     let section_elements = payload["sections"][0]["elements"]
         .as_array()
         .expect("section elements");
-    assert!(section_elements
-        .iter()
-        .any(|element| element["kind"] == "paragraph"));
-    assert!(section_elements
-        .iter()
-        .any(|element| element["kind"] == "plain-list"));
-    assert!(section_elements
-        .iter()
-        .any(|element| element["kind"] == "src-block" && element["language"] == "python"));
-    assert!(payload["index"]
-        .as_array()
-        .expect("flat node index")
-        .iter()
-        .any(|node| node["category"] == "object"
-            && node["kind"] == "link"
-            && node["summary"]["path"] == "https://example.test"));
+    assert!(
+        section_elements
+            .iter()
+            .any(|element| element["kind"] == "paragraph")
+    );
+    assert!(
+        section_elements
+            .iter()
+            .any(|element| element["kind"] == "plain-list")
+    );
+    assert!(
+        section_elements
+            .iter()
+            .any(|element| element["kind"] == "src-block" && element["language"] == "python")
+    );
+    assert!(
+        payload["index"]
+            .as_array()
+            .expect("flat node index")
+            .iter()
+            .any(|node| node["category"] == "object"
+                && node["kind"] == "link"
+                && node["summary"]["path"] == "https://example.test")
+    );
     let index_only: Value =
         serde_json::from_str(&org.org_elements_index_json()).expect("Org elements index JSON");
     assert_eq!(
@@ -272,11 +280,13 @@ SCHEDULED: <2026-05-15 Fri>
 
     assert_eq!(second["blockers"][0]["kind"], "orderedPreviousSibling");
     assert_eq!(second["blockers"][0]["blocker"]["title"], "First");
-    assert!(second["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "blockedByOrderedSibling"));
+    assert!(
+        second["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "blockedByOrderedSibling")
+    );
 }
 
 #[test]
@@ -346,21 +356,27 @@ CLOSED: [2026-05-12 Tue]
     assert_eq!(cards[0]["priority"]["effective"], "A");
     assert_eq!(cards[0]["matches"][0]["kind"], "tag");
     assert_eq!(cards[0]["receipts"][0]["kind"], "candidate");
-    assert!(cards[0]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "matchExpressionMatched"));
-    assert!(cards[0]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "textMatched"));
+    assert!(
+        cards[0]["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "matchExpressionMatched")
+    );
+    assert!(
+        cards[0]["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "textMatched")
+    );
     assert_eq!(cards[0]["links"][0]["path"], "id:old-memory");
-    assert!(cards[0]["preview"]
-        .as_str()
-        .unwrap()
-        .contains("current memory"));
+    assert!(
+        cards[0]["preview"]
+            .as_str()
+            .unwrap()
+            .contains("current memory")
+    );
 
     let explained: Value = serde_json::from_str(
         &org.sparse_tree_explain_json(

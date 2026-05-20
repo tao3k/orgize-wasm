@@ -20,7 +20,7 @@ use orgize::{
         Document, Element, ElementData, ParsedAnnotation, Section, SectionIndexRecord,
         SparseTreeProjection,
     },
-    lint::{lint_document, LintFinding, LintSeverity},
+    lint::{LintFinding, LintSeverity, lint_document},
 };
 use std::collections::HashSet;
 

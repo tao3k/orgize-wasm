@@ -1,5 +1,5 @@
 use orgize_wasm::Org;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[test]
 fn wasm_capture_plan_contract_renders_agent_native_org_preview() {
@@ -51,34 +51,44 @@ fn wasm_capture_plan_contract_renders_agent_native_org_preview() {
         response["plan"]["target"]["date"],
         json!({ "year": 2026, "month": 5, "day": 16 })
     );
-    assert!(response["plan"]["orgEntry"]
-        .as_str()
-        .unwrap()
-        .contains(":CAPTURE_KIND: articleNote"));
-    assert!(response["plan"]["orgEntry"]
-        .as_str()
-        .unwrap()
-        .contains("[[https://example.test/agent-capture][Agent capture article]]"));
+    assert!(
+        response["plan"]["orgEntry"]
+            .as_str()
+            .unwrap()
+            .contains(":CAPTURE_KIND: articleNote")
+    );
+    assert!(
+        response["plan"]["orgEntry"]
+            .as_str()
+            .unwrap()
+            .contains("[[https://example.test/agent-capture][Agent capture article]]")
+    );
     assert_eq!(response["plan"]["application"]["action"], "insertOrgEntry");
     assert_eq!(
         response["plan"]["application"]["target"]["sourceFile"],
         "notes/inbox.org"
     );
-    assert!(response["plan"]["application"]["preconditions"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|precondition| precondition["kind"] == "writeLock"));
-    assert!(response["plan"]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "nonMutating"));
-    assert!(response["plan"]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "applicationPlan"));
+    assert!(
+        response["plan"]["application"]["preconditions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|precondition| precondition["kind"] == "writeLock")
+    );
+    assert!(
+        response["plan"]["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "nonMutating")
+    );
+    assert!(
+        response["plan"]["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "applicationPlan")
+    );
     assert_eq!(
         response["plan"]["warnings"][0]["kind"],
         "sanitizedPropertyKey"

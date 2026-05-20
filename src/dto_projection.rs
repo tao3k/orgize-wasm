@@ -25,6 +25,7 @@ use crate::{
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
     dto_property_profile::{property_profile, property_profile_response},
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
+    dto_runtime::runtime_metadata_response,
     dto_sdd::{sdd_records, sdd_response},
 };
 use orgize::ast::{
@@ -226,6 +227,10 @@ pub(crate) fn crypt_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&crypt_response(document))
 }
 
+pub(crate) fn runtime_metadata_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&runtime_metadata_response(document))
+}
+
 pub(crate) fn memory_json(document: &Document<ParsedAnnotation>, query: &MemoryQuery) -> String {
     to_json(&memory_response(document, query))
 }
@@ -262,6 +267,7 @@ pub(crate) fn snapshot_json(
         sdd: sdd_records(document),
         memory: memory_response(document, &MemoryQuery::new()),
         crypt: crypt_records(document),
+        runtime_metadata: runtime_metadata_response(document),
         lint: lint_findings(&lint.findings),
     })
 }

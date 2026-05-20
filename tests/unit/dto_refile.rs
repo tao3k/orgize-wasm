@@ -1,5 +1,5 @@
 use orgize_wasm::Org;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[test]
 fn wasm_refile_contract_exposes_targets_and_non_executing_plan() {
@@ -61,11 +61,13 @@ fn wasm_refile_contract_exposes_targets_and_non_executing_plan() {
     assert_eq!(plan["plan"]["source"]["title"], "Capture");
     assert_eq!(plan["plan"]["target"]["title"], "Project A");
     assert_eq!(plan["plan"]["warnings"][0]["kind"], "copyMayDuplicateId");
-    assert!(plan["plan"]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "nonMutating"));
+    assert!(
+        plan["plan"]["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "nonMutating")
+    );
 
     let create_request = json!({
         "sourceOutlinePath": ["Inbox", "Capture"],
@@ -98,9 +100,11 @@ fn wasm_refile_contract_exposes_targets_and_non_executing_plan() {
         create_plan["plan"]["createdTarget"]["requiresConfirmation"],
         true
     );
-    assert!(create_plan["plan"]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["kind"] == "parentCreationRequiresConfirmation"));
+    assert!(
+        create_plan["plan"]["receipts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|receipt| receipt["kind"] == "parentCreationRequiresConfirmation")
+    );
 }

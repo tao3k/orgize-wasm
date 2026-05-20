@@ -35,6 +35,7 @@ export const org_progressStatsJson: (a: number) => [number, number];
 export const org_propertyProfileJson: (a: number) => [number, number];
 export const org_refilePlanJson: (a: number, b: number, c: number) => [number, number, number, number];
 export const org_refileTargetsJson: (a: number, b: number, c: number) => [number, number, number, number];
+export const org_runtimeMetadataJson: (a: number) => [number, number];
 export const org_sdd: (a: number) => [number, number];
 export const org_sddJson: (a: number) => [number, number];
 export const org_sectionIndexJson: (a: number, b: number, c: number) => [number, number];

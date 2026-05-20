@@ -33,11 +33,13 @@ SCHEDULED: <2026-05-15 Fri 13:00>
     assert_eq!(cards[0]["title"], "Deadline");
     assert_eq!(cards[0]["kind"], "deadline");
     assert!(cards[0]["urgency"]["total"].as_i64().unwrap() > 0);
-    assert!(cards[0]["urgency"]["ingredients"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|ingredient| ingredient["kind"] == "deadline"));
+    assert!(
+        cards[0]["urgency"]["ingredients"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|ingredient| ingredient["kind"] == "deadline")
+    );
     assert_eq!(cards[0]["sortKeys"][0]["key"], "displayDate");
     assert_eq!(cards[0]["receipts"][0]["kind"], "queryMatched");
     assert_eq!(cards[0]["receipts"][2]["kind"], "accepted");
@@ -73,14 +75,16 @@ DEADLINE: <2026-05-15 Fri>
     assert_eq!(sorted["cards"][0]["title"], "High timed");
     assert_eq!(sorted["cards"][1]["title"], "Low timed");
     assert_eq!(sorted["skipped"][0]["title"], "Untimed deadline");
-    assert!(sorted["cards"][0]["receipts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|receipt| receipt["message"]
-            .as_str()
+    assert!(
+        sorted["cards"][0]["receipts"]
+            .as_array()
             .unwrap()
-            .contains("agenda sort strategy: time-up,priority-down")));
+            .iter()
+            .any(|receipt| receipt["message"]
+                .as_str()
+                .unwrap()
+                .contains("agenda sort strategy: time-up,priority-down"))
+    );
 
     let block_request = r#"{"title":"Daily agent agenda","sections":[{"name":"Timed","query":{"start":{"year":2026,"month":5,"day":15},"end":{"year":2026,"month":5,"day":15},"sortStrategy":[{"key":"time","direction":"up"}]}},{"name":"Priority","query":{"start":{"year":2026,"month":5,"day":15},"end":{"year":2026,"month":5,"day":15},"limit":1,"sortStrategy":[{"key":"priority","direction":"down"}]}}]}"#;
     let block: Value = serde_json::from_str(

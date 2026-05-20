@@ -6,8 +6,8 @@ use crate::dto_capture_model::{
     WasmAgentCaptureTarget, WasmAgentCaptureWarning,
 };
 use orgize::ast::{
-    agent_capture_plan, AgendaDate, AgentCaptureApplication, AgentCapturePlan, AgentCaptureRequest,
-    AgentCaptureTarget,
+    AgendaDate, AgentCaptureApplication, AgentCapturePlan, AgentCaptureRequest, AgentCaptureTarget,
+    agent_capture_plan,
 };
 
 pub(crate) fn agent_capture_plan_response(

@@ -149,10 +149,10 @@ impl AgentCaptureTargetJson {
         if let Some(source_file) = self.source_file {
             target = target.source_file(source_file);
         }
-        if matches!(kind.as_str(), "inbox" | "currentSection") {
-            if let Some(outline_path) = outline_path {
-                target.outline_path = outline_path;
-            }
+        if matches!(kind.as_str(), "inbox" | "currentSection")
+            && let Some(outline_path) = outline_path
+        {
+            target.outline_path = outline_path;
         }
         if let Some(insert_position) = self.insert_position {
             target = target.insert_position(agent_capture_insert_position(&insert_position)?);

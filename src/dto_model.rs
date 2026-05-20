@@ -6,6 +6,7 @@ use crate::dto_dynamic_block_model::WasmDynamicBlockRecord;
 use crate::dto_memory_model::WasmMemoryResponse;
 use crate::dto_property_profile_model::WasmPropertyProfile;
 use crate::dto_refile_model::WasmRefileTarget;
+use crate::dto_runtime_model::WasmRuntimeMetadataResponse;
 use crate::dto_sdd_model::WasmSddNodeRecord;
 use crate::dto_shared_model::{WasmOrgDuration, WasmSourceRange};
 use serde::Serialize;
@@ -162,6 +163,7 @@ pub(crate) struct WasmSnapshotResponse {
     pub(crate) sdd: Vec<WasmSddNodeRecord>,
     pub(crate) memory: WasmMemoryResponse,
     pub(crate) crypt: Vec<WasmCryptRecord>,
+    pub(crate) runtime_metadata: WasmRuntimeMetadataResponse,
     pub(crate) lint: Vec<WasmLintFinding>,
 }
 

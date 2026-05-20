@@ -22,15 +22,19 @@ fn wasm_property_profile_contract_exposes_allowed_values() {
 
     assert_eq!(property_profile["schemaVersion"], 1);
     assert_eq!(profile["inheritance"], "all");
-    assert!(profile["inheritedKeys"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|key| key == "Owner"));
-    assert!(allowed_values
-        .iter()
-        .any(|record| record["descriptorKey"] == "VISIBILITY_ALL"
-            && record["scope"]["kind"] == "fixedGlobal"));
+    assert!(
+        profile["inheritedKeys"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|key| key == "Owner")
+    );
+    assert!(
+        allowed_values
+            .iter()
+            .any(|record| record["descriptorKey"] == "VISIBILITY_ALL"
+                && record["scope"]["kind"] == "fixedGlobal")
+    );
 
     let owner = allowed_values
         .iter()
