@@ -97,6 +97,14 @@ export interface OrgizeSourceBlockTangleNowebDto extends OrgizeDto.OrgizeSourceB
 export interface OrgizeSourceBlockResultDto extends OrgizeDto.OrgizeSourceBlockResultDto {}
 export interface OrgizeSourceBlockResultOptionsDto extends OrgizeDto.OrgizeSourceBlockResultOptionsDto {}
 export interface OrgizeSourceBlockResultFileDto extends OrgizeDto.OrgizeSourceBlockResultFileDto {}
+export interface OrgizeSourceBlockExecutionPlanDto extends OrgizeDto.OrgizeSourceBlockExecutionPlanDto {}
+export interface OrgizeSourceBlockEvalDto extends OrgizeDto.OrgizeSourceBlockEvalDto {}
+export interface OrgizeSourceBlockExportsDto extends OrgizeDto.OrgizeSourceBlockExportsDto {}
+export interface OrgizeSourceBlockCacheDto extends OrgizeDto.OrgizeSourceBlockCacheDto {}
+export interface OrgizeSourceBlockSessionDto extends OrgizeDto.OrgizeSourceBlockSessionDto {}
+export interface OrgizeSourceBlockDirectoryDto extends OrgizeDto.OrgizeSourceBlockDirectoryDto {}
+export interface OrgizeSourceBlockBooleanHeaderDto extends OrgizeDto.OrgizeSourceBlockBooleanHeaderDto {}
+export interface OrgizeSourceBlockNowebPlanDto extends OrgizeDto.OrgizeSourceBlockNowebPlanDto {}
 export interface OrgizeSourceBlockRecordDto extends OrgizeDto.OrgizeSourceBlockRecordDto {}
 export type OrgizeSourceBlockReferenceKindDto = OrgizeDto.OrgizeSourceBlockReferenceKindDto;
 export interface OrgizeSourceBlockReferenceDto extends OrgizeDto.OrgizeSourceBlockReferenceDto {}

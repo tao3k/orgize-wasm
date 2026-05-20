@@ -96,6 +96,72 @@ declare namespace OrgizeDto {
     outputDir?: string | null;
   }
 
+  export interface OrgizeSourceBlockExecutionPlanDto {
+    eval: OrgizeSourceBlockEvalDto;
+    exports: OrgizeSourceBlockExportsDto;
+    cache: OrgizeSourceBlockCacheDto;
+    session: OrgizeSourceBlockSessionDto;
+    directory?: OrgizeSourceBlockDirectoryDto | null;
+    hlines: OrgizeSourceBlockBooleanHeaderDto;
+    noweb: OrgizeSourceBlockNowebPlanDto;
+  }
+
+  export interface OrgizeSourceBlockEvalDto {
+    raw: string;
+    source: "explicit" | "default";
+    policy:
+      | "yes"
+      | "no"
+      | "noExport"
+      | "stripExport"
+      | "neverExport"
+      | "eval"
+      | "never"
+      | "query"
+      | "other";
+  }
+
+  export interface OrgizeSourceBlockExportsDto {
+    raw: string;
+    source: "explicit" | "default";
+    policy: "code" | "results" | "both" | "none" | "other";
+  }
+
+  export interface OrgizeSourceBlockCacheDto {
+    raw: string;
+    source: "explicit" | "default";
+    enabled: boolean;
+  }
+
+  export interface OrgizeSourceBlockSessionDto {
+    raw: string;
+    source: "explicit" | "default";
+    name?: string | null;
+    active: boolean;
+  }
+
+  export interface OrgizeSourceBlockDirectoryDto {
+    raw: string;
+    source: "explicit" | "default";
+    target: string;
+    kind: "path" | "attachment";
+  }
+
+  export interface OrgizeSourceBlockBooleanHeaderDto {
+    raw: string;
+    source: "explicit" | "default";
+    enabled: boolean;
+  }
+
+  export interface OrgizeSourceBlockNowebPlanDto {
+    raw: string;
+    source: "explicit" | "default";
+    tokens: string[];
+    eval: "disabled" | "expand" | "strip";
+    export: "disabled" | "expand" | "strip";
+    tangle: "disabled" | "expand" | "strip";
+  }
+
   export interface OrgizeSourceBlockRecordDto {
     source: OrgizeSourceRangeDto;
     kind: OrgizeSourceBlockKindDto;
@@ -106,6 +172,7 @@ declare namespace OrgizeDto {
     codeRefs: OrgizeSourceBlockCodeRefDto[];
     tangle?: OrgizeSourceBlockTangleDto | null;
     resultOptions: OrgizeSourceBlockResultOptionsDto;
+    execution: OrgizeSourceBlockExecutionPlanDto;
     result?: OrgizeSourceBlockResultDto | null;
     value: string;
   }

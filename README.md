@@ -122,7 +122,9 @@ readFile(require.resolve("orgize/wasm")).then((bytes) => {
    `#+PROPERTY: header-args`, `#+HEADER:`, and `#+BEGIN_SRC` header arguments
    plus non-executing tangle metadata for `:mkdirp`, `:comments`, `:shebang`,
    and `:noweb`, plus result planning metadata for `:results` and `:file`
-   output hints. It also exposes literate references for `#+CALL`, inline
+   output hints, and execution/export planning metadata for `:eval`,
+   `:exports`, `:cache`, `:session`, `:dir`, `:hlines`, and context-specific
+   `:noweb`. It also exposes literate references for `#+CALL`, inline
    `call_name(...)`, source-block `:var` dependencies, and noweb `<<name>>`
    targets. Worker users receive parsed objects;
 

@@ -18,7 +18,7 @@ echo load
 #+end_src
 
 #+HEADER: :var topic="demo" :results file link output :file "reports/demo.txt" :file-desc "Demo output" :file-mode 0644 :output-dir public
-#+begin_src sh :var rows=load_data :var scoped=load_data(limit=1) :var literal=42 :var quoted="load_data" :var missing=missing_call()
+#+begin_src sh :eval never-export :exports none :cache yes :noweb no-export :var rows=load_data :var scoped=load_data(limit=1) :var literal=42 :var quoted="load_data" :var missing=missing_call()
 echo "$rows"
 #+end_src
 
@@ -69,6 +69,17 @@ Inline call_load_data() and call_missing_inline().
     assert_eq!(result_options["file"]["description"], "Demo output");
     assert_eq!(result_options["file"]["fileMode"], "0644");
     assert_eq!(result_options["file"]["outputDir"], "public");
+    let execution = header_arg_record["execution"]
+        .as_object()
+        .expect("execution");
+    assert_eq!(execution["eval"]["policy"], "neverExport");
+    assert_eq!(execution["exports"]["policy"], "none");
+    assert_eq!(execution["cache"]["enabled"], true);
+    assert_eq!(execution["session"]["name"], "shared");
+    assert_eq!(execution["directory"]["target"], "./scripts");
+    assert_eq!(execution["noweb"]["eval"], "expand");
+    assert_eq!(execution["noweb"]["export"], "disabled");
+    assert_eq!(execution["noweb"]["tangle"], "expand");
 
     let tangle = records[0]["tangle"].as_object().expect("tangle metadata");
     assert_eq!(tangle["target"], "scripts/setup.sh");

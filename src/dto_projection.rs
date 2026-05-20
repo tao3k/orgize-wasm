@@ -12,8 +12,7 @@ use crate::{
     dto_document::{
         column_view_records, column_views_response, datetree_entries, datetree_response,
         document_metadata, include_expansion_entries, include_expansion_response, outline_node,
-        progress_stats_records, progress_stats_response, source_block_records,
-        source_blocks_response, task_blockers_response,
+        progress_stats_records, progress_stats_response, task_blockers_response,
     },
     dto_dynamic_block::{dynamic_block_records, dynamic_blocks_response},
     dto_index::{
@@ -30,6 +29,7 @@ use crate::{
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
     dto_runtime::runtime_metadata_response,
     dto_sdd::{sdd_records, sdd_response},
+    dto_source_blocks::{source_block_records, source_blocks_response},
 };
 use orgize::ast::{
     AgendaBlockViewQuery, AgendaViewQuery, AgentCaptureRequest, ClockIssueProfile, Document,

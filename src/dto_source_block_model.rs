@@ -23,6 +23,7 @@ pub(crate) struct WasmSourceBlockRecord {
     pub(crate) code_refs: Vec<WasmSourceBlockCodeRef>,
     pub(crate) tangle: Option<WasmSourceBlockTangle>,
     pub(crate) result_options: WasmSourceBlockResultOptions,
+    pub(crate) execution: WasmSourceBlockExecutionPlan,
     pub(crate) result: Option<WasmSourceBlockResult>,
     pub(crate) value: String,
 }
@@ -132,4 +133,77 @@ pub(crate) struct WasmSourceBlockResultFile {
     pub(crate) extension: Option<String>,
     pub(crate) file_mode: Option<String>,
     pub(crate) output_dir: Option<String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockExecutionPlan {
+    pub(crate) eval: WasmSourceBlockEval,
+    pub(crate) exports: WasmSourceBlockExports,
+    pub(crate) cache: WasmSourceBlockCache,
+    pub(crate) session: WasmSourceBlockSession,
+    pub(crate) directory: Option<WasmSourceBlockDirectory>,
+    pub(crate) hlines: WasmSourceBlockBooleanHeader,
+    pub(crate) noweb: WasmSourceBlockNowebPlan,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockEval {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) policy: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockExports {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) policy: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockCache {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) enabled: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockSession {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) name: Option<String>,
+    pub(crate) active: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockDirectory {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) target: String,
+    pub(crate) kind: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockBooleanHeader {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) enabled: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockNowebPlan {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) tokens: Vec<String>,
+    pub(crate) eval: &'static str,
+    pub(crate) export: &'static str,
+    pub(crate) tangle: &'static str,
 }

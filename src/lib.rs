@@ -29,5 +29,6 @@ mod dto_sdd;
 mod dto_sdd_model;
 mod dto_shared_model;
 mod dto_source_block_model;
+mod dto_source_blocks;
 
 pub use bindings::Org;
