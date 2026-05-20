@@ -8,10 +8,10 @@ on:
       orgize-ref:
         description: orgize branch, tag, or commit to use as the parent checkout
         required: false
-        default: agenda-semantics-m16
+        default: 6174dc0d203c9b3aa393814872ef4b2d268fae56
 
 env:
-  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || 'agenda-semantics-m16' }}
+  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || '6174dc0d203c9b3aa393814872ef4b2d268fae56' }}
   CARGO_INCREMENTAL: "0"
   CARGO_TARGET_DIR: ${{ github.workspace }}/orgize/target/orgize-wasm
 
