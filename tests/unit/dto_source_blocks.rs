@@ -17,7 +17,7 @@ echo load
 <<missing>>
 #+end_src
 
-#+HEADER: :var topic="demo" :results drawer
+#+HEADER: :var topic="demo" :results file link output :file "reports/demo.txt" :file-desc "Demo output" :file-mode 0644 :output-dir public
 #+begin_src sh :var rows=load_data :var scoped=load_data(limit=1) :var literal=42 :var quoted="load_data" :var missing=missing_call()
 echo "$rows"
 #+end_src
@@ -51,8 +51,25 @@ Inline call_load_data() and call_missing_inline().
         arg["key"] == "dir" && arg["source"] == "explicit" && arg["value"] == "./scripts"
     }));
     assert!(header_args.iter().any(|arg| {
-        arg["key"] == "results" && arg["source"] == "explicit" && arg["value"] == "drawer"
+        arg["key"] == "results" && arg["source"] == "explicit" && arg["value"] == "file link output"
     }));
+    assert!(header_args.iter().any(|arg| {
+        arg["kind"] == "file"
+            && arg["source"] == "explicit"
+            && arg["value"] == "\"reports/demo.txt\""
+    }));
+    let result_options = header_arg_record["resultOptions"]
+        .as_object()
+        .expect("result options");
+    assert_eq!(result_options["collection"], "file");
+    assert_eq!(result_options["format"], "link");
+    assert_eq!(result_options["handling"], "replace");
+    assert_eq!(result_options["valueType"], "output");
+    assert_eq!(result_options["file"]["target"], "reports/demo.txt");
+    assert_eq!(result_options["file"]["description"], "Demo output");
+    assert_eq!(result_options["file"]["fileMode"], "0644");
+    assert_eq!(result_options["file"]["outputDir"], "public");
+
     let tangle = records[0]["tangle"].as_object().expect("tangle metadata");
     assert_eq!(tangle["target"], "scripts/setup.sh");
     assert_eq!(tangle["mkdirp"]["enabled"], true);

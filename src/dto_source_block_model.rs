@@ -22,6 +22,7 @@ pub(crate) struct WasmSourceBlockRecord {
     pub(crate) header_args: Vec<WasmSourceBlockHeaderArg>,
     pub(crate) code_refs: Vec<WasmSourceBlockCodeRef>,
     pub(crate) tangle: Option<WasmSourceBlockTangle>,
+    pub(crate) result_options: WasmSourceBlockResultOptions,
     pub(crate) result: Option<WasmSourceBlockResult>,
     pub(crate) value: String,
 }
@@ -107,4 +108,28 @@ pub(crate) struct WasmSourceBlockResult {
     pub(crate) name: Option<String>,
     pub(crate) keyword_value: String,
     pub(crate) value: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockResultOptions {
+    pub(crate) raw: String,
+    pub(crate) source: &'static str,
+    pub(crate) tokens: Vec<String>,
+    pub(crate) collection: Option<&'static str>,
+    pub(crate) format: Option<&'static str>,
+    pub(crate) handling: &'static str,
+    pub(crate) value_type: &'static str,
+    pub(crate) unknown: Vec<String>,
+    pub(crate) file: Option<WasmSourceBlockResultFile>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockResultFile {
+    pub(crate) target: String,
+    pub(crate) description: Option<String>,
+    pub(crate) extension: Option<String>,
+    pub(crate) file_mode: Option<String>,
+    pub(crate) output_dir: Option<String>,
 }

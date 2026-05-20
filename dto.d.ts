@@ -1,5 +1,6 @@
 /// <reference path="./dto/core.d.ts" />
 /// <reference path="./dto/elements.d.ts" />
+/// <reference path="./dto/source-blocks.d.ts" />
 /// <reference path="./dto/workspace.d.ts" />
 /// <reference path="./dto/operations.d.ts" />
 /// <reference path="./dto/clock.d.ts" />
@@ -94,6 +95,8 @@ export interface OrgizeSourceBlockTangleMkdirpDto extends OrgizeDto.OrgizeSource
 export interface OrgizeSourceBlockTangleCommentsDto extends OrgizeDto.OrgizeSourceBlockTangleCommentsDto {}
 export interface OrgizeSourceBlockTangleNowebDto extends OrgizeDto.OrgizeSourceBlockTangleNowebDto {}
 export interface OrgizeSourceBlockResultDto extends OrgizeDto.OrgizeSourceBlockResultDto {}
+export interface OrgizeSourceBlockResultOptionsDto extends OrgizeDto.OrgizeSourceBlockResultOptionsDto {}
+export interface OrgizeSourceBlockResultFileDto extends OrgizeDto.OrgizeSourceBlockResultFileDto {}
 export interface OrgizeSourceBlockRecordDto extends OrgizeDto.OrgizeSourceBlockRecordDto {}
 export type OrgizeSourceBlockReferenceKindDto = OrgizeDto.OrgizeSourceBlockReferenceKindDto;
 export interface OrgizeSourceBlockReferenceDto extends OrgizeDto.OrgizeSourceBlockReferenceDto {}

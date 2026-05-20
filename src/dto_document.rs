@@ -21,15 +21,18 @@ use crate::{
     dto_source_block_model::{
         WasmSourceBlockCodeRef, WasmSourceBlockHeaderArg, WasmSourceBlockHeaderVar,
         WasmSourceBlockRecord, WasmSourceBlockReference, WasmSourceBlockResult,
-        WasmSourceBlockTangle, WasmSourceBlockTangleComments, WasmSourceBlockTangleMkdirp,
-        WasmSourceBlockTangleNoweb, WasmSourceBlocksResponse,
+        WasmSourceBlockResultFile, WasmSourceBlockResultOptions, WasmSourceBlockTangle,
+        WasmSourceBlockTangleComments, WasmSourceBlockTangleMkdirp, WasmSourceBlockTangleNoweb,
+        WasmSourceBlocksResponse,
     },
 };
 use orgize::ast::{
     ColumnViewRecord, ColumnViewScope, ColumnViewSource, DateTreeEntry, Document, IncludeDirective,
     IncludeExpansionMode, IncludeExpansionOptions, IncludeLineSelection, ParsedAnnotation, Section,
     SourceBlockHeaderArgKind, SourceBlockHeaderArgSource, SourceBlockRecord, SourceBlockRecordKind,
-    SourceBlockReference, SourceBlockReferenceKind, SourceBlockResultKind, SourceBlockSource,
+    SourceBlockReference, SourceBlockReferenceKind, SourceBlockResultCollection,
+    SourceBlockResultFormat, SourceBlockResultHandling, SourceBlockResultKind,
+    SourceBlockResultOptions, SourceBlockResultValueType, SourceBlockSource,
     SourceBlockTangleCommentsMode, SourceBlockTangleMode, SourceBlockTangleNowebMode,
     TaskBlockerRecord, TaskBlockerTask,
 };
@@ -346,6 +349,7 @@ fn source_block_record(record: &SourceBlockRecord) -> WasmSourceBlockRecord {
                 mode: source_block_tangle_noweb_mode(tangle.noweb.mode),
             },
         }),
+        result_options: source_block_result_options(&record.result_options),
         result: record.result.as_ref().map(|result| WasmSourceBlockResult {
             source: source_block_source(&result.source),
             kind: match result.kind {
@@ -373,6 +377,26 @@ fn source_block_reference(reference: &SourceBlockReference) -> WasmSourceBlockRe
         variable: reference.variable.clone(),
         target: reference.target.clone(),
         resolved: reference.resolved,
+    }
+}
+
+fn source_block_result_options(options: &SourceBlockResultOptions) -> WasmSourceBlockResultOptions {
+    WasmSourceBlockResultOptions {
+        raw: options.raw.clone(),
+        source: source_block_header_arg_source(options.source),
+        tokens: options.tokens.clone(),
+        collection: options.collection.map(source_block_result_collection),
+        format: options.format.map(source_block_result_format),
+        handling: source_block_result_handling(options.handling),
+        value_type: source_block_result_value_type(options.value_type),
+        unknown: options.unknown.clone(),
+        file: options.file.as_ref().map(|file| WasmSourceBlockResultFile {
+            target: file.target.clone(),
+            description: file.description.clone(),
+            extension: file.extension.clone(),
+            file_mode: file.file_mode.as_ref().map(|mode| mode.raw.clone()),
+            output_dir: file.output_dir.clone(),
+        }),
     }
 }
 
@@ -624,8 +648,13 @@ fn source_block_header_arg_kind(kind: SourceBlockHeaderArgKind) -> &'static str 
         SourceBlockHeaderArgKind::Dir => "dir",
         SourceBlockHeaderArgKind::Eval => "eval",
         SourceBlockHeaderArgKind::Exports => "exports",
+        SourceBlockHeaderArgKind::File => "file",
+        SourceBlockHeaderArgKind::FileDesc => "fileDesc",
+        SourceBlockHeaderArgKind::FileExt => "fileExt",
+        SourceBlockHeaderArgKind::FileMode => "fileMode",
         SourceBlockHeaderArgKind::Hlines => "hlines",
         SourceBlockHeaderArgKind::Noweb => "noweb",
+        SourceBlockHeaderArgKind::OutputDir => "outputDir",
         SourceBlockHeaderArgKind::Results => "results",
         SourceBlockHeaderArgKind::Session => "session",
         SourceBlockHeaderArgKind::Tangle => "tangle",
@@ -666,5 +695,48 @@ fn source_block_tangle_noweb_mode(mode: SourceBlockTangleNowebMode) -> &'static 
         SourceBlockTangleNowebMode::Disabled => "disabled",
         SourceBlockTangleNowebMode::Expand => "expand",
         SourceBlockTangleNowebMode::Strip => "strip",
+    }
+}
+
+fn source_block_result_collection(collection: SourceBlockResultCollection) -> &'static str {
+    match collection {
+        SourceBlockResultCollection::File => "file",
+        SourceBlockResultCollection::List => "list",
+        SourceBlockResultCollection::Vector => "vector",
+        SourceBlockResultCollection::Table => "table",
+        SourceBlockResultCollection::Scalar => "scalar",
+        SourceBlockResultCollection::Verbatim => "verbatim",
+    }
+}
+
+fn source_block_result_format(format: SourceBlockResultFormat) -> &'static str {
+    match format {
+        SourceBlockResultFormat::Raw => "raw",
+        SourceBlockResultFormat::Html => "html",
+        SourceBlockResultFormat::Latex => "latex",
+        SourceBlockResultFormat::Org => "org",
+        SourceBlockResultFormat::Code => "code",
+        SourceBlockResultFormat::Pp => "pp",
+        SourceBlockResultFormat::Drawer => "drawer",
+        SourceBlockResultFormat::Link => "link",
+        SourceBlockResultFormat::Graphics => "graphics",
+    }
+}
+
+fn source_block_result_handling(handling: SourceBlockResultHandling) -> &'static str {
+    match handling {
+        SourceBlockResultHandling::Replace => "replace",
+        SourceBlockResultHandling::Silent => "silent",
+        SourceBlockResultHandling::None => "none",
+        SourceBlockResultHandling::Discard => "discard",
+        SourceBlockResultHandling::Append => "append",
+        SourceBlockResultHandling::Prepend => "prepend",
+    }
+}
+
+fn source_block_result_value_type(value_type: SourceBlockResultValueType) -> &'static str {
+    match value_type {
+        SourceBlockResultValueType::Value => "value",
+        SourceBlockResultValueType::Output => "output",
     }
 }
