@@ -71,6 +71,10 @@ worker.postMessage({
 For TanStack Query or Effect integrations, treat the worker response DTOs as the
 cache boundary. Keep the full semantic AST in Rust and request smaller
 projections for UI panels.
+When a host has loaded property-schema contracts, pass
+`propertySchemaRegistry` with `projection: "snapshot"` or
+`projection: "snapshotWithSchemas"` so the returned `propertyProfile` and
+`lint` entries are validated against the same registry.
 
 ## Node.js
 
@@ -108,8 +112,9 @@ readFile(require.resolve("orgize/wasm")).then((bytes) => {
    `outlineJson`, `metadataJson`, `lintJson`, `sectionIndexJson`,
    `sparseTreeJson`, `agendaViewJson`, `agendaBlockJson`,
    `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`,
-   `columnViewsJson`, `includeExpansionJson`, `datetreeJson`, and
-   `snapshotJson`. Worker users receive parsed objects;
+   `columnViewsJson`, `propertyProfileJson`, `propertyProfileWithSchemasJson`,
+   `includeExpansionJson`, `datetreeJson`, `snapshotJson`, and
+   `snapshotWithSchemasJson`. Worker users receive parsed objects;
 
 5. This npm package is primarily aimed at browser demos and high-level
    integrations. If you need a custom Node-only package, build with `napi`.

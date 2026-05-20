@@ -30,6 +30,13 @@ pub(crate) fn property_profile(document: &Document<ParsedAnnotation>) -> WasmPro
     property_profile_from_core(profile)
 }
 
+pub(crate) fn property_profile_with_schema_registry(
+    document: &Document<ParsedAnnotation>,
+    registry: &PropertySchemaRegistry,
+) -> WasmPropertyProfile {
+    property_profile_from_core(document.property_profile_with_schema_registry(registry))
+}
+
 pub(crate) fn property_profile_with_schema_registry_response(
     document: &Document<ParsedAnnotation>,
     request: WasmPropertySchemaRegistryRequest,
@@ -37,9 +44,7 @@ pub(crate) fn property_profile_with_schema_registry_response(
     let registry = property_schema_registry(request);
     WasmPropertyProfileResponse {
         schema_version: 1,
-        profile: property_profile_from_core(
-            document.property_profile_with_schema_registry(&registry),
-        ),
+        profile: property_profile_with_schema_registry(document, &registry),
     }
 }
 
@@ -155,7 +160,9 @@ fn property_schema_finding(finding: PropertySchemaFinding) -> WasmPropertySchema
     }
 }
 
-fn property_schema_registry(request: WasmPropertySchemaRegistryRequest) -> PropertySchemaRegistry {
+pub(crate) fn property_schema_registry(
+    request: WasmPropertySchemaRegistryRequest,
+) -> PropertySchemaRegistry {
     PropertySchemaRegistry::new(request.contracts.into_iter().map(property_schema_contract))
 }
 

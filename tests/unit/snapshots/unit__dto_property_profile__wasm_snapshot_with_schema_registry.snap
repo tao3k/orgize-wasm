@@ -1,0 +1,78 @@
+---
+source: tests/unit/dto_property_profile.rs
+expression: "serde_json::to_string_pretty(&serde_json::json!({\n    \"propertyProfile\":\n    {\n        \"schemaApplications\":\n        snapshot[\"propertyProfile\"][\"schemaApplications\"],\n    }, \"lint\": snapshot[\"lint\"],\n})).expect(\"stable snapshot JSON\")"
+---
+{
+  "lint": [
+    {
+      "code": "ORG040",
+      "message": "property schema `wendao.capture.v1` requires `CAPTURE_KIND`",
+      "severity": "warning",
+      "source": {
+        "end": {
+          "column": 59,
+          "line": 5
+        },
+        "rangeEnd": 154,
+        "rangeStart": 114,
+        "start": {
+          "column": 19,
+          "line": 5
+        }
+      }
+    }
+  ],
+  "propertyProfile": {
+    "schemaApplications": [
+      {
+        "contractId": "wendao.capture.v1",
+        "findings": [
+          {
+            "actual": null,
+            "expected": [],
+            "kind": "missingRequiredProperty",
+            "message": "property schema `wendao.capture.v1` requires `CAPTURE_KIND`",
+            "property": "CAPTURE_KIND",
+            "source": {
+              "end": {
+                "column": 59,
+                "line": 5
+              },
+              "rangeEnd": 154,
+              "rangeStart": 114,
+              "start": {
+                "column": 19,
+                "line": 5
+              }
+            }
+          }
+        ],
+        "reference": {
+          "kind": "macro",
+          "normalized": "wendao.capture.v1",
+          "raw": "{{{property_schema(wendao.capture.v1)}}}"
+        },
+        "scope": {
+          "kind": "section",
+          "level": 1,
+          "outlinePath": [
+            "Project"
+          ],
+          "title": "Project"
+        },
+        "source": {
+          "end": {
+            "column": 59,
+            "line": 5
+          },
+          "rangeEnd": 154,
+          "rangeStart": 114,
+          "start": {
+            "column": 19,
+            "line": 5
+          }
+        }
+      }
+    ]
+  }
+}

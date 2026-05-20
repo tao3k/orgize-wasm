@@ -42,6 +42,7 @@ export const org_sddJson: (a: number) => [number, number];
 export const org_sectionIndexJson: (a: number, b: number, c: number) => [number, number];
 export const org_semantic: (a: number) => [number, number];
 export const org_snapshotJson: (a: number, b: number, c: number) => [number, number];
+export const org_snapshotWithSchemasJson: (a: number, b: number, c: number, d: number, e: number) => [number, number, number, number];
 export const org_sourceBlocksJson: (a: number) => [number, number];
 export const org_sparseTreeExplainJson: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number, number];
 export const org_sparseTreeJson: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number, number];

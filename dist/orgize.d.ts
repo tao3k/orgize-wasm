@@ -45,6 +45,7 @@ export class Org {
     sectionIndexJson(source_file?: string | null): string;
     semantic(): string;
     snapshotJson(source_file?: string | null): string;
+    snapshotWithSchemasJson(request_json: string, source_file?: string | null): string;
     sourceBlocksJson(): string;
     sparseTreeExplainJson(source_file?: string | null, match_expression?: string | null, text?: string | null, include_archived?: boolean | null): string;
     sparseTreeJson(source_file?: string | null, match_expression?: string | null, text?: string | null, include_archived?: boolean | null): string;
@@ -102,6 +103,7 @@ export interface InitOutput {
     readonly org_sectionIndexJson: (a: number, b: number, c: number) => [number, number];
     readonly org_semantic: (a: number) => [number, number];
     readonly org_snapshotJson: (a: number, b: number, c: number) => [number, number];
+    readonly org_snapshotWithSchemasJson: (a: number, b: number, c: number, d: number, e: number) => [number, number, number, number];
     readonly org_sourceBlocksJson: (a: number) => [number, number];
     readonly org_sparseTreeExplainJson: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number, number];
     readonly org_sparseTreeJson: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number, number];

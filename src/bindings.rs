@@ -476,6 +476,27 @@ impl Org {
         dto_projection::snapshot_json(&document, &self.source, source_file.as_deref())
     }
 
+    #[wasm_bindgen(js_name = snapshotWithSchemasJson)]
+    pub fn snapshot_with_schemas_json(
+        &self,
+        request_json: &str,
+        source_file: Option<String>,
+    ) -> Result<String, JsValue> {
+        let request: crate::dto_property_profile_model::WasmPropertySchemaRegistryRequest =
+            serde_json::from_str(request_json).map_err(|error| {
+                JsValue::from_str(&format!(
+                    "invalid property schema registry request: {error}"
+                ))
+            })?;
+        let document = self.document();
+        Ok(dto_projection::snapshot_with_schema_registry_json(
+            &document,
+            &self.source,
+            source_file.as_deref(),
+            request,
+        ))
+    }
+
     pub fn traverse(&self) -> String {
         let mut result = String::new();
         let mut ident = 0;

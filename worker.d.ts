@@ -7,6 +7,7 @@ import type {
   OrgizeOrgElementsIndexQueryDto,
   OrgizeProjectionDto,
   OrgizeProjectionName,
+  OrgizePropertySchemaRegistryRequestDto,
 } from "./dto.js";
 
 export type OrgizeRenderFormat =
@@ -36,6 +37,7 @@ export interface OrgizeWorkerBaseRequest {
   orgElementsIndex?: OrgizeOrgElementsIndexQueryDto;
   clockIssueProfile?: OrgizeClockIssueProfileRequestDto;
   memory?: OrgizeMemoryJsonRequestDto;
+  propertySchemaRegistry?: OrgizePropertySchemaRegistryRequestDto;
 }
 
 export interface OrgizeWorkerInitRequest extends OrgizeWorkerBaseRequest {

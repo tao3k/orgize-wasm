@@ -47,20 +47,8 @@ fn wasm_property_profile_contract_exposes_allowed_values() {
     assert_eq!(owner["values"][2], "");
 
     let with_registry: Value = serde_json::from_str(
-        &org.property_profile_with_schemas_json(
-            r#"{
-              "contracts": [{
-                "id": "wendao.capture.v1",
-                "aliases": ["file:schemas/capture.schema.json#wendao.capture.v1"],
-                "allowUnknownProperties": false,
-                "fields": [
-                  {"key": "CAPTURE_KIND", "required": true, "valueRule": {"kind": "oneOf", "values": ["idea", "note"]}},
-                  {"key": "Owner", "valueRule": {"kind": "nonEmpty"}}
-                ]
-              }]
-            }"#,
-        )
-        .expect("property profile with loaded schema registry"),
+        &org.property_profile_with_schemas_json(capture_schema_registry_request())
+            .expect("property profile with loaded schema registry"),
     )
     .expect("property profile with schema registry JSON should parse");
     let applications = with_registry["profile"]["schemaApplications"]
@@ -84,4 +72,44 @@ fn wasm_property_profile_contract_exposes_allowed_values() {
         }))
         .expect("stable JSON snapshot")
     );
+
+    let snapshot: Value = serde_json::from_str(
+        &org.snapshot_with_schemas_json(
+            capture_schema_registry_request(),
+            Some("capture.org".to_string()),
+        )
+        .expect("snapshot with loaded schema registry"),
+    )
+    .expect("snapshot with schema registry JSON should parse");
+    assert!(
+        snapshot["lint"]
+            .as_array()
+            .expect("snapshot lint findings")
+            .iter()
+            .any(|finding| finding["code"] == "ORG040")
+    );
+    insta::assert_snapshot!(
+        "wasm_snapshot_with_schema_registry",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "propertyProfile": {
+                "schemaApplications": snapshot["propertyProfile"]["schemaApplications"],
+            },
+            "lint": snapshot["lint"],
+        }))
+        .expect("stable snapshot JSON")
+    );
+}
+
+fn capture_schema_registry_request() -> &'static str {
+    r#"{
+      "contracts": [{
+        "id": "wendao.capture.v1",
+        "aliases": ["file:schemas/capture.schema.json#wendao.capture.v1"],
+        "allowUnknownProperties": false,
+        "fields": [
+          {"key": "CAPTURE_KIND", "required": true, "valueRule": {"kind": "oneOf", "values": ["idea", "note"]}},
+          {"key": "Owner", "valueRule": {"kind": "nonEmpty"}}
+        ]
+      }]
+    }"#
 }

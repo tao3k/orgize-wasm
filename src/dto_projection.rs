@@ -23,8 +23,10 @@ use crate::{
     },
     dto_memory::memory_response,
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
-    dto_property_profile::property_profile_with_schema_registry_response,
-    dto_property_profile::{property_profile, property_profile_response},
+    dto_property_profile::{
+        property_profile, property_profile_response, property_profile_with_schema_registry,
+        property_profile_with_schema_registry_response, property_schema_registry,
+    },
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
     dto_runtime::runtime_metadata_response,
     dto_sdd::{sdd_records, sdd_response},
@@ -33,6 +35,10 @@ use orgize::ast::{
     AgendaBlockViewQuery, AgendaViewQuery, AgentCaptureRequest, ClockIssueProfile, Document,
     IncludeExpansionOptions, MemoryQuery, ParsedAnnotation, RefilePlanRequest, RefileTargetQuery,
     SparseTreeQuery,
+};
+use orgize::{
+    ast::PropertySchemaRegistry,
+    lint::{LintOptions, lint_document_with_options},
 };
 
 pub(crate) fn outline_json(document: &Document<ParsedAnnotation>) -> String {
@@ -250,14 +256,48 @@ pub(crate) fn snapshot_json(
     source: &str,
     source_file: Option<&str>,
 ) -> String {
+    to_json(&snapshot_response(document, source, source_file, None))
+}
+
+pub(crate) fn snapshot_with_schema_registry_json(
+    document: &Document<ParsedAnnotation>,
+    source: &str,
+    source_file: Option<&str>,
+    request: crate::dto_property_profile_model::WasmPropertySchemaRegistryRequest,
+) -> String {
+    let registry = property_schema_registry(request);
+    to_json(&snapshot_response(
+        document,
+        source,
+        source_file,
+        Some(&registry),
+    ))
+}
+
+fn snapshot_response(
+    document: &Document<ParsedAnnotation>,
+    source: &str,
+    source_file: Option<&str>,
+    schema_registry: Option<&PropertySchemaRegistry>,
+) -> WasmSnapshotResponse {
     let records = section_index_records(document, source_file);
-    let lint = orgize::lint::lint_document(document, source);
+    let lint = match schema_registry {
+        Some(registry) => lint_document_with_options(
+            document,
+            source,
+            &LintOptions {
+                property_schema_registry: registry.clone(),
+                ..LintOptions::default()
+            },
+        ),
+        None => orgize::lint::lint_document(document, source),
+    };
     let include_options = IncludeExpansionOptions::default();
     let mut refile_query = RefileTargetQuery::new();
     if let Some(source_file) = source_file {
         refile_query = refile_query.source_file(source_file);
     }
-    to_json(&WasmSnapshotResponse {
+    WasmSnapshotResponse {
         schema_version: 1,
         metadata: document_metadata(document),
         outline: document.sections.iter().map(outline_node).collect(),
@@ -266,7 +306,10 @@ pub(crate) fn snapshot_json(
         source_blocks: source_block_records(document),
         column_views: column_view_records(document),
         dynamic_blocks: dynamic_block_records(document),
-        property_profile: property_profile(document),
+        property_profile: schema_registry.map_or_else(
+            || property_profile(document),
+            |registry| property_profile_with_schema_registry(document, registry),
+        ),
         refile_targets: refile_targets(document, &refile_query),
         include_expansion: include_expansion_entries(document, &include_options),
         datetree: datetree_entries(document),
@@ -279,5 +322,5 @@ pub(crate) fn snapshot_json(
         crypt: crypt_records(document),
         runtime_metadata: runtime_metadata_response(document),
         lint: lint_findings(&lint.findings),
-    })
+    }
 }

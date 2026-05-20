@@ -51,6 +51,7 @@ declare namespace OrgizeDto {
     | "columnViews"
     | "dynamicBlocks"
     | "propertyProfile"
+    | "propertyProfileWithSchemas"
     | "capturePlan"
     | "refileTargets"
     | "refilePlan"
@@ -65,7 +66,8 @@ declare namespace OrgizeDto {
     | "memory"
     | "crypt"
     | "runtimeMetadata"
-    | "snapshot";
+    | "snapshot"
+    | "snapshotWithSchemas";
 
   export type OrgizeProjectionDto =
     | OrgizeOutlineResponseDto

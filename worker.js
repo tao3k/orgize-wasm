@@ -36,8 +36,12 @@ const projectionFor = (
   capturePlan,
   orgElementsIndex,
   clockIssueProfile,
-  memory
+  memory,
+  propertySchemaRegistry
 ) => {
+  const schemaRegistryRequest = () =>
+    JSON.stringify(propertySchemaRegistry ?? { contracts: [] });
+
   switch (projection) {
     case "outline":
       return parseJson(org.outlineJson());
@@ -86,6 +90,10 @@ const projectionFor = (
       );
     case "memory":
       return parseJson(org.memoryJson(memory ? JSON.stringify(memory) : undefined));
+    case "propertyProfile":
+      return parseJson(org.propertyProfileJson());
+    case "propertyProfileWithSchemas":
+      return parseJson(org.propertyProfileWithSchemasJson(schemaRegistryRequest()));
     case "crypt":
       return parseJson(org.cryptJson());
     case "runtimeMetadata":
@@ -105,7 +113,16 @@ const projectionFor = (
     case "datetree":
       return parseJson(org.datetreeJson());
     case "snapshot":
+      if (propertySchemaRegistry) {
+        return parseJson(
+          org.snapshotWithSchemasJson(schemaRegistryRequest(), sourceFile ?? undefined)
+        );
+      }
       return parseJson(org.snapshotJson(sourceFile ?? undefined));
+    case "snapshotWithSchemas":
+      return parseJson(
+        org.snapshotWithSchemasJson(schemaRegistryRequest(), sourceFile ?? undefined)
+      );
     default:
       throw new Error(`unknown orgize projection '${projection}'`);
   }
@@ -190,7 +207,8 @@ const handleMessage = async (message) => {
           message.capturePlan,
           message.orgElementsIndex,
           message.clockIssueProfile,
-          message.memory
+          message.memory,
+          message.propertySchemaRegistry
         );
         break;
       }
@@ -218,7 +236,8 @@ const handleMessage = async (message) => {
           message.capturePlan,
           message.orgElementsIndex,
           message.clockIssueProfile,
-          message.memory
+          message.memory,
+          message.propertySchemaRegistry
         );
         break;
       }
@@ -236,7 +255,8 @@ const handleMessage = async (message) => {
           message.capturePlan,
           message.orgElementsIndex,
           message.clockIssueProfile,
-          message.memory
+          message.memory,
+          message.propertySchemaRegistry
         );
         break;
       }
