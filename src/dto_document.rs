@@ -93,6 +93,13 @@ pub(crate) fn document_metadata(document: &Document<ParsedAnnotation>) -> WasmMe
                 name: definition.name.clone(),
                 shortcut: definition.shortcut.clone(),
                 raw: definition.raw.clone(),
+                is_group: definition.is_group,
+                group: definition.group.as_ref().map(|group| {
+                    crate::dto_model::WasmTagDefinitionGroup {
+                        name: group.name.clone(),
+                        exclusive: group.exclusive,
+                    }
+                }),
             })
             .collect(),
         export_settings: WasmExportSettings {

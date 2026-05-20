@@ -110,7 +110,8 @@ Value src_sh[:exports both]{echo hi}
 #[test]
 fn wasm_org_elements_contract_exposes_tag_vocabulary_and_source_blocks() {
     let org = Org::parse(
-        r#"#+TAGS: EMACS (e) COURSE (c) EXERCISE (ex) READ(r)
+        r#"#+TAGS: { EMACS (e) COURSE (c) } EXERCISE (ex) READ(r)
+#+TAGS: [ Learn : EXERCISE READ ]
 #+PYTHON: print("explicit host execution only")
 
 * TODO Browser binding :EMACS:READ:
@@ -126,8 +127,13 @@ print(topic)
         serde_json::from_str(&org.metadata_json()).expect("metadata JSON should parse");
     assert_eq!(metadata["tagDefinitions"][0]["name"], "EMACS");
     assert_eq!(metadata["tagDefinitions"][0]["shortcut"], "e");
+    assert_eq!(metadata["tagDefinitions"][0]["group"]["exclusive"], true);
     assert_eq!(metadata["tagDefinitions"][2]["shortcut"], "ex");
     assert_eq!(metadata["tagDefinitions"][3]["shortcut"], "r");
+    assert_eq!(metadata["tagDefinitions"][4]["name"], "Learn");
+    assert_eq!(metadata["tagDefinitions"][4]["isGroup"], true);
+    assert_eq!(metadata["tagDefinitions"][5]["group"]["name"], "Learn");
+    assert_eq!(metadata["tagDefinitions"][5]["group"]["exclusive"], false);
 
     let payload: Value = serde_json::from_str(&org.org_elements_json()).expect("Org elements JSON");
     assert_eq!(payload["schemaVersion"], 1);

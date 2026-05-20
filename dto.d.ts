@@ -19,6 +19,7 @@ export interface OrgizeKeywordAttributeDto extends OrgizeDto.OrgizeKeywordAttrib
 export interface OrgizeKeywordDto extends OrgizeDto.OrgizeKeywordDto {}
 export interface OrgizeExportSettingsDto extends OrgizeDto.OrgizeExportSettingsDto {}
 export interface OrgizeTagDefinitionDto extends OrgizeDto.OrgizeTagDefinitionDto {}
+export interface OrgizeTagDefinitionGroupDto extends OrgizeDto.OrgizeTagDefinitionGroupDto {}
 export interface OrgizePropertyDto extends OrgizeDto.OrgizePropertyDto {}
 export interface OrgizeLinkAbbreviationDto extends OrgizeDto.OrgizeLinkAbbreviationDto {}
 export interface OrgizeIncludeOptionDto extends OrgizeDto.OrgizeIncludeOptionDto {}

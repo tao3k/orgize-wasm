@@ -740,6 +740,15 @@ pub(crate) struct WasmTagDefinition {
     pub(crate) name: String,
     pub(crate) shortcut: Option<String>,
     pub(crate) raw: String,
+    pub(crate) is_group: bool,
+    pub(crate) group: Option<WasmTagDefinitionGroup>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmTagDefinitionGroup {
+    pub(crate) name: Option<String>,
+    pub(crate) exclusive: bool,
 }
 
 #[derive(Serialize)]

@@ -96,6 +96,13 @@ declare namespace OrgizeDto {
     name: string;
     shortcut?: string | null;
     raw: string;
+    isGroup: boolean;
+    group?: OrgizeTagDefinitionGroupDto | null;
+  }
+
+  export interface OrgizeTagDefinitionGroupDto {
+    name?: string | null;
+    exclusive: boolean;
   }
 
   export interface OrgizePropertyDto {
