@@ -224,6 +224,11 @@ export interface OrgizeOrgElementsPropertyDto {
   value: string;
 }
 
+export type OrgizeOrgElementsNodeDto = Record<string, unknown> & {
+  source: OrgizeOrgElementsSourceRangeDto;
+  kind: string;
+};
+
 export interface OrgizeOrgElementsSectionDto {
   source: OrgizeOrgElementsSourceRangeDto;
   outlinePath: string[];
@@ -237,14 +242,19 @@ export interface OrgizeOrgElementsSectionDto {
   isComment: boolean;
   properties: OrgizeOrgElementsPropertyDto[];
   effectiveProperties: OrgizeOrgElementsPropertyDto[];
+  elements: OrgizeOrgElementsNodeDto[];
   children: OrgizeOrgElementsSectionDto[];
 }
 
 export interface OrgizeOrgElementsDto {
   schemaVersion: 1;
+  source: OrgizeOrgElementsSourceRangeDto;
   metadata: OrgizeKeywordDto[];
   filetags: string[];
   tagDefinitions: OrgizeTagDefinitionDto[];
+  targets: OrgizeTargetDefinitionDto[];
+  footnotes: OrgizeFootnoteEntryDto[];
+  elements: OrgizeOrgElementsNodeDto[];
   sections: OrgizeOrgElementsSectionDto[];
   sourceBlocks: OrgizeSourceBlockRecordDto[];
 }

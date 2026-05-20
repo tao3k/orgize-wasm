@@ -114,6 +114,8 @@ fn wasm_org_elements_contract_exposes_tag_vocabulary_and_source_blocks() {
 #+PYTHON: print("explicit host execution only")
 
 * TODO Browser binding :EMACS:READ:
+See [[https://example.test][example]] at <2026-05-19 Tue>.
+- [X] done item
 #+begin_src python :results output :var topic="org-elements"
 print(topic)
 #+end_src
@@ -132,6 +134,18 @@ print(topic)
     assert_eq!(payload["sections"][0]["title"], "Browser binding");
     assert_eq!(payload["sections"][0]["todo"], "TODO");
     assert_eq!(payload["sections"][0]["tags"][0], "EMACS");
+    let section_elements = payload["sections"][0]["elements"]
+        .as_array()
+        .expect("section elements");
+    assert!(section_elements
+        .iter()
+        .any(|element| element["kind"] == "paragraph"));
+    assert!(section_elements
+        .iter()
+        .any(|element| element["kind"] == "plain-list"));
+    assert!(section_elements
+        .iter()
+        .any(|element| element["kind"] == "src-block" && element["language"] == "python"));
     assert_eq!(payload["sourceBlocks"][0]["language"], "python");
     assert_eq!(
         payload["sourceBlocks"][0]["normalizedHeaderArgs"]
