@@ -8,6 +8,7 @@ use crate::{
         clock_table_plans, clock_table_plans_response,
     },
     dto_common::to_json,
+    dto_crypt::{crypt_records, crypt_response},
     dto_document::{
         column_view_records, column_views_response, datetree_entries, datetree_response,
         document_metadata, include_expansion_entries, include_expansion_response, outline_node,
@@ -221,6 +222,10 @@ pub(crate) fn sdd_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&sdd_response(document))
 }
 
+pub(crate) fn crypt_json(document: &Document<ParsedAnnotation>) -> String {
+    to_json(&crypt_response(document))
+}
+
 pub(crate) fn memory_json(document: &Document<ParsedAnnotation>, query: &MemoryQuery) -> String {
     to_json(&memory_response(document, query))
 }
@@ -256,6 +261,7 @@ pub(crate) fn snapshot_json(
         clock_issues: clock_issue_findings(document, &ClockIssueProfile::org_default()),
         sdd: sdd_records(document),
         memory: memory_response(document, &MemoryQuery::new()),
+        crypt: crypt_records(document),
         lint: lint_findings(&lint.findings),
     })
 }

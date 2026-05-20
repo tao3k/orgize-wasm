@@ -86,6 +86,8 @@ const projectionFor = (
       );
     case "memory":
       return parseJson(org.memoryJson(memory ? JSON.stringify(memory) : undefined));
+    case "crypt":
+      return parseJson(org.cryptJson());
     case "sdd":
       return parseJson(org.sddJson());
     case "viewIndex":

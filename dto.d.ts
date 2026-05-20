@@ -1324,6 +1324,41 @@ export interface OrgizeMemoryResponseDto {
   authorityKinds: OrgizeMemoryFacetDto[];
 }
 
+export type OrgizeCryptWarningKindDto =
+  | "inheritedCryptTag"
+  | "plaintextCryptBody"
+  | "cryptKeyWithoutCryptTag";
+
+export interface OrgizeCryptKeyDto {
+  source: OrgizeSourceRangeDto;
+  value: string;
+  inherited: boolean;
+}
+
+export interface OrgizeCryptWarningDto {
+  kind: OrgizeCryptWarningKindDto;
+  message: string;
+}
+
+export interface OrgizeCryptRecordDto {
+  source: OrgizeSourceRangeDto;
+  outlinePath: string[];
+  level: number;
+  title: string;
+  tag: string;
+  hasDirectTag: boolean;
+  hasInheritedTag: boolean;
+  cryptKey?: OrgizeCryptKeyDto | null;
+  encryptedPayload: boolean;
+  bodyIsOpaque: boolean;
+  warnings: OrgizeCryptWarningDto[];
+}
+
+export interface OrgizeCryptResponseDto {
+  schemaVersion: 1;
+  records: OrgizeCryptRecordDto[];
+}
+
 export interface OrgizeProgressStatsRecordDto {
   source: OrgizeSourceRangeDto;
   outlinePath: string[];
@@ -1550,6 +1585,7 @@ export interface OrgizeSnapshotDto {
   clockIssues: OrgizeClockIssueFindingDto[];
   sdd: OrgizeSddNodeRecordDto[];
   memory: OrgizeMemoryResponseDto;
+  crypt: OrgizeCryptRecordDto[];
   lint: OrgizeLintFindingDto[];
 }
 
@@ -1581,6 +1617,7 @@ export type OrgizeProjectionName =
   | "taskBlockers"
   | "sdd"
   | "memory"
+  | "crypt"
   | "snapshot";
 
 export type OrgizeProjectionDto =
@@ -1611,4 +1648,5 @@ export type OrgizeProjectionDto =
   | OrgizeTaskBlockersResponseDto
   | OrgizeSddResponseDto
   | OrgizeMemoryResponseDto
+  | OrgizeCryptResponseDto
   | OrgizeSnapshotDto;

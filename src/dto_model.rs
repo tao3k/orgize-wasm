@@ -1,6 +1,7 @@
 //! Stable TypeScript-facing DTO models for browser projections.
 
 use crate::dto_clock_model::{WasmClockIssueFinding, WasmClockRollupRecord, WasmClockTablePlan};
+use crate::dto_crypt_model::WasmCryptRecord;
 use crate::dto_dynamic_block_model::WasmDynamicBlockRecord;
 use crate::dto_memory_model::WasmMemoryResponse;
 use crate::dto_property_profile_model::WasmPropertyProfile;
@@ -160,6 +161,7 @@ pub(crate) struct WasmSnapshotResponse {
     pub(crate) clock_issues: Vec<WasmClockIssueFinding>,
     pub(crate) sdd: Vec<WasmSddNodeRecord>,
     pub(crate) memory: WasmMemoryResponse,
+    pub(crate) crypt: Vec<WasmCryptRecord>,
     pub(crate) lint: Vec<WasmLintFinding>,
 }
 

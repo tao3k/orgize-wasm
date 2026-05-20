@@ -14,6 +14,7 @@ export const org_clockIssuesJson: (a: number, b: number, c: number) => [number, 
 export const org_clockRollupsJson: (a: number) => [number, number];
 export const org_clockTablePlansJson: (a: number) => [number, number];
 export const org_columnViewsJson: (a: number) => [number, number];
+export const org_cryptJson: (a: number) => [number, number];
 export const org_datetreeJson: (a: number) => [number, number];
 export const org_dynamicBlocksJson: (a: number) => [number, number];
 export const org_gitHash: () => [number, number];

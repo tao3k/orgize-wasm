@@ -441,6 +441,12 @@ impl Org {
         dto_projection::sdd_json(&document)
     }
 
+    #[wasm_bindgen(js_name = cryptJson)]
+    pub fn crypt_json(&self) -> String {
+        let document = self.document();
+        dto_projection::crypt_json(&document)
+    }
+
     #[wasm_bindgen(js_name = snapshotJson)]
     pub fn snapshot_json(&self, source_file: Option<String>) -> String {
         let document = self.document();
