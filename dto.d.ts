@@ -239,6 +239,14 @@ export interface OrgizeOrgElementsIndexNodeDto {
   summary: Record<string, unknown>;
 }
 
+export interface OrgizeOrgElementsIndexQueryDto {
+  category?: string;
+  kind?: string;
+  context?: string;
+  outlinePathPrefix?: string[];
+  limit?: number;
+}
+
 export interface OrgizeOrgElementsSectionDto {
   source: OrgizeOrgElementsSourceRangeDto;
   outlinePath: string[];
@@ -1205,6 +1213,117 @@ export interface OrgizeSddResponseDto {
   records: OrgizeSddNodeRecordDto[];
 }
 
+export interface OrgizeMemoryJsonRequestDto {
+  includeComments?: boolean;
+  includeClosed?: boolean;
+  includeArchived?: boolean;
+  requiredTags?: string[];
+  excludedTags?: string[];
+}
+
+export type OrgizeMemoryRecordStateDto = "current" | "background" | "closed" | "archived";
+
+export type OrgizeAgentMemorySeverityDto = "action" | "suppressed" | "info";
+
+export interface OrgizeMemoryStatsDto {
+  totalRecords: number;
+  currentRecords: number;
+  backgroundRecords: number;
+  closedRecords: number;
+  archivedRecords: number;
+  cards: number;
+  actionCards: number;
+  suppressedCards: number;
+  infoCards: number;
+  evidence: number;
+  properties: number;
+  links: number;
+  authorityReasons: number;
+}
+
+export interface OrgizeMemoryPropertyDto {
+  source: OrgizeSourceRangeDto;
+  key: string;
+  value: string;
+}
+
+export interface OrgizeMemoryEvidenceKindDto {
+  code: string;
+  label: string;
+  family: string;
+  detail?: string | null;
+}
+
+export interface OrgizeMemoryEvidenceDto {
+  source: OrgizeSourceRangeDto;
+  kind: OrgizeMemoryEvidenceKindDto;
+  value: string;
+}
+
+export interface OrgizeMemoryLinkDto {
+  source: OrgizeSourceRangeDto;
+  path: string;
+  description: string;
+}
+
+export interface OrgizeMemoryAuthorityReasonDto {
+  kind: string;
+  label: string;
+  message: string;
+}
+
+export interface OrgizeAgentMemoryDecisionDto {
+  code: string;
+  kind: OrgizeMemoryRecordStateDto;
+  severity: OrgizeAgentMemorySeverityDto;
+  title: string;
+  nextAction: string;
+}
+
+export interface OrgizeMemoryRecordDto {
+  source: OrgizeSourceRangeDto;
+  state: OrgizeMemoryRecordStateDto;
+  level: number;
+  title: string;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+  tags: string[];
+  effectiveTags: string[];
+  anchor?: string | null;
+  properties: OrgizeMemoryPropertyDto[];
+  evidence: OrgizeMemoryEvidenceDto[];
+  links: OrgizeMemoryLinkDto[];
+}
+
+export interface OrgizeAgentMemoryCardDto {
+  source: OrgizeSourceRangeDto;
+  decision: OrgizeAgentMemoryDecisionDto;
+  authority: OrgizeMemoryAuthorityReasonDto[];
+  title: string;
+  todo?: string | null;
+  todoState?: "todo" | "done" | null;
+  tags: string[];
+  effectiveTags: string[];
+  anchor?: string | null;
+  evidence: OrgizeMemoryEvidenceDto[];
+  links: OrgizeMemoryLinkDto[];
+}
+
+export interface OrgizeMemoryFacetDto {
+  code: string;
+  label: string;
+  count: number;
+}
+
+export interface OrgizeMemoryResponseDto {
+  schemaVersion: 1;
+  stats: OrgizeMemoryStatsDto;
+  records: OrgizeMemoryRecordDto[];
+  cards: OrgizeAgentMemoryCardDto[];
+  evidenceKinds: OrgizeMemoryFacetDto[];
+  authorityKinds: OrgizeMemoryFacetDto[];
+}
+
 export interface OrgizeProgressStatsRecordDto {
   source: OrgizeSourceRangeDto;
   outlinePath: string[];
@@ -1430,6 +1549,7 @@ export interface OrgizeSnapshotDto {
   clockTablePlans: OrgizeClockTablePlanDto[];
   clockIssues: OrgizeClockIssueFindingDto[];
   sdd: OrgizeSddNodeRecordDto[];
+  memory: OrgizeMemoryResponseDto;
   lint: OrgizeLintFindingDto[];
 }
 
@@ -1460,6 +1580,7 @@ export type OrgizeProjectionName =
   | "clockIssues"
   | "taskBlockers"
   | "sdd"
+  | "memory"
   | "snapshot";
 
 export type OrgizeProjectionDto =
@@ -1489,4 +1610,5 @@ export type OrgizeProjectionDto =
   | OrgizeClockIssuesResponseDto
   | OrgizeTaskBlockersResponseDto
   | OrgizeSddResponseDto
+  | OrgizeMemoryResponseDto
   | OrgizeSnapshotDto;

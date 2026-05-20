@@ -34,7 +34,9 @@ const projectionFor = (
   agendaView,
   agendaBlock,
   capturePlan,
-  clockIssueProfile
+  orgElementsIndex,
+  clockIssueProfile,
+  memory
 ) => {
   switch (projection) {
     case "outline":
@@ -44,6 +46,9 @@ const projectionFor = (
     case "orgElements":
       return parseJson(org.orgElementsJson());
     case "orgElementsIndex":
+      if (orgElementsIndex) {
+        return parseJson(org.orgElementsIndexQueryJson(JSON.stringify(orgElementsIndex)));
+      }
       return parseJson(org.orgElementsIndexJson());
     case "lint":
       return parseJson(org.lintJson());
@@ -79,6 +84,8 @@ const projectionFor = (
           clockIssueProfile ? JSON.stringify(clockIssueProfile) : undefined
         )
       );
+    case "memory":
+      return parseJson(org.memoryJson(memory ? JSON.stringify(memory) : undefined));
     case "sdd":
       return parseJson(org.sddJson());
     case "viewIndex":
@@ -177,7 +184,9 @@ const handleMessage = async (message) => {
           message.agendaView,
           message.agendaBlock,
           message.capturePlan,
-          message.clockIssueProfile
+          message.orgElementsIndex,
+          message.clockIssueProfile,
+          message.memory
         );
         break;
       }
@@ -203,7 +212,9 @@ const handleMessage = async (message) => {
           message.agendaView,
           message.agendaBlock,
           message.capturePlan,
-          message.clockIssueProfile
+          message.orgElementsIndex,
+          message.clockIssueProfile,
+          message.memory
         );
         break;
       }
@@ -219,7 +230,9 @@ const handleMessage = async (message) => {
           message.agendaView,
           message.agendaBlock,
           message.capturePlan,
-          message.clockIssueProfile
+          message.orgElementsIndex,
+          message.clockIssueProfile,
+          message.memory
         );
         break;
       }

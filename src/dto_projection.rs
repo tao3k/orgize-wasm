@@ -20,6 +20,7 @@ use crate::{
         section_index_record, section_index_records, section_index_response, sparse_tree_response,
         view_index_response,
     },
+    dto_memory::memory_response,
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
     dto_property_profile::{property_profile, property_profile_response},
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
@@ -27,7 +28,7 @@ use crate::{
 };
 use orgize::ast::{
     AgendaBlockViewQuery, AgendaViewQuery, AgentCaptureRequest, ClockIssueProfile, Document,
-    IncludeExpansionOptions, ParsedAnnotation, RefilePlanRequest, RefileTargetQuery,
+    IncludeExpansionOptions, MemoryQuery, ParsedAnnotation, RefilePlanRequest, RefileTargetQuery,
     SparseTreeQuery,
 };
 
@@ -220,6 +221,10 @@ pub(crate) fn sdd_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&sdd_response(document))
 }
 
+pub(crate) fn memory_json(document: &Document<ParsedAnnotation>, query: &MemoryQuery) -> String {
+    to_json(&memory_response(document, query))
+}
+
 pub(crate) fn snapshot_json(
     document: &Document<ParsedAnnotation>,
     source: &str,
@@ -250,6 +255,7 @@ pub(crate) fn snapshot_json(
         clock_table_plans: clock_table_plans(document),
         clock_issues: clock_issue_findings(document, &ClockIssueProfile::org_default()),
         sdd: sdd_records(document),
+        memory: memory_response(document, &MemoryQuery::new()),
         lint: lint_findings(&lint.findings),
     })
 }

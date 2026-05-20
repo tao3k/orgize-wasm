@@ -159,6 +159,13 @@ print(topic)
         index_only.as_array().expect("index array").len(),
         payload["index"].as_array().expect("payload index").len()
     );
+    let filtered_index: Value = serde_json::from_str(
+        &org.org_elements_index_query_json(r#"{"category":"object","kind":"link","limit":1}"#)
+            .expect("filtered org elements index JSON"),
+    )
+    .expect("filtered index JSON should parse");
+    assert_eq!(filtered_index.as_array().expect("filtered index").len(), 1);
+    assert_eq!(filtered_index[0]["kind"], "link");
     assert_eq!(payload["sourceBlocks"][0]["language"], "python");
     assert_eq!(
         payload["sourceBlocks"][0]["normalizedHeaderArgs"]

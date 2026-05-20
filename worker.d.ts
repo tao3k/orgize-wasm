@@ -3,6 +3,8 @@ import type {
   OrgizeAgendaViewJsonRequestDto,
   OrgizeAgentCaptureRequestDto,
   OrgizeClockIssueProfileRequestDto,
+  OrgizeMemoryJsonRequestDto,
+  OrgizeOrgElementsIndexQueryDto,
   OrgizeProjectionDto,
   OrgizeProjectionName,
 } from "./dto.js";
@@ -31,7 +33,9 @@ export interface OrgizeWorkerBaseRequest {
   agendaView?: OrgizeAgendaViewJsonRequestDto;
   agendaBlock?: OrgizeAgendaBlockJsonRequestDto;
   capturePlan?: OrgizeAgentCaptureRequestDto;
+  orgElementsIndex?: OrgizeOrgElementsIndexQueryDto;
   clockIssueProfile?: OrgizeClockIssueProfileRequestDto;
+  memory?: OrgizeMemoryJsonRequestDto;
 }
 
 export interface OrgizeWorkerInitRequest extends OrgizeWorkerBaseRequest {

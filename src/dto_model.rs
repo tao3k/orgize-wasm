@@ -2,6 +2,7 @@
 
 use crate::dto_clock_model::{WasmClockIssueFinding, WasmClockRollupRecord, WasmClockTablePlan};
 use crate::dto_dynamic_block_model::WasmDynamicBlockRecord;
+use crate::dto_memory_model::WasmMemoryResponse;
 use crate::dto_property_profile_model::WasmPropertyProfile;
 use crate::dto_refile_model::WasmRefileTarget;
 use crate::dto_sdd_model::WasmSddNodeRecord;
@@ -158,6 +159,7 @@ pub(crate) struct WasmSnapshotResponse {
     pub(crate) clock_table_plans: Vec<WasmClockTablePlan>,
     pub(crate) clock_issues: Vec<WasmClockIssueFinding>,
     pub(crate) sdd: Vec<WasmSddNodeRecord>,
+    pub(crate) memory: WasmMemoryResponse,
     pub(crate) lint: Vec<WasmLintFinding>,
 }
 

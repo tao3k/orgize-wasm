@@ -25,9 +25,11 @@ export class Org {
     latex(): string;
     lintJson(): string;
     markdown(): string;
+    memoryJson(request_json?: string | null): string;
     metadataJson(): string;
     org(): string;
     orgElementsIndexJson(): string;
+    orgElementsIndexQueryJson(request_json: string): string;
     orgElementsJson(): string;
     outlineJson(): string;
     constructor(input: string);
@@ -77,9 +79,11 @@ export interface InitOutput {
     readonly org_latex: (a: number) => [number, number];
     readonly org_lintJson: (a: number) => [number, number];
     readonly org_markdown: (a: number) => [number, number];
+    readonly org_memoryJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_metadataJson: (a: number) => [number, number];
     readonly org_org: (a: number) => [number, number];
     readonly org_orgElementsIndexJson: (a: number) => [number, number];
+    readonly org_orgElementsIndexQueryJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_orgElementsJson: (a: number) => [number, number];
     readonly org_outlineJson: (a: number) => [number, number];
     readonly org_parse: (a: number, b: number) => number;

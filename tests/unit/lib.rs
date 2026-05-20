@@ -8,6 +8,8 @@ mod dto_clock;
 mod dto_contract;
 #[path = "dto_dynamic_block.rs"]
 mod dto_dynamic_block;
+#[path = "dto_memory.rs"]
+mod dto_memory;
 #[path = "dto_property_profile.rs"]
 mod dto_property_profile;
 #[path = "dto_refile.rs"]

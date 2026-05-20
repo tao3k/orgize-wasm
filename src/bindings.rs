@@ -10,7 +10,8 @@ use orgize::{
     ast::{
         AgendaBlockViewQuery, AgendaDate, AgendaQuery, AgendaViewQuery, AgendaViewSortDirection,
         AgendaViewSortKey, AgendaViewSortSpec, AgentMemoryQuery, AgentPlanningQuery,
-        ClockIssueProfile, MemoryQuery, ParsedAst,
+        ClockIssueProfile, MemoryQuery, OrgElementsIndexCategory, OrgElementsIndexKind,
+        OrgElementsIndexQuery, ParsedAst,
     },
     export::{from_fn, Container, Event},
     rowan::ast::AstNode,
@@ -54,6 +55,43 @@ struct AgendaViewSortSpecJson {
     direction: String,
 }
 
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct OrgElementsIndexJsonRequest {
+    category: Option<String>,
+    kind: Option<String>,
+    context: Option<String>,
+    outline_path_prefix: Option<Vec<String>>,
+    limit: Option<usize>,
+}
+
+impl OrgElementsIndexJsonRequest {
+    fn into_query(self) -> Result<OrgElementsIndexQuery, JsValue> {
+        let mut query = OrgElementsIndexQuery::new();
+        if let Some(category) = self.category {
+            let Some(category) = OrgElementsIndexCategory::from_label(&category) else {
+                return Err(JsValue::from_str(&format!(
+                    "invalid org elements index category: {category}"
+                )));
+            };
+            query = query.category(category);
+        }
+        if let Some(kind) = self.kind {
+            query = query.kind(OrgElementsIndexKind::new(kind));
+        }
+        if let Some(context) = self.context {
+            query = query.context(context);
+        }
+        if let Some(outline_path_prefix) = self.outline_path_prefix {
+            query = query.outline_path_prefix(outline_path_prefix);
+        }
+        if let Some(limit) = self.limit {
+            query = query.limit(limit);
+        }
+        Ok(query)
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AgendaBlockJsonRequest {
@@ -66,6 +104,16 @@ struct AgendaBlockJsonRequest {
 struct AgendaBlockSectionJsonRequest {
     name: String,
     query: AgendaViewJsonRequest,
+}
+
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryJsonRequest {
+    include_comments: Option<bool>,
+    include_closed: Option<bool>,
+    include_archived: Option<bool>,
+    required_tags: Option<Vec<String>>,
+    excluded_tags: Option<Vec<String>>,
 }
 
 impl AgendaViewJsonDate {
@@ -142,7 +190,7 @@ impl Org {
 
     #[wasm_bindgen(js_name = agentMemory)]
     pub fn agent_memory(&self) -> String {
-        let query = AgentMemoryQuery::new(MemoryQuery::new().require_tag("memory"));
+        let query = AgentMemoryQuery::new(MemoryQuery::new());
         self.document()
             .agent_memory_snapshot(&query)
             .to_compact_text("wasm-demo.org")
@@ -152,6 +200,16 @@ impl Org {
         self.document()
             .sdd_status()
             .to_compact_text("wasm-demo.org")
+    }
+
+    #[wasm_bindgen(js_name = memoryJson)]
+    pub fn memory_json(&self, request_json: Option<String>) -> Result<String, JsValue> {
+        let request = parse_optional_memory_request(request_json.as_deref())?;
+        let document = self.document();
+        Ok(dto_projection::memory_json(
+            &document,
+            &request.into_query(),
+        ))
     }
 
     pub fn update(&mut self, s: &str) {
@@ -182,6 +240,16 @@ impl Org {
     pub fn org_elements_index_json(&self) -> String {
         let document = self.document();
         document.org_elements_index_json()
+    }
+
+    #[wasm_bindgen(js_name = orgElementsIndexQueryJson)]
+    pub fn org_elements_index_query_json(&self, request_json: &str) -> Result<String, JsValue> {
+        let request: OrgElementsIndexJsonRequest =
+            serde_json::from_str(request_json).map_err(|error| {
+                JsValue::from_str(&format!("invalid org elements index query: {error}"))
+            })?;
+        let document = self.document();
+        Ok(document.org_elements_index_query_json(&request.into_query()?))
     }
 
     #[wasm_bindgen(js_name = lintJson)]
@@ -577,6 +645,36 @@ fn parse_optional_clock_issue_request(
     };
     serde_json::from_str(request_json)
         .map_err(|error| JsValue::from_str(&format!("invalid clock issue request: {error}")))
+}
+
+fn parse_optional_memory_request(request_json: Option<&str>) -> Result<MemoryJsonRequest, JsValue> {
+    let Some(request_json) = request_json.map(str::trim).filter(|text| !text.is_empty()) else {
+        return Ok(MemoryJsonRequest::default());
+    };
+    serde_json::from_str(request_json)
+        .map_err(|error| JsValue::from_str(&format!("invalid memory request: {error}")))
+}
+
+impl MemoryJsonRequest {
+    fn into_query(self) -> MemoryQuery {
+        let mut query = MemoryQuery::new();
+        if let Some(include_comments) = self.include_comments {
+            query = query.include_comments(include_comments);
+        }
+        if let Some(include_closed) = self.include_closed {
+            query = query.include_closed(include_closed);
+        }
+        if let Some(include_archived) = self.include_archived {
+            query = query.include_archived(include_archived);
+        }
+        for tag in self.required_tags.into_iter().flatten() {
+            query = query.require_tag(tag);
+        }
+        for tag in self.excluded_tags.into_iter().flatten() {
+            query = query.exclude_tag(tag);
+        }
+        query
+    }
 }
 
 impl Org {

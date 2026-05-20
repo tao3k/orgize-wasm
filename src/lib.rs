@@ -12,6 +12,8 @@ mod dto_document;
 mod dto_dynamic_block;
 mod dto_dynamic_block_model;
 mod dto_index;
+mod dto_memory;
+mod dto_memory_model;
 mod dto_model;
 mod dto_projection;
 mod dto_property_profile;
