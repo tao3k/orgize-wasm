@@ -12,12 +12,13 @@ use orgize::{
         AgendaBlockViewQuery, AgendaDate, AgendaQuery, AgendaViewQuery, AgendaViewSortDirection,
         AgendaViewSortKey, AgendaViewSortSpec, AgentMemoryQuery, AgentPlanningQuery,
         ClockIssueProfile, MemoryQuery, OrgElementsIndexCategory, OrgElementsIndexKind,
-        OrgElementsIndexQuery, ParsedAst,
+        OrgElementsIndexQuery, OrgElementsIndexSummaryValue, ParsedAst,
     },
     export::{Container, Event, from_fn},
     rowan::ast::AstNode,
 };
 use serde::Deserialize;
+use serde_json::Value;
 use std::cell::{Ref, RefCell};
 use std::fmt::Write;
 
@@ -62,6 +63,8 @@ struct OrgElementsIndexJsonRequest {
     kind: Option<String>,
     context: Option<String>,
     outline_path_prefix: Option<Vec<String>>,
+    summary_equals: Option<serde_json::Map<String, Value>>,
+    summary_contains: Option<serde_json::Map<String, Value>>,
     limit: Option<usize>,
 }
 
@@ -85,10 +88,57 @@ impl OrgElementsIndexJsonRequest {
         if let Some(outline_path_prefix) = self.outline_path_prefix {
             query = query.outline_path_prefix(outline_path_prefix);
         }
+        if let Some(summary_equals) = self.summary_equals {
+            for (key, value) in summary_equals {
+                query = query.summary_eq(key, summary_value(value)?);
+            }
+        }
+        if let Some(summary_contains) = self.summary_contains {
+            for (key, value) in summary_contains {
+                let Some(needle) = value.as_str() else {
+                    return Err(JsValue::from_str(
+                        "org elements summaryContains values must be strings",
+                    ));
+                };
+                query = query.summary_contains(key, needle);
+            }
+        }
         if let Some(limit) = self.limit {
             query = query.limit(limit);
         }
         Ok(query)
+    }
+}
+
+fn summary_value(value: Value) -> Result<OrgElementsIndexSummaryValue, JsValue> {
+    match value {
+        Value::Null => Ok(OrgElementsIndexSummaryValue::Null),
+        Value::Bool(value) => Ok(OrgElementsIndexSummaryValue::Bool(value)),
+        Value::Number(value) => {
+            let Some(value) = value.as_i64() else {
+                return Err(JsValue::from_str(
+                    "org elements summaryEquals numeric values must fit i64",
+                ));
+            };
+            Ok(OrgElementsIndexSummaryValue::Integer(value))
+        }
+        Value::String(value) => Ok(OrgElementsIndexSummaryValue::Text(value)),
+        Value::Array(values) => {
+            let strings = values
+                .into_iter()
+                .map(|value| {
+                    value.as_str().map(str::to_string).ok_or_else(|| {
+                        JsValue::from_str(
+                            "org elements summaryEquals arrays must contain only strings",
+                        )
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(OrgElementsIndexSummaryValue::StringList(strings))
+        }
+        Value::Object(_) => Err(JsValue::from_str(
+            "org elements summaryEquals values cannot be objects",
+        )),
     }
 }
 

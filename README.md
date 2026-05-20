@@ -75,6 +75,10 @@ When a host has loaded property-schema contracts, pass
 `propertySchemaRegistry` with `projection: "snapshot"` or
 `projection: "snapshotWithSchemas"` so the returned `propertyProfile` and
 `lint` entries are validated against the same registry.
+For `projection: "orgElementsIndex"`, pass `orgElementsIndex.summaryEquals`
+or `orgElementsIndex.summaryContains` to filter compact index rows by fields
+such as link `path`, section `title`, or source-block `language` without
+shipping the full Org elements tree back to the UI.
 
 ## Node.js
 

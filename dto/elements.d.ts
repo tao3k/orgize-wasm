@@ -29,6 +29,8 @@ declare namespace OrgizeDto {
     kind?: string;
     context?: string;
     outlinePathPrefix?: string[];
+    summaryEquals?: Record<string, null | boolean | number | string | string[]>;
+    summaryContains?: Record<string, string>;
     limit?: number;
   }
 

@@ -180,6 +180,31 @@ print(topic)
     .expect("filtered index JSON should parse");
     assert_eq!(filtered_index.as_array().expect("filtered index").len(), 1);
     assert_eq!(filtered_index[0]["kind"], "link");
+    let summary_filtered_index: Value = serde_json::from_str(
+        &org.org_elements_index_query_json(
+            r#"{"kind":"link","summaryEquals":{"path":"https://example.test"}}"#,
+        )
+        .expect("summary-filtered org elements index JSON"),
+    )
+    .expect("summary-filtered index JSON should parse");
+    assert_eq!(
+        summary_filtered_index
+            .as_array()
+            .expect("summary-filtered index")
+            .len(),
+        1
+    );
+    let title_filtered_index: Value = serde_json::from_str(
+        &org.org_elements_index_query_json(
+            r#"{"category":"section","summaryContains":{"title":"Browser"}}"#,
+        )
+        .expect("title-filtered org elements index JSON"),
+    )
+    .expect("title-filtered index JSON should parse");
+    assert_eq!(
+        title_filtered_index[0]["summary"]["title"],
+        "Browser binding"
+    );
     assert_eq!(payload["sourceBlocks"][0]["language"], "python");
     assert_eq!(
         payload["sourceBlocks"][0]["normalizedHeaderArgs"]
