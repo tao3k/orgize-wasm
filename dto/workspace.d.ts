@@ -227,9 +227,22 @@ declare namespace OrgizeDto {
     value: string;
   }
 
+  export type OrgizeSourceBlockReferenceKindDto =
+    | "babelCall"
+    | "inlineCall"
+    | "noweb";
+
+  export interface OrgizeSourceBlockReferenceDto {
+    source: OrgizeSourceRangeDto;
+    kind: OrgizeSourceBlockReferenceKindDto;
+    target: string;
+    resolved: boolean;
+  }
+
   export interface OrgizeSourceBlocksResponseDto {
     schemaVersion: 1;
     records: OrgizeSourceBlockRecordDto[];
+    references: OrgizeSourceBlockReferenceDto[];
   }
 
   export interface OrgizeColumnViewScopeDto {

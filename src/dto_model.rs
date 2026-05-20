@@ -104,6 +104,7 @@ pub(crate) struct WasmAttachmentsResponse {
 pub(crate) struct WasmSourceBlocksResponse {
     pub(crate) schema_version: u8,
     pub(crate) records: Vec<WasmSourceBlockRecord>,
+    pub(crate) references: Vec<WasmSourceBlockReference>,
 }
 
 #[derive(Serialize)]
@@ -636,6 +637,15 @@ pub(crate) struct WasmSourceBlockRecord {
     pub(crate) tangle: Option<WasmSourceBlockTangle>,
     pub(crate) result: Option<WasmSourceBlockResult>,
     pub(crate) value: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct WasmSourceBlockReference {
+    pub(crate) source: WasmSourceRange,
+    pub(crate) kind: &'static str,
+    pub(crate) target: String,
+    pub(crate) resolved: bool,
 }
 
 #[derive(Serialize)]

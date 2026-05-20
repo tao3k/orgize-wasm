@@ -15,9 +15,10 @@ use crate::{
         WasmProgressEffortSummary, WasmProgressStatisticCookie, WasmProgressStatsRecord,
         WasmProgressStatsResponse, WasmProgressTodoSummary, WasmSourceBlockCodeRef,
         WasmSourceBlockHeaderArg, WasmSourceBlockHeaderVar, WasmSourceBlockRecord,
-        WasmSourceBlockResult, WasmSourceBlockTangle, WasmSourceBlocksResponse, WasmTagDefinition,
-        WasmTargetDefinition, WasmTaskBlockerParent, WasmTaskBlockerRecord, WasmTaskBlockerTask,
-        WasmTaskBlockersResponse, WasmTaskDependencyRecord,
+        WasmSourceBlockReference, WasmSourceBlockResult, WasmSourceBlockTangle,
+        WasmSourceBlocksResponse, WasmTagDefinition, WasmTargetDefinition, WasmTaskBlockerParent,
+        WasmTaskBlockerRecord, WasmTaskBlockerTask, WasmTaskBlockersResponse,
+        WasmTaskDependencyRecord,
     },
     dto_shared_model::WasmSourceRange,
 };
@@ -25,8 +26,8 @@ use orgize::ast::{
     ColumnViewRecord, ColumnViewScope, ColumnViewSource, DateTreeEntry, Document, IncludeDirective,
     IncludeExpansionMode, IncludeExpansionOptions, IncludeLineSelection, ParsedAnnotation, Section,
     SourceBlockHeaderArgKind, SourceBlockHeaderArgSource, SourceBlockRecord, SourceBlockRecordKind,
-    SourceBlockResultKind, SourceBlockSource, SourceBlockTangleMode, TaskBlockerRecord,
-    TaskBlockerTask,
+    SourceBlockReference, SourceBlockReferenceKind, SourceBlockResultKind, SourceBlockSource,
+    SourceBlockTangleMode, TaskBlockerRecord, TaskBlockerTask,
 };
 
 pub(crate) fn outline_node(section: &Section<ParsedAnnotation>) -> WasmOutlineNode {
@@ -162,6 +163,7 @@ pub(crate) fn source_blocks_response(
     WasmSourceBlocksResponse {
         schema_version: 1,
         records: source_block_records(document),
+        references: source_block_references(document),
     }
 }
 
@@ -172,6 +174,16 @@ pub(crate) fn source_block_records(
         .source_block_records()
         .iter()
         .map(source_block_record)
+        .collect()
+}
+
+pub(crate) fn source_block_references(
+    document: &Document<ParsedAnnotation>,
+) -> Vec<WasmSourceBlockReference> {
+    document
+        .source_block_references()
+        .iter()
+        .map(source_block_reference)
         .collect()
 }
 
@@ -333,6 +345,19 @@ fn source_block_record(record: &SourceBlockRecord) -> WasmSourceBlockRecord {
             value: result.value.clone(),
         }),
         value: record.value.clone(),
+    }
+}
+
+fn source_block_reference(reference: &SourceBlockReference) -> WasmSourceBlockReference {
+    WasmSourceBlockReference {
+        source: source_block_source(&reference.source),
+        kind: match reference.kind {
+            SourceBlockReferenceKind::BabelCall => "babelCall",
+            SourceBlockReferenceKind::InlineCall => "inlineCall",
+            SourceBlockReferenceKind::Noweb => "noweb",
+        },
+        target: reference.target.clone(),
+        resolved: reference.resolved,
     }
 }
 

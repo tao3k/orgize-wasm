@@ -92,6 +92,8 @@ export interface OrgizeSourceBlockCodeRefDto extends OrgizeDto.OrgizeSourceBlock
 export interface OrgizeSourceBlockTangleDto extends OrgizeDto.OrgizeSourceBlockTangleDto {}
 export interface OrgizeSourceBlockResultDto extends OrgizeDto.OrgizeSourceBlockResultDto {}
 export interface OrgizeSourceBlockRecordDto extends OrgizeDto.OrgizeSourceBlockRecordDto {}
+export type OrgizeSourceBlockReferenceKindDto = OrgizeDto.OrgizeSourceBlockReferenceKindDto;
+export interface OrgizeSourceBlockReferenceDto extends OrgizeDto.OrgizeSourceBlockReferenceDto {}
 export interface OrgizeSourceBlocksResponseDto extends OrgizeDto.OrgizeSourceBlocksResponseDto {}
 export interface OrgizeColumnViewScopeDto extends OrgizeDto.OrgizeColumnViewScopeDto {}
 export interface OrgizeColumnViewColumnDto extends OrgizeDto.OrgizeColumnViewColumnDto {}

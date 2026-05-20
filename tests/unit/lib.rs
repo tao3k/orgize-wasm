@@ -20,3 +20,5 @@ mod dto_refile;
 mod dto_runtime;
 #[path = "dto_sdd.rs"]
 mod dto_sdd;
+#[path = "dto_source_blocks.rs"]
+mod dto_source_blocks;
