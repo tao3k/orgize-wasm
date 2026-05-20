@@ -229,6 +229,16 @@ export type OrgizeOrgElementsNodeDto = Record<string, unknown> & {
   kind: string;
 };
 
+export interface OrgizeOrgElementsIndexNodeDto {
+  ordinal: number;
+  category: string;
+  kind: string;
+  source: OrgizeOrgElementsSourceRangeDto;
+  outlinePath: string[];
+  context: string;
+  summary: Record<string, unknown>;
+}
+
 export interface OrgizeOrgElementsSectionDto {
   source: OrgizeOrgElementsSourceRangeDto;
   outlinePath: string[];
@@ -256,6 +266,7 @@ export interface OrgizeOrgElementsDto {
   footnotes: OrgizeFootnoteEntryDto[];
   elements: OrgizeOrgElementsNodeDto[];
   sections: OrgizeOrgElementsSectionDto[];
+  index: OrgizeOrgElementsIndexNodeDto[];
   sourceBlocks: OrgizeSourceBlockRecordDto[];
 }
 

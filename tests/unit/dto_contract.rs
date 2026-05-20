@@ -146,6 +146,13 @@ print(topic)
     assert!(section_elements
         .iter()
         .any(|element| element["kind"] == "src-block" && element["language"] == "python"));
+    assert!(payload["index"]
+        .as_array()
+        .expect("flat node index")
+        .iter()
+        .any(|node| node["category"] == "object"
+            && node["kind"] == "link"
+            && node["summary"]["path"] == "https://example.test"));
     assert_eq!(payload["sourceBlocks"][0]["language"], "python");
     assert_eq!(
         payload["sourceBlocks"][0]["normalizedHeaderArgs"]
