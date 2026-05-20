@@ -31,7 +31,9 @@ pub(crate) fn attachment_inventory_response(
             .map(|record| WasmAttachmentDisplayRecord {
                 source: section_source(&record.source),
                 section_title: record.section_title.clone(),
+                section_title_text: record.section_title_text.clone(),
                 outline_path: record.outline_path.clone(),
+                outline_path_text: record.outline_path_text.clone(),
                 tags: record.tags.clone(),
                 effective_tags: record.effective_tags.clone(),
                 attachment_id: record

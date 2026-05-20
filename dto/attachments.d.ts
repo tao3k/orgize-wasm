@@ -64,7 +64,9 @@ declare namespace OrgizeDto {
   export interface OrgizeAttachmentDisplayRecordDto {
     source: OrgizeSourceRangeDto;
     sectionTitle: string;
+    sectionTitleText: string;
     outlinePath: string[];
+    outlinePathText: string[];
     tags: string[];
     effectiveTags: string[];
     attachmentId?: string | null;

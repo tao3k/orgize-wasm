@@ -20,7 +20,7 @@ fn wasm_attachment_inventory_contract_exposes_display_and_sync_plan() {
     .expect("write orphan");
 
     let org = Org::parse(
-        r#"* Wallpaper :ATTACH:
+        r#"* [[https://example.com/wallpaper][Wallpaper]] :ATTACH:
 :PROPERTIES:
 :ID: aabbccdd-0000-4000-8000-000000000000
 :END:
@@ -41,7 +41,12 @@ fn wasm_attachment_inventory_contract_exposes_display_and_sync_plan() {
     .expect("attachment inventory JSON should parse");
 
     assert_eq!(payload["schemaVersion"], 1);
-    assert_eq!(payload["display"][0]["sectionTitle"], "Wallpaper");
+    assert_eq!(
+        payload["display"][0]["sectionTitle"],
+        "[[https://example.com/wallpaper][Wallpaper]]"
+    );
+    assert_eq!(payload["display"][0]["sectionTitleText"], "Wallpaper");
+    assert_eq!(payload["display"][0]["outlinePathText"][0], "Wallpaper");
     assert_eq!(payload["display"][0]["mediaKind"], "image");
     assert_eq!(
         payload["display"][0]["attachmentId"],

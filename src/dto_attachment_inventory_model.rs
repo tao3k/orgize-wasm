@@ -51,7 +51,9 @@ pub(crate) struct WasmAttachmentInventoryEntryKind {
 pub(crate) struct WasmAttachmentDisplayRecord {
     pub(crate) source: WasmSourceRange,
     pub(crate) section_title: String,
+    pub(crate) section_title_text: String,
     pub(crate) outline_path: Vec<String>,
+    pub(crate) outline_path_text: Vec<String>,
     pub(crate) tags: Vec<String>,
     pub(crate) effective_tags: Vec<String>,
     pub(crate) attachment_id: Option<String>,
