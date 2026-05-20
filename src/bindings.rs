@@ -362,6 +362,23 @@ impl Org {
         dto_projection::property_profile_json(&document)
     }
 
+    #[wasm_bindgen(js_name = propertyProfileWithSchemasJson)]
+    pub fn property_profile_with_schemas_json(
+        &self,
+        request_json: &str,
+    ) -> Result<String, JsValue> {
+        let request: crate::dto_property_profile_model::WasmPropertySchemaRegistryRequest =
+            serde_json::from_str(request_json).map_err(|error| {
+                JsValue::from_str(&format!(
+                    "invalid property schema registry request: {error}"
+                ))
+            })?;
+        let document = self.document();
+        Ok(dto_projection::property_profile_with_schema_registry_json(
+            &document, request,
+        ))
+    }
+
     #[wasm_bindgen(js_name = capturePlanJson)]
     pub fn capture_plan_json(&self, request_json: &str) -> Result<String, JsValue> {
         let request: AgentCaptureJsonRequest =

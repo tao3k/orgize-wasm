@@ -8,6 +8,7 @@ fn wasm_property_profile_contract_exposes_allowed_values() {
 * Project
 :PROPERTIES:
 :Owner_ALL: "Sarah Connor" Jim ""
+:PROPERTY_SCHEMA: {{{property_schema(wendao.capture.v1)}}}
 :Owner: Sarah Connor
 :END:
 "#,
@@ -44,4 +45,43 @@ fn wasm_property_profile_contract_exposes_allowed_values() {
     assert_eq!(owner["scope"]["title"], "Project");
     assert_eq!(owner["values"][0], "Sarah Connor");
     assert_eq!(owner["values"][2], "");
+
+    let with_registry: Value = serde_json::from_str(
+        &org.property_profile_with_schemas_json(
+            r#"{
+              "contracts": [{
+                "id": "wendao.capture.v1",
+                "aliases": ["file:schemas/capture.schema.json#wendao.capture.v1"],
+                "allowUnknownProperties": false,
+                "fields": [
+                  {"key": "CAPTURE_KIND", "required": true, "valueRule": {"kind": "oneOf", "values": ["idea", "note"]}},
+                  {"key": "Owner", "valueRule": {"kind": "nonEmpty"}}
+                ]
+              }]
+            }"#,
+        )
+        .expect("property profile with loaded schema registry"),
+    )
+    .expect("property profile with schema registry JSON should parse");
+    let applications = with_registry["profile"]["schemaApplications"]
+        .as_array()
+        .expect("schema applications should be an array");
+    assert_eq!(applications[0]["reference"]["kind"], "macro");
+    assert_eq!(
+        applications[0]["reference"]["normalized"],
+        "wendao.capture.v1"
+    );
+    assert_eq!(applications[0]["contractId"], "wendao.capture.v1");
+    assert_eq!(
+        applications[0]["findings"][0]["kind"],
+        "missingRequiredProperty"
+    );
+    insta::assert_snapshot!(
+        "wasm_property_profile_with_schema_registry",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "schemaVersion": with_registry["schemaVersion"],
+            "schemaApplications": applications,
+        }))
+        .expect("stable JSON snapshot")
+    );
 }

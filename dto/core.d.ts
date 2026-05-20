@@ -247,4 +247,80 @@ declare namespace OrgizeDto {
     descriptorKey: string;
     values: string[];
   }
+
+  export type OrgizePropertySchemaReferenceKindDto =
+    | "empty"
+    | "contractId"
+    | "file"
+    | "orgFileLink"
+    | "macro";
+
+  export type OrgizePropertySchemaScopeKindDto =
+    | "document"
+    | "section";
+
+  export type OrgizePropertySchemaFindingKindDto =
+    | "emptyReference"
+    | "unresolvedReference"
+    | "missingRequiredProperty"
+    | "unknownProperty"
+    | "emptyValue"
+    | "disallowedValue";
+
+  export type OrgizePropertySchemaValueRuleKindDto =
+    | "any"
+    | "nonEmpty"
+    | "oneOf";
+
+  export interface OrgizePropertySchemaReferenceDto {
+    raw: string;
+    normalized: string;
+    kind: OrgizePropertySchemaReferenceKindDto;
+  }
+
+  export interface OrgizePropertySchemaScopeDto {
+    kind: OrgizePropertySchemaScopeKindDto;
+    outlinePath: string[];
+    level?: number | null;
+    title?: string | null;
+  }
+
+  export interface OrgizePropertySchemaFindingDto {
+    source: OrgizeSourceRangeDto;
+    kind: OrgizePropertySchemaFindingKindDto;
+    property?: string | null;
+    actual?: string | null;
+    expected: string[];
+    message: string;
+  }
+
+  export interface OrgizePropertySchemaApplicationDto {
+    source: OrgizeSourceRangeDto;
+    scope: OrgizePropertySchemaScopeDto;
+    reference: OrgizePropertySchemaReferenceDto;
+    contractId?: string | null;
+    findings: OrgizePropertySchemaFindingDto[];
+  }
+
+  export type OrgizePropertySchemaValueRuleDto =
+    | { kind: "any" }
+    | { kind: "nonEmpty" }
+    | { kind: "oneOf"; values: string[] };
+
+  export interface OrgizePropertySchemaFieldDto {
+    key: string;
+    required?: boolean;
+    valueRule?: OrgizePropertySchemaValueRuleDto;
+  }
+
+  export interface OrgizePropertySchemaContractDto {
+    id: string;
+    aliases?: string[];
+    fields?: OrgizePropertySchemaFieldDto[];
+    allowUnknownProperties?: boolean;
+  }
+
+  export interface OrgizePropertySchemaRegistryRequestDto {
+    contracts?: OrgizePropertySchemaContractDto[];
+  }
 }

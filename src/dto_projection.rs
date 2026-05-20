@@ -23,6 +23,7 @@ use crate::{
     },
     dto_memory::memory_response,
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
+    dto_property_profile::property_profile_with_schema_registry_response,
     dto_property_profile::{property_profile, property_profile_response},
     dto_refile::{refile_plan_response, refile_target_index_response, refile_targets},
     dto_runtime::runtime_metadata_response,
@@ -165,6 +166,15 @@ pub(crate) fn dynamic_blocks_json(document: &Document<ParsedAnnotation>) -> Stri
 
 pub(crate) fn property_profile_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&property_profile_response(document))
+}
+
+pub(crate) fn property_profile_with_schema_registry_json(
+    document: &Document<ParsedAnnotation>,
+    request: crate::dto_property_profile_model::WasmPropertySchemaRegistryRequest,
+) -> String {
+    to_json(&property_profile_with_schema_registry_response(
+        document, request,
+    ))
 }
 
 pub(crate) fn capture_plan_json(request: &AgentCaptureRequest) -> String {

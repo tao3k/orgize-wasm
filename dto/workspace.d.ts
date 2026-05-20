@@ -293,6 +293,7 @@ declare namespace OrgizeDto {
     inheritance: OrgizePropertyInheritanceDto;
     inheritedKeys: string[];
     allowedValues: OrgizePropertyAllowedValueRecordDto[];
+    schemaApplications: OrgizePropertySchemaApplicationDto[];
   }
 
   export interface OrgizePropertyProfileResponseDto {

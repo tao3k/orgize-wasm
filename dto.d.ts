@@ -106,6 +106,18 @@ export type OrgizePropertyInheritanceDto = OrgizeDto.OrgizePropertyInheritanceDt
 export type OrgizePropertyAllowedValueScopeKindDto = OrgizeDto.OrgizePropertyAllowedValueScopeKindDto;
 export interface OrgizePropertyAllowedValueScopeDto extends OrgizeDto.OrgizePropertyAllowedValueScopeDto {}
 export interface OrgizePropertyAllowedValueRecordDto extends OrgizeDto.OrgizePropertyAllowedValueRecordDto {}
+export type OrgizePropertySchemaReferenceKindDto = OrgizeDto.OrgizePropertySchemaReferenceKindDto;
+export type OrgizePropertySchemaScopeKindDto = OrgizeDto.OrgizePropertySchemaScopeKindDto;
+export type OrgizePropertySchemaFindingKindDto = OrgizeDto.OrgizePropertySchemaFindingKindDto;
+export type OrgizePropertySchemaValueRuleKindDto = OrgizeDto.OrgizePropertySchemaValueRuleKindDto;
+export interface OrgizePropertySchemaReferenceDto extends OrgizeDto.OrgizePropertySchemaReferenceDto {}
+export interface OrgizePropertySchemaScopeDto extends OrgizeDto.OrgizePropertySchemaScopeDto {}
+export interface OrgizePropertySchemaFindingDto extends OrgizeDto.OrgizePropertySchemaFindingDto {}
+export interface OrgizePropertySchemaApplicationDto extends OrgizeDto.OrgizePropertySchemaApplicationDto {}
+export type OrgizePropertySchemaValueRuleDto = OrgizeDto.OrgizePropertySchemaValueRuleDto;
+export interface OrgizePropertySchemaFieldDto extends OrgizeDto.OrgizePropertySchemaFieldDto {}
+export interface OrgizePropertySchemaContractDto extends OrgizeDto.OrgizePropertySchemaContractDto {}
+export interface OrgizePropertySchemaRegistryRequestDto extends OrgizeDto.OrgizePropertySchemaRegistryRequestDto {}
 export interface OrgizePropertyProfileDto extends OrgizeDto.OrgizePropertyProfileDto {}
 export interface OrgizePropertyProfileResponseDto extends OrgizeDto.OrgizePropertyProfileResponseDto {}
 export type OrgizeAgentCaptureKindDto = OrgizeDto.OrgizeAgentCaptureKindDto;

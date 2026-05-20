@@ -36,6 +36,7 @@ export class Org {
     constructor(input: string);
     progressStatsJson(): string;
     propertyProfileJson(): string;
+    propertyProfileWithSchemasJson(request_json: string): string;
     refilePlanJson(request_json: string): string;
     refileTargetsJson(request_json?: string | null): string;
     runtimeMetadataJson(): string;
@@ -92,6 +93,7 @@ export interface InitOutput {
     readonly org_parse: (a: number, b: number) => number;
     readonly org_progressStatsJson: (a: number) => [number, number];
     readonly org_propertyProfileJson: (a: number) => [number, number];
+    readonly org_propertyProfileWithSchemasJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_refilePlanJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_refileTargetsJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_runtimeMetadataJson: (a: number) => [number, number];
