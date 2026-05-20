@@ -150,8 +150,10 @@ declare namespace OrgizeDto {
   export interface OrgizeSectionIndexRecordDto {
     source: OrgizeSourceRangeDto;
     outlinePath: string[];
+    outlinePathText: string[];
     level: number;
     title: string;
+    titleText: string;
     body: OrgizeTextSliceDto[];
     todo?: string | null;
     todoState?: "todo" | "done" | null;

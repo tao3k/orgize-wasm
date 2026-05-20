@@ -184,8 +184,10 @@ pub(crate) struct WasmOutlineNode {
 pub(crate) struct WasmSectionIndexRecord {
     pub(crate) source: WasmSourceRange,
     pub(crate) outline_path: Vec<String>,
+    pub(crate) outline_path_text: Vec<String>,
     pub(crate) level: usize,
     pub(crate) title: String,
+    pub(crate) title_text: String,
     pub(crate) body: Vec<WasmTextSlice>,
     pub(crate) todo: Option<String>,
     pub(crate) todo_state: Option<&'static str>,

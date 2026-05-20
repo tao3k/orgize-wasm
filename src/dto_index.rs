@@ -110,8 +110,10 @@ pub(crate) fn section_index_record(record: &SectionIndexRecord) -> WasmSectionIn
     WasmSectionIndexRecord {
         source: section_source(&record.source),
         outline_path: record.outline_path.clone(),
+        outline_path_text: record.outline_path_text.clone(),
         level: record.level,
         title: record.title.clone(),
+        title_text: record.title_text.clone(),
         body: record
             .body
             .iter()

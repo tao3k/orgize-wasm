@@ -20,6 +20,8 @@ mod dto_property_profile;
 mod dto_refile;
 #[path = "dto_runtime.rs"]
 mod dto_runtime;
+#[path = "dto_section_index.rs"]
+mod dto_section_index;
 #[path = "dto_sdd.rs"]
 mod dto_sdd;
 #[path = "dto_source_blocks.rs"]
