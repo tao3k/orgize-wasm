@@ -14,12 +14,23 @@ npm install orgize
 yarn add orgize
 ```
 
-Pinned git consumption also works because `dist/` is intentionally committed:
+Pinned git consumption uses the generated `npm-package` branch. Prefer a
+specific commit from that branch so lockfiles point at immutable build output:
 
 ```json
 {
   "dependencies": {
-    "orgize": "github:tao3k/orgize-wasm#<commit-sha>"
+    "orgize": "git+https://github.com/tao3k/orgize-wasm.git#<npm-package-commit>"
+  }
+}
+```
+
+The branch name also works for local experiments:
+
+```json
+{
+  "dependencies": {
+    "orgize": "github:tao3k/orgize-wasm#npm-package"
   }
 }
 ```
@@ -147,10 +158,12 @@ parser-branch iteration. The standalone GitHub Actions workflow checks out
 `tao3k/orgize` first, replaces `orgize/wasm` with this repository, then runs the
 Rust tests and `wasm-pack` build there.
 
-The generated `dist/` directory is part of the repository contract, not a local
-cache. Commit it whenever bindings or DTO types change so downstream
-`package.json` git dependencies can import the package without running Rust or
-`wasm-pack` locally.
+`main` is the source branch. Generated `wasm-pack` output is intentionally kept
+out of `main`; GitHub Actions builds it after source validation and appends the
+git-consumable payload to the `npm-package` branch. That branch carries
+`.orgize-source-rev` and `.orgize-parent-rev` so a package commit can be traced
+back to both the standalone wasm source commit and the parent parser checkout
+used for the build.
 
 Useful local commands:
 

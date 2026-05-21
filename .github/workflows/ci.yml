@@ -3,63 +3,29 @@ name: CI
 on:
   pull_request:
   push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       orgize-ref:
         description: orgize branch, tag, or commit to use as the parent checkout
         required: false
-        default: 6174dc0d203c9b3aa393814872ef4b2d268fae56
+        default: v0.10
 
 env:
-  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || '6174dc0d203c9b3aa393814872ef4b2d268fae56' }}
+  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || 'v0.10' }}
   CARGO_INCREMENTAL: "0"
   CARGO_TARGET_DIR: ${{ github.workspace }}/orgize/target/orgize-wasm
 
+permissions:
+  contents: read
+
+concurrency:
+  group: orgize-wasm-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  package:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout orgize-wasm
-        uses: actions/checkout@v6
-
-      - name: Verify committed dist package
-        run: |
-          test -f dist/orgize.js
-          test -f dist/orgize.d.ts
-          test -f dist/orgize_bg.wasm
-          test -f dto.d.ts
-          test -f worker.js
-
-      - name: Smoke test git-consumable package
-        run: |
-          node --input-type=module <<'JS'
-          import { readFileSync } from 'node:fs';
-          import { initSync, Org } from './dist/orgize.js';
-
-          const bytes = readFileSync('./dist/orgize_bg.wasm');
-          initSync({ module: bytes });
-          const org = new Org('* Git package smoke\n');
-          if (!org.html().includes('Git package smoke')) {
-            throw new Error('html projection did not render expected heading');
-          }
-          org.free();
-          JS
-
-      - name: Pack npm artifact
-        run: |
-          mkdir -p package
-          npm pack --pack-destination package
-
-      - name: Upload npm artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: orgize-wasm-npm-package
-          path: package/*.tgz
-          if-no-files-found: error
-
   source-build:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -121,6 +87,99 @@ jobs:
       - name: Build wasm package
         working-directory: orgize/wasm
         run: |
+          rm -rf dist package
           wasm-pack build -t web -d dist --out-name orgize
           rm -f dist/.gitignore
-          git diff --exit-code -- dist
+
+      - name: Smoke test built package
+        working-directory: orgize/wasm
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { initSync, Org } from './dist/orgize.js';
+
+          const bytes = readFileSync('./dist/orgize_bg.wasm');
+          initSync({ module: bytes });
+          const org = new Org('* Source build smoke\n');
+          if (!org.html().includes('Source build smoke')) {
+            throw new Error('html projection did not render expected heading');
+          }
+          org.free();
+          JS
+
+      - name: Verify npm package shape
+        working-directory: orgize/wasm
+        run: npm pack --dry-run
+
+      - name: Prepare package branch payload
+        working-directory: orgize/wasm
+        run: |
+          set -euo pipefail
+
+          payload="${RUNNER_TEMP}/orgize-wasm-package"
+          rm -rf "${payload}"
+          mkdir -p "${payload}"
+
+          cp package.json README.md LICENSE dto.d.ts dto.js worker.d.ts worker.js "${payload}/"
+          cp -R dist dto "${payload}/"
+          git rev-parse HEAD > "${payload}/.orgize-source-rev"
+          git -C .. rev-parse HEAD > "${payload}/.orgize-parent-rev"
+
+      - name: Upload package branch payload
+        uses: actions/upload-artifact@v5
+        with:
+          name: orgize-wasm-package-payload
+          path: ${{ runner.temp }}/orgize-wasm-package
+          include-hidden-files: true
+          if-no-files-found: error
+
+  publish-package:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: source-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download package branch payload
+        uses: actions/download-artifact@v5
+        with:
+          name: orgize-wasm-package-payload
+          path: package-payload
+
+      - name: Publish npm-package branch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          publish_dir="${RUNNER_TEMP}/orgize-wasm-npm-package"
+          rm -rf "${publish_dir}"
+          mkdir -p "${publish_dir}"
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git init "${publish_dir}"
+          cd "${publish_dir}"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          if git ls-remote --exit-code --heads origin npm-package >/dev/null 2>&1; then
+            git fetch origin npm-package:refs/remotes/origin/npm-package
+            git switch -c npm-package --track origin/npm-package
+          else
+            git switch --orphan npm-package
+          fi
+
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R "${GITHUB_WORKSPACE}/package-payload/." .
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No package branch changes to publish."
+            exit 0
+          fi
+
+          git commit -m "Build orgize wasm package ${GITHUB_SHA}"
+          git push origin HEAD:npm-package

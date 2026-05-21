@@ -32,7 +32,6 @@
     "dto",
     "dto.d.ts",
     "dto.js",
-    "index.html",
     "README.md",
     "worker.d.ts",
     "worker.js"
