@@ -8,6 +8,8 @@ mod dto_capture;
 mod dto_clock;
 #[path = "dto_contract.rs"]
 mod dto_contract;
+#[path = "html_export.rs"]
+mod html_export;
 #[path = "dto_crypt.rs"]
 mod dto_crypt;
 #[path = "dto_dynamic_block.rs"]
