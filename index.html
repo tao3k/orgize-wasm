@@ -58,6 +58,11 @@
         border-radius: 4px;
       }
 
+      #editor {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
       .output-pane {
         margin: 0;
         max-width: none;
@@ -159,8 +164,69 @@
       }
 
       @media (max-width: 720px) {
+        body,
+        html {
+          height: auto;
+          min-height: 100%;
+          overflow: auto;
+        }
+
+        body {
+          min-height: 100dvh;
+        }
+
         #workspace {
           flex-direction: column;
+          gap: 12px;
+          margin: 8px;
+          min-height: calc(100dvh - 16px);
+          width: calc(100vw - 16px);
+        }
+
+        .bordered {
+          flex: 0 0 auto;
+          min-height: 42dvh;
+        }
+
+        #editor {
+          flex: 0 0 42dvh;
+          min-height: 320px;
+        }
+
+        .output-pane {
+          min-height: 48dvh;
+        }
+
+        #tabsList span {
+          padding: 0.5rem 0.75rem;
+        }
+
+        #spacer {
+          display: none;
+        }
+
+        #took {
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+
+        .rendered-html,
+        .feature-overview {
+          padding: 1rem;
+        }
+
+        .feature-overview table,
+        .feature-overview tbody,
+        .feature-overview tr,
+        .feature-overview td {
+          display: block;
+          width: 100%;
+        }
+
+        .feature-overview td:first-child {
+          padding-top: 0.75rem;
+          white-space: normal;
+          width: auto;
         }
       }
     </style>
@@ -168,7 +234,7 @@
   <body>
     <div id="workspace">
       <div class="bordered">
-        <div style="height: 100%" id="editor"></div>
+        <div id="editor"></div>
       </div>
 
       <div class="bordered output-pane">
