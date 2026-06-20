@@ -24,16 +24,19 @@ const requireSession = (sessionId) => {
 
 const parseJson = (json) => JSON.parse(json);
 
-const createSession = (source) => ({
-  org: new Org(source),
-  source,
-  revision: 1,
-});
+const createSession = (source) => {
+  const org = new Org(source);
+  return {
+    org,
+    revision: 1,
+    sourceLengthBytes: org.sourceLenBytes(),
+  };
+};
 
 const sessionMetadata = (session, changed) => ({
   revision: session.revision,
   changed,
-  sourceLengthBytes: session.org.sourceLenBytes(),
+  sourceLengthBytes: session.sourceLengthBytes,
 });
 
 const projectionFor = (
@@ -248,8 +251,8 @@ const handleMessage = async (message) => {
           sessions.set(sessionId, session);
         } else {
           session.org.update(message.source);
-          session.source = message.source;
           session.revision += 1;
+          session.sourceLengthBytes = session.org.sourceLenBytes();
         }
         result = projectMessage(session.org, message);
         metadata = sessionMetadata(session, true);
