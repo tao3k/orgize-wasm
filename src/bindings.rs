@@ -8,7 +8,7 @@ use crate::{
     dto_refile_request::{parse_optional_refile_targets_request, parse_refile_plan_request},
 };
 use orgize::{
-    Org as Inner,
+    Org as Inner, TextRange, TextSize,
     ast::{
         AgendaBlockViewQuery, AgendaDate, AgendaQuery, AgendaViewQuery, AgendaViewSortDirection,
         AgendaViewSortKey, AgendaViewSortSpec, AgentMemoryQuery, AgentPlanningQuery,
@@ -16,9 +16,10 @@ use orgize::{
         OrgElementsIndexQuery, OrgElementsIndexSummaryValue, ParsedAst,
     },
     export::{Container, Event, from_fn},
+    fmt::{FormatOptions, format_org},
     rowan::ast::AstNode,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::{Ref, RefCell};
 use std::fmt::Write;
@@ -167,6 +168,35 @@ struct MemoryJsonRequest {
     excluded_tags: Option<Vec<String>>,
 }
 
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct FormatJsonRequest {
+    trim_trailing_whitespace: Option<bool>,
+    align_tables: Option<bool>,
+    final_newline: Option<bool>,
+}
+
+impl FormatJsonRequest {
+    fn into_options(self) -> FormatOptions {
+        let defaults = FormatOptions::default();
+        FormatOptions {
+            trim_trailing_whitespace: self
+                .trim_trailing_whitespace
+                .unwrap_or(defaults.trim_trailing_whitespace),
+            align_tables: self.align_tables.unwrap_or(defaults.align_tables),
+            final_newline: self.final_newline.unwrap_or(defaults.final_newline),
+        }
+    }
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct FormatJsonResponse<'a> {
+    schema_version: u8,
+    output: &'a str,
+    changed: bool,
+}
+
 impl AgendaViewJsonDate {
     fn into_agenda_date(self) -> AgendaDate {
         AgendaDate::new(self.year, self.month, self.day)
@@ -267,6 +297,48 @@ impl Org {
         self.source = s.to_string();
         self.inner = Inner::parse(s);
         self.document.replace(None);
+    }
+
+    #[wasm_bindgen(js_name = replaceRange)]
+    pub fn replace_range(&mut self, start: u32, end: u32, text: &str) -> Result<(), JsValue> {
+        if start > end {
+            return Err(JsValue::from_str(
+                "orgize replaceRange start must be <= end",
+            ));
+        }
+
+        let start = start as usize;
+        let end = end as usize;
+        if end > self.source.len() {
+            return Err(JsValue::from_str("orgize replaceRange range out of bounds"));
+        }
+        if !self.source.is_char_boundary(start) || !self.source.is_char_boundary(end) {
+            return Err(JsValue::from_str(
+                "orgize replaceRange range must align to UTF-8 character boundaries",
+            ));
+        }
+
+        let range = TextRange::new(TextSize::from(start as u32), TextSize::from(end as u32));
+        self.inner.replace_range(range, text);
+        self.source.replace_range(start..end, text);
+        self.document.replace(None);
+        Ok(())
+    }
+
+    pub fn format(&self, request_json: Option<String>) -> Result<String, JsValue> {
+        let request = parse_optional_format_request(request_json.as_deref())?;
+        let result = format_org(&self.source, &request.into_options());
+        serde_json::to_string(&FormatJsonResponse {
+            schema_version: 1,
+            output: &result.output,
+            changed: result.changed,
+        })
+        .map_err(|error| JsValue::from_str(&format!("failed to render format response: {error}")))
+    }
+
+    #[wasm_bindgen(js_name = sourceLenBytes)]
+    pub fn source_len_bytes(&self) -> u32 {
+        self.source.len().try_into().unwrap_or(u32::MAX)
     }
 
     #[wasm_bindgen(js_name = outlineJson)]
@@ -771,6 +843,14 @@ fn parse_optional_memory_request(request_json: Option<&str>) -> Result<MemoryJso
     };
     serde_json::from_str(request_json)
         .map_err(|error| JsValue::from_str(&format!("invalid memory request: {error}")))
+}
+
+fn parse_optional_format_request(request_json: Option<&str>) -> Result<FormatJsonRequest, JsValue> {
+    let Some(request_json) = request_json.map(str::trim).filter(|text| !text.is_empty()) else {
+        return Ok(FormatJsonRequest::default());
+    };
+    serde_json::from_str(request_json)
+        .map_err(|error| JsValue::from_str(&format!("invalid format request: {error}")))
 }
 
 impl MemoryJsonRequest {

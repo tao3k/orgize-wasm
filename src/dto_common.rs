@@ -217,8 +217,8 @@ pub(crate) fn attachment_directory_source(
             id: None,
             layout: None,
         },
-        AttachmentDirectorySource::LegacyAttachDirProperty => WasmAttachmentDirectorySource {
-            kind: "legacyAttachDirProperty",
+        AttachmentDirectorySource::AttachDirProperty => WasmAttachmentDirectorySource {
+            kind: "attachDirProperty",
             id: None,
             layout: None,
         },

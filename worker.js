@@ -1,4 +1,5 @@
 import init, { Org } from "./dist/orgize.js";
+import { applySyncMessage } from "./worker-sync.js";
 
 const sessions = new Map();
 
@@ -14,14 +15,26 @@ const ensureReady = (wasmUrl) => {
 const sessionIdFor = (message) => message.sessionId || "default";
 
 const requireSession = (sessionId) => {
-  const org = sessions.get(sessionId);
-  if (!org) {
+  const session = sessions.get(sessionId);
+  if (!session) {
     throw new Error(`orgize session '${sessionId}' does not exist`);
   }
-  return org;
+  return session;
 };
 
 const parseJson = (json) => JSON.parse(json);
+
+const createSession = (source) => ({
+  org: new Org(source),
+  source,
+  revision: 1,
+});
+
+const sessionMetadata = (session, changed) => ({
+  revision: session.revision,
+  changed,
+  sourceLengthBytes: session.org.sourceLenBytes(),
+});
 
 const projectionFor = (
   org,
@@ -135,6 +148,25 @@ const projectionFor = (
   }
 };
 
+const projectMessage = (org, message) =>
+  projectionFor(
+    org,
+    message.projection || "snapshot",
+    message.sourceFile,
+    message.includeBaseDir,
+    message.sparseTreeMatch,
+    message.sparseTreeText,
+    message.sparseTreeIncludeArchived,
+    message.agendaView,
+    message.agendaBlock,
+    message.capturePlan,
+    message.orgElementsIndex,
+    message.clockIssueProfile,
+    message.memory,
+    message.attachmentInventory,
+    message.propertySchemaRegistry
+  );
+
 const renderFor = (org, format) => {
   switch (format) {
     case "html":
@@ -165,9 +197,9 @@ const renderFor = (org, format) => {
 };
 
 const dispose = (sessionId) => {
-  const org = sessions.get(sessionId);
-  if (org) {
-    org.free();
+  const session = sessions.get(sessionId);
+  if (session) {
+    session.org.free();
     sessions.delete(sessionId);
   }
 };
@@ -185,6 +217,7 @@ const handleMessage = async (message) => {
     }
 
     let result;
+    let metadata;
     switch (command) {
       case "init": {
         await ensureReady(message.wasmUrl);
@@ -199,79 +232,50 @@ const handleMessage = async (message) => {
           throw new Error("orgize parse requires a source string");
         }
         dispose(sessionId);
-        const org = new Org(message.source);
-        sessions.set(sessionId, org);
-        result = projectionFor(
-          org,
-          message.projection || "snapshot",
-          message.sourceFile,
-          message.includeBaseDir,
-          message.sparseTreeMatch,
-          message.sparseTreeText,
-          message.sparseTreeIncludeArchived,
-          message.agendaView,
-          message.agendaBlock,
-          message.capturePlan,
-          message.orgElementsIndex,
-          message.clockIssueProfile,
-          message.memory,
-          message.attachmentInventory,
-          message.propertySchemaRegistry
-        );
+        const session = createSession(message.source);
+        sessions.set(sessionId, session);
+        result = projectMessage(session.org, message);
+        metadata = sessionMetadata(session, true);
         break;
       }
       case "update": {
         if (typeof message.source !== "string") {
           throw new Error("orgize update requires a source string");
         }
-        let org = sessions.get(sessionId);
-        if (!org) {
-          org = new Org(message.source);
-          sessions.set(sessionId, org);
+        let session = sessions.get(sessionId);
+        if (!session) {
+          session = createSession(message.source);
+          sessions.set(sessionId, session);
         } else {
-          org.update(message.source);
+          session.org.update(message.source);
+          session.source = message.source;
+          session.revision += 1;
         }
-        result = projectionFor(
-          org,
-          message.projection || "snapshot",
-          message.sourceFile,
-          message.includeBaseDir,
-          message.sparseTreeMatch,
-          message.sparseTreeText,
-          message.sparseTreeIncludeArchived,
-          message.agendaView,
-          message.agendaBlock,
-          message.capturePlan,
-          message.orgElementsIndex,
-          message.clockIssueProfile,
-          message.memory,
-          message.attachmentInventory,
-          message.propertySchemaRegistry
-        );
+        result = projectMessage(session.org, message);
+        metadata = sessionMetadata(session, true);
+        break;
+      }
+      case "sync": {
+        const session = requireSession(sessionId);
+        const changed = applySyncMessage(session, message);
+        result = projectMessage(session.org, message);
+        metadata = sessionMetadata(session, changed);
         break;
       }
       case "projection": {
-        result = projectionFor(
-          requireSession(sessionId),
-          message.projection || "snapshot",
-          message.sourceFile,
-          message.includeBaseDir,
-          message.sparseTreeMatch,
-          message.sparseTreeText,
-          message.sparseTreeIncludeArchived,
-          message.agendaView,
-          message.agendaBlock,
-          message.capturePlan,
-          message.orgElementsIndex,
-          message.clockIssueProfile,
-          message.memory,
-          message.attachmentInventory,
-          message.propertySchemaRegistry
-        );
+        const session = requireSession(sessionId);
+        result = projectMessage(session.org, message);
         break;
       }
       case "render": {
-        result = renderFor(requireSession(sessionId), message.format || "html");
+        result = renderFor(requireSession(sessionId).org, message.format || "html");
+        break;
+      }
+      case "format": {
+        const session = requireSession(sessionId);
+        result = parseJson(
+          session.org.format(message.options ? JSON.stringify(message.options) : undefined)
+        );
         break;
       }
       case "dispose": {
@@ -298,6 +302,7 @@ const handleMessage = async (message) => {
       sessionId,
       ok: true,
       result,
+      ...(metadata || {}),
     });
   } catch (error) {
     self.postMessage({

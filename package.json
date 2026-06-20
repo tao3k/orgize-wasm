@@ -34,6 +34,7 @@
     "dto.js",
     "README.md",
     "worker.d.ts",
-    "worker.js"
+    "worker.js",
+    "worker-sync.js"
   ]
 }

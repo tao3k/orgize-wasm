@@ -24,6 +24,26 @@ export type OrgizeRenderFormat =
   | "sdd"
   | "traverse";
 
+export interface OrgizeTextPatch {
+  /** UTF-8 byte offset in the current Org source. */
+  start: number;
+  /** UTF-8 byte offset in the current Org source. */
+  end: number;
+  text: string;
+}
+
+export interface OrgizeFormatOptionsDto {
+  trimTrailingWhitespace?: boolean;
+  alignTables?: boolean;
+  finalNewline?: boolean;
+}
+
+export interface OrgizeFormatResponseDto {
+  schemaVersion: 1;
+  output: string;
+  changed: boolean;
+}
+
 export interface OrgizeWorkerBaseRequest {
   id?: string | number;
   requestId?: string | number;
@@ -62,6 +82,15 @@ export interface OrgizeWorkerUpdateRequest extends OrgizeWorkerBaseRequest {
   projection?: OrgizeProjectionName;
 }
 
+export interface OrgizeWorkerSyncRequest extends OrgizeWorkerBaseRequest {
+  command: "sync";
+  revision: number;
+  patches: OrgizeTextPatch[];
+  sourceFile?: string;
+  includeBaseDir?: string;
+  projection?: OrgizeProjectionName;
+}
+
 export interface OrgizeWorkerProjectionRequest extends OrgizeWorkerBaseRequest {
   command: "projection";
   sourceFile?: string;
@@ -74,6 +103,11 @@ export interface OrgizeWorkerRenderRequest extends OrgizeWorkerBaseRequest {
   format?: OrgizeRenderFormat;
 }
 
+export interface OrgizeWorkerFormatRequest extends OrgizeWorkerBaseRequest {
+  command: "format";
+  options?: OrgizeFormatOptionsDto;
+}
+
 export interface OrgizeWorkerDisposeRequest extends OrgizeWorkerBaseRequest {
   command: "dispose" | "disposeAll";
 }
@@ -82,17 +116,22 @@ export type OrgizeWorkerRequest =
   | OrgizeWorkerInitRequest
   | OrgizeWorkerParseRequest
   | OrgizeWorkerUpdateRequest
+  | OrgizeWorkerSyncRequest
   | OrgizeWorkerProjectionRequest
   | OrgizeWorkerRenderRequest
+  | OrgizeWorkerFormatRequest
   | OrgizeWorkerDisposeRequest;
 
-export interface OrgizeWorkerResultMessage<T = OrgizeProjectionDto | string> {
+export interface OrgizeWorkerResultMessage<T = OrgizeProjectionDto | OrgizeFormatResponseDto | string> {
   type: "result";
   id?: string | number;
   requestId?: string | number;
   command: OrgizeWorkerRequest["command"];
   sessionId: string;
   ok: true;
+  revision?: number;
+  changed?: boolean;
+  sourceLengthBytes?: number;
   result: T;
 }
 

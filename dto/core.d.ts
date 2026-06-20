@@ -33,7 +33,7 @@ declare namespace OrgizeDto {
   }
 
   export interface OrgizeAttachmentDirectorySourceDto {
-    kind: "dirProperty" | "legacyAttachDirProperty" | "idDerived";
+    kind: "dirProperty" | "attachDirProperty" | "idDerived";
     id?: string | null;
     layout?: "uuid" | "timestamp" | "fallback" | null;
   }

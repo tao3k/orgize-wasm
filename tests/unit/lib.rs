@@ -28,3 +28,5 @@ mod dto_section_index;
 mod dto_source_blocks;
 #[path = "html_export.rs"]
 mod html_export;
+#[path = "sync.rs"]
+mod sync;
