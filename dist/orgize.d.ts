@@ -19,7 +19,6 @@ export class Org {
     clockRollupsJson(): string;
     clockTablePlansJson(): string;
     columnViewsJson(): string;
-    contractEvaluationsJson(request_json: string): string;
     cryptJson(): string;
     datetreeJson(): string;
     dynamicBlocksJson(): string;
@@ -81,7 +80,6 @@ export interface InitOutput {
     readonly org_clockRollupsJson: (a: number) => [number, number];
     readonly org_clockTablePlansJson: (a: number) => [number, number];
     readonly org_columnViewsJson: (a: number) => [number, number];
-    readonly org_contractEvaluationsJson: (a: number, b: number, c: number) => [number, number, number, number];
     readonly org_cryptJson: (a: number) => [number, number];
     readonly org_datetreeJson: (a: number) => [number, number];
     readonly org_dynamicBlocksJson: (a: number) => [number, number];

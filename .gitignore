@@ -1,8 +1,0 @@
-/lib
-/node_modules
-/out-tsc
-/package
-/pkg
-/target
-*.tgz
-dist/
