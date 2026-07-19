@@ -258,6 +258,48 @@ export class Org {
         }
     }
     /**
+     * @param {string} request_json
+     * @returns {string}
+     */
+    contractEvaluationsJson(request_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            const ptr0 = passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_contractEvaluationsJson(this.__wbg_ptr, ptr0, len0);
+            var ptr2 = ret[0];
+            var len2 = ret[1];
+            if (ret[3]) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
+     * @param {string | null} [source_path]
+     * @returns {string}
+     */
+    contractSourceValidationJson(source_path) {
+        let deferred2_0;
+        let deferred2_1;
+        try {
+            var ptr0 = isLikeNone(source_path) ? 0 : passStringToWasm0(source_path, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len0 = WASM_VECTOR_LEN;
+            const ret = wasm.org_contractSourceValidationJson(this.__wbg_ptr, ptr0, len0);
+            deferred2_0 = ret[0];
+            deferred2_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        }
+    }
+    /**
      * @returns {string}
      */
     cryptJson() {
@@ -927,6 +969,28 @@ export class Org {
         const ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.org_update(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @param {string | null} [source_path]
+     */
+    validateContractSource(source_path) {
+        var ptr0 = isLikeNone(source_path) ? 0 : passStringToWasm0(source_path, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.org_validateContractSource(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {string} request_json
+     */
+    validateContracts(request_json) {
+        const ptr0 = passStringToWasm0(request_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.org_validateContracts(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
     }
     /**
      * @param {string | null} [source_file]

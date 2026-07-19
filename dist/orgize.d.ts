@@ -19,6 +19,8 @@ export class Org {
     clockRollupsJson(): string;
     clockTablePlansJson(): string;
     columnViewsJson(): string;
+    contractEvaluationsJson(request_json: string): string;
+    contractSourceValidationJson(source_path?: string | null): string;
     cryptJson(): string;
     datetreeJson(): string;
     dynamicBlocksJson(): string;
@@ -57,6 +59,8 @@ export class Org {
     taskBlockersJson(): string;
     traverse(): string;
     update(s: string): void;
+    validateContractSource(source_path?: string | null): void;
+    validateContracts(request_json: string): void;
     viewIndexJson(source_file?: string | null): string;
     static readonly buildTime: string;
     static readonly gitHash: string;
@@ -66,6 +70,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly org_validateContractSource: (a: number, b: number, c: number) => [number, number];
+    readonly org_validateContracts: (a: number, b: number, c: number) => [number, number];
     readonly __wbg_org_free: (a: number, b: number) => void;
     readonly org_agenda: (a: number) => [number, number];
     readonly org_agendaBlockJson: (a: number, b: number, c: number) => [number, number, number, number];
@@ -80,6 +86,8 @@ export interface InitOutput {
     readonly org_clockRollupsJson: (a: number) => [number, number];
     readonly org_clockTablePlansJson: (a: number) => [number, number];
     readonly org_columnViewsJson: (a: number) => [number, number];
+    readonly org_contractEvaluationsJson: (a: number, b: number, c: number) => [number, number, number, number];
+    readonly org_contractSourceValidationJson: (a: number, b: number, c: number) => [number, number];
     readonly org_cryptJson: (a: number) => [number, number];
     readonly org_datetreeJson: (a: number) => [number, number];
     readonly org_dynamicBlocksJson: (a: number) => [number, number];

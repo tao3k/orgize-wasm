@@ -1,6 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export const org_validateContractSource: (a: number, b: number, c: number) => [number, number];
+export const org_validateContracts: (a: number, b: number, c: number) => [number, number];
 export const __wbg_org_free: (a: number, b: number) => void;
 export const org_agenda: (a: number) => [number, number];
 export const org_agendaBlockJson: (a: number, b: number, c: number) => [number, number, number, number];
@@ -15,6 +17,8 @@ export const org_clockIssuesJson: (a: number, b: number, c: number) => [number, 
 export const org_clockRollupsJson: (a: number) => [number, number];
 export const org_clockTablePlansJson: (a: number) => [number, number];
 export const org_columnViewsJson: (a: number) => [number, number];
+export const org_contractEvaluationsJson: (a: number, b: number, c: number) => [number, number, number, number];
+export const org_contractSourceValidationJson: (a: number, b: number, c: number) => [number, number];
 export const org_cryptJson: (a: number) => [number, number];
 export const org_datetreeJson: (a: number) => [number, number];
 export const org_dynamicBlocksJson: (a: number) => [number, number];
