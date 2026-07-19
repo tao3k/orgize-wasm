@@ -58,6 +58,16 @@ jobs:
           manifest.write_text(text)
           PY
 
+      - name: Verify source branch excludes generated package
+        working-directory: orgize/wasm
+        run: |
+          tracked_dist="$(git ls-files -- dist)"
+          if [[ -n "${tracked_dist}" ]]; then
+            echo "::error::dist is generated and must only be published on the npm-package branch"
+            printf '%s\n' "${tracked_dist}"
+            exit 1
+          fi
+
       - name: Setup rust
         uses: dtolnay/rust-toolchain@stable
         with:
