@@ -513,7 +513,7 @@ dependencies = [
 [[package]]
 name = "rust-lang-project-harness"
 version = "0.1.2"
-source = "git+https://github.com/tao3k/rust-lang-project-harness?rev=6dea4b1afc46bec0b4b480b9ab99b9d471d045ee#6dea4b1afc46bec0b4b480b9ab99b9d471d045ee"
+source = "git+https://github.com/tao3k/rust-lang-project-harness?rev=8f23f6cd211c02f4b0146d842025f3c639fcf1cc#6dea4b1afc46bec0b4b480b9ab99b9d471d045ee"
 dependencies = [
  "cargo-lock",
  "cargo_toml",

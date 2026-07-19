@@ -10,6 +10,7 @@ mod dto_capture_request;
 mod dto_clock;
 mod dto_clock_model;
 mod dto_common;
+mod dto_contracts;
 mod dto_crypt;
 mod dto_crypt_model;
 mod dto_document;

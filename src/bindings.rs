@@ -30,7 +30,7 @@ use wasm_bindgen::prelude::{JsValue, wasm_bindgen};
 /// WebAssembly wrapper around [`orgize::Org`].
 pub struct Org {
     inner: Inner,
-    source: String,
+    pub(crate) source: String,
     document: RefCell<Option<ParsedAst>>,
 }
 
@@ -379,6 +379,17 @@ impl Org {
     pub fn lint_json(&self) -> String {
         let document = self.document();
         dto_projection::lint_json(&document, &self.source)
+    }
+
+    #[wasm_bindgen(js_name = contractEvaluationsJson)]
+    pub fn contract_evaluations_json(&self, request_json: &str) -> Result<String, JsValue> {
+        crate::dto_contracts::evaluate(&self.source, request_json)
+            .map_err(|error| JsValue::from_str(&error))
+    }
+
+    #[wasm_bindgen(js_name = contractSourceValidationJson)]
+    pub fn contract_source_validation_json(&self, source_path: Option<String>) -> String {
+        crate::dto_contracts::validate_source(&self.source, source_path.as_deref())
     }
 
     #[wasm_bindgen(js_name = sectionIndexJson)]
