@@ -1,6 +1,15 @@
 {
   "name": "orgize",
   "version": "0.10.0-alpha.0",
+  "description": "WebAssembly Org parser and exporter for browsers and JavaScript runtimes",
+  "homepage": "https://github.com/tao3k/orgize-wasm#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "license": "MIT",
   "author": "PoiScript <poiscript@gmail.com>",
   "scripts": {
