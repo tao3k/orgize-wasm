@@ -12,6 +12,8 @@ mod dto_contract;
 mod dto_crypt;
 #[path = "dto_dynamic_block.rs"]
 mod dto_dynamic_block;
+#[path = "dto_interactive.rs"]
+mod dto_interactive;
 #[path = "dto_memory.rs"]
 mod dto_memory;
 #[path = "dto_property_profile.rs"]

@@ -887,7 +887,7 @@ impl MemoryJsonRequest {
 }
 
 impl Org {
-    fn document(&self) -> Ref<'_, ParsedAst> {
+    pub(crate) fn document(&self) -> Ref<'_, ParsedAst> {
         if self.document.borrow().is_none() {
             self.document.replace(Some(self.inner.document()));
         }
