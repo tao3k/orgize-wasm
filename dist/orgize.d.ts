@@ -36,6 +36,7 @@ export class Org {
     orgElementsIndexJson(): string;
     orgElementsIndexQueryJson(request_json: string): string;
     orgElementsJson(): string;
+    orgInteractiveJson(): string;
     outlineJson(): string;
     constructor(input: string);
     progressStatsJson(): string;
@@ -70,8 +71,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
-    readonly org_validateContractSource: (a: number, b: number, c: number) => [number, number];
-    readonly org_validateContracts: (a: number, b: number, c: number) => [number, number];
     readonly __wbg_org_free: (a: number, b: number) => void;
     readonly org_agenda: (a: number) => [number, number];
     readonly org_agendaBlockJson: (a: number, b: number, c: number) => [number, number, number, number];
@@ -128,6 +127,9 @@ export interface InitOutput {
     readonly org_traverse: (a: number) => [number, number];
     readonly org_update: (a: number, b: number, c: number) => void;
     readonly org_viewIndexJson: (a: number, b: number, c: number) => [number, number];
+    readonly org_orgInteractiveJson: (a: number) => [number, number, number, number];
+    readonly org_validateContractSource: (a: number, b: number, c: number) => [number, number];
+    readonly org_validateContracts: (a: number, b: number, c: number) => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_free: (a: number, b: number, c: number) => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
