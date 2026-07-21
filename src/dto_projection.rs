@@ -22,6 +22,7 @@ use crate::{
         section_index_record, section_index_records, section_index_response, sparse_tree_response,
         view_index_response,
     },
+    dto_interactive::org_interactive_response,
     dto_memory::memory_response,
     dto_model::{WasmOutlineResponse, WasmSnapshotResponse},
     dto_property_profile::{
@@ -52,6 +53,12 @@ pub(crate) fn outline_json(document: &Document<ParsedAnnotation>) -> String {
 
 pub(crate) fn metadata_json(document: &Document<ParsedAnnotation>) -> String {
     to_json(&document_metadata(document))
+}
+
+pub(crate) fn org_interactive_json(
+    document: &Document<ParsedAnnotation>,
+) -> Result<String, String> {
+    org_interactive_response(document).map(|response| to_json(&response))
 }
 
 pub(crate) fn lint_json(document: &Document<ParsedAnnotation>, source: &str) -> String {

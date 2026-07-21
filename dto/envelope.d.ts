@@ -1,3 +1,5 @@
+/// <reference path="./interactive.d.ts" />
+
 declare namespace OrgizeDto {
   export interface OrgizeLintFindingDto {
     code: string;
@@ -40,6 +42,7 @@ declare namespace OrgizeDto {
     | "metadata"
     | "orgElements"
     | "orgElementsIndex"
+    | "orgInteractive"
     | "lint"
     | "sectionIndex"
     | "sparseTree"
@@ -75,6 +78,7 @@ declare namespace OrgizeDto {
     | OrgizeMetadataResponseDto
     | OrgizeOrgElementsDto
     | OrgizeOrgElementsIndexDto
+    | OrgizeInteractiveResponseDto
     | OrgizeLintResponseDto
     | OrgizeSectionIndexResponseDto
     | OrgizeSparseTreeResponseDto
