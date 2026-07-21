@@ -10,10 +10,10 @@ on:
       orgize-ref:
         description: orgize branch, tag, or commit to use as the parent checkout
         required: false
-        default: a6d619067670f2b207365ae05fff20c175a08ed1
+        default: 98dad4b0878a1ff34e2e17ec78f236e7a9873015
 
 env:
-  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || 'a6d619067670f2b207365ae05fff20c175a08ed1' }}
+  ORGIZE_REF: ${{ github.event.inputs['orgize-ref'] || '98dad4b0878a1ff34e2e17ec78f236e7a9873015' }}
   CARGO_INCREMENTAL: "0"
   CARGO_TARGET_DIR: ${{ github.workspace }}/orgize/target/orgize-wasm
 
