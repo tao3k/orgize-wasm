@@ -6,7 +6,7 @@
 /// <reference path="./dto/operations.d.ts" />
 /// <reference path="./dto/clock.d.ts" />
 /// <reference path="./dto/envelope.d.ts" />
-
+export interface OrgizeInteractiveResponseDto extends OrgizeDto.OrgizeInteractiveResponseDto {}
 export interface OrgizeSourcePositionDto extends OrgizeDto.OrgizeSourcePositionDto {}
 export interface OrgizeSourceRangeDto extends OrgizeDto.OrgizeSourceRangeDto {}
 export interface OrgizePriorityDto extends OrgizeDto.OrgizePriorityDto {}

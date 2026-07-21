@@ -1,6 +1,7 @@
 //! WebAssembly bindings for `orgize`.
 
 mod bindings;
+mod bindings_interactive;
 mod dto_agenda;
 mod dto_attachment_inventory;
 mod dto_attachment_inventory_model;
@@ -17,6 +18,8 @@ mod dto_document;
 mod dto_dynamic_block;
 mod dto_dynamic_block_model;
 mod dto_index;
+mod dto_interactive;
+mod dto_interactive_model;
 mod dto_memory;
 mod dto_memory_model;
 mod dto_model;

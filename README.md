@@ -52,7 +52,8 @@ init().then(() => {
 
 Use the worker entry when large documents must not block React rendering. The
 worker owns the Rust parser session and returns typed DTO projections such as
-`snapshot`, `outline`, `sectionIndex`, `attachments`, and `lint`.
+`snapshot`, `outline`, `orgInteractive`, `sectionIndex`, `attachments`, and
+`lint`.
 
 ```ts
 import type { OrgizeWorkerMessage, OrgizeWorkerRequest } from "orgize/worker";
@@ -125,11 +126,14 @@ readFile(require.resolve("orgize/wasm")).then((bytes) => {
 
 4. The WebAssembly API exposes projection methods that return JSON strings:
    `outlineJson`, `metadataJson`, `lintJson`, `sectionIndexJson`,
+   `orgInteractiveJson`,
    `sparseTreeJson`, `agendaViewJson`, `agendaBlockJson`,
    `capturePlanJson`, `attachmentsJson`, `sourceBlocksJson`,
    `columnViewsJson`, `propertyProfileJson`, `propertyProfileWithSchemasJson`,
    `includeExpansionJson`, `datetreeJson`, `snapshotJson`, and
-   `snapshotWithSchemasJson`. `sourceBlocksJson` includes block records with
+   `snapshotWithSchemasJson`. `orgInteractiveJson` validates formal
+   `org-contract :type agent-interactive` blocks with the Rust-owned parser
+   before returning typed choice DTOs. `sourceBlocksJson` includes block records with
    `#+PROPERTY: header-args`, `#+HEADER:`, and `#+BEGIN_SRC` header arguments
    plus non-executing tangle metadata for `:mkdirp`, `:comments`, `:shebang`,
    and `:noweb`, plus result planning metadata for `:results` and `:file`
