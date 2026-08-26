@@ -1,0 +1,53 @@
+name: Publish npm package
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-package-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - name: Check out verified package payload
+        uses: actions/checkout@v6
+        with:
+          ref: npm-package
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Verify package provenance receipt
+        env:
+          EXPECTED_SOURCE_REV: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$(cat .orgize-source-rev)" = "$EXPECTED_SOURCE_REV"
+          npm pack --dry-run
+
+      - name: Publish an unpublished version
+        shell: bash
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "$name@$version is already published"
+            exit 0
+          fi
+          npm publish --access public --provenance
