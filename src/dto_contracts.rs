@@ -169,11 +169,15 @@ fn evaluate_typed(source: &str, request_json: &str) -> Result<ContractEvaluation
 
     let context = orgize::ast::OrgContractEvaluationContext::with_source_path(source_path);
     let mut evaluations = Vec::new();
+    let mut evaluated_contract_ids = std::collections::BTreeSet::new();
     for reference in contract_references {
         let raw = reference.raw.clone();
         let contract = registry.resolve(&reference).ok_or_else(|| {
             format!("{source_path}: CONTRACT_ORG `{raw}` was not found in the loaded registry")
         })?;
+        if !evaluated_contract_ids.insert(contract.id.clone()) {
+            continue;
+        }
         if contract.scope != orgize::ast::OrgContractScope::Document {
             return Err(format!(
                 "{source_path}: CONTRACT_ORG `{raw}` has subtree scope and cannot be used as a document contract"
@@ -229,13 +233,31 @@ fn validate_document(source: &str, request_json: &str) -> Result<(), String> {
         .map_err(|error| format!("invalid contract validation request: {error}"))?;
     let outcome = evaluate_typed(source, request_json)?;
     let source_path = request.source_path.as_deref().unwrap_or("<memory>");
+    let document = orgize::Org::parse(source).document();
+    let bound_contract_ids = document
+        .properties
+        .iter()
+        .filter(|property| property.key.eq_ignore_ascii_case("CONTRACT_ORG"))
+        .map(|property| property.value.trim())
+        .chain(
+            document
+                .metadata
+                .iter()
+                .filter(|keyword| keyword.key.eq_ignore_ascii_case("CONTRACT_ORG"))
+                .map(|keyword| keyword.value.trim()),
+        )
+        .filter(|raw| !raw.is_empty())
+        .filter_map(|raw| {
+            orgize::ast::parse_contract_reference_from_source(
+                raw,
+                request.source_path.as_deref().map(Path::new),
+            )
+            .contract_id
+        })
+        .collect::<std::collections::BTreeSet<_>>();
 
     for required_contract_id in request.required_contract_ids {
-        let is_present = outcome
-            .evaluations
-            .iter()
-            .any(|evaluation| evaluation.contract_id == required_contract_id);
-        if !is_present {
+        if !bound_contract_ids.contains(&required_contract_id) {
             return Err(format!(
                 "{source_path}: CONTRACT-E011 missing path-qualified CONTRACT_ORG reference to `{required_contract_id}`"
             ));

@@ -32,6 +32,25 @@ fn requires_the_declared_contract_binding() {
 }
 
 #[test]
+fn request_selected_contracts_do_not_impersonate_document_bindings() {
+    let request = serde_json::json!({
+        "registrySources": [{
+            "path": "docs/contracts/document-policy.org",
+            "source": DOCUMENT_CONTRACT
+        }],
+        "contractIds": ["tao3k.document"],
+        "applyRegistryContracts": true,
+        "requiredContractIds": ["tao3k.document"],
+        "sourcePath": "content/document.org"
+    });
+
+    let error = validate_document("#+TITLE: Document\nBody\n", &request.to_string()).unwrap_err();
+
+    assert!(error.contains("CONTRACT-E011"));
+    assert!(error.contains("tao3k.document"));
+}
+
+#[test]
 fn accepts_a_resolved_file_link() {
     validate_document(
         "#+TITLE: Document\n#+CONTRACT_ORG: [[file:../docs/contracts/document-policy.org][tao3k.document]]\nBody\n",
