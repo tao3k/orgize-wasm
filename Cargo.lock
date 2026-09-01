@@ -20,7 +20,7 @@ checksum = "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56"
 [[package]]
 name = "asp-rust"
 version = "0.1.2"
-source = "git+https://github.com/tao3k/asp-rust?rev=078be718fe8284520bc7d8ab3f66bfa4643f1daf#078be718fe8284520bc7d8ab3f66bfa4643f1daf"
+source = "git+https://github.com/tao3k/asp-rust?rev=77fb11ea7e9b767320fb9f7706bcd63d182110da#77fb11ea7e9b767320fb9f7706bcd63d182110da"
 dependencies = [
  "asp-rust-build-support",
  "blake3",
@@ -42,7 +42,7 @@ dependencies = [
 [[package]]
 name = "asp-rust-build-support"
 version = "0.1.0"
-source = "git+https://github.com/tao3k/asp-rust?rev=078be718fe8284520bc7d8ab3f66bfa4643f1daf#078be718fe8284520bc7d8ab3f66bfa4643f1daf"
+source = "git+https://github.com/tao3k/asp-rust?rev=77fb11ea7e9b767320fb9f7706bcd63d182110da#77fb11ea7e9b767320fb9f7706bcd63d182110da"
 dependencies = [
  "blake3",
 ]
