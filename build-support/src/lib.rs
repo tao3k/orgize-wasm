@@ -2,8 +2,8 @@
 
 use std::{fs, path::Path};
 
-/// Enforces local public-surface file budgets that are outside the Rust-only
-/// parser scope of `rust-lang-project-harness`.
+/// Enforces local public-surface file budgets that are outside ASP Rust's
+/// Rust-source policy scope.
 pub fn enforce_public_surface_file_shape(package_root: &str) {
     const MAX_DTO_BARREL_LINES: usize = 260;
     const MAX_DTO_MODULE_LINES: usize = 650;

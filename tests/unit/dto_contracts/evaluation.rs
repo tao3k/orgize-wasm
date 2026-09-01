@@ -77,6 +77,32 @@ fn evaluates_a_loaded_document_contract() {
 }
 
 #[test]
+fn evaluates_each_resolved_contract_identity_once() {
+    let contract = "* Document contract\n:PROPERTIES:\n:CONTRACT_ID: document.contract\n:CONTRACT_SCOPE: document\n:END:\n** Has document text\n:PROPERTIES:\n:ASSERT_ID: document.has-paragraph\n:ASSERT_SEVERITY: error\n:END:\n#+begin_src org-elements-selector\n(:org-element (:type paragraph))\n#+end_src\n";
+    let request = serde_json::json!({
+        "registrySources": [
+            {"path": "contracts/document.org", "source": contract}
+        ],
+        "contractIds": ["document.contract"],
+        "applyRegistryContracts": true,
+        "sourcePath": "docs/document.org"
+    });
+
+    let value: serde_json::Value = serde_json::from_str(
+        &evaluate(
+            "#+CONTRACT_ORG: [[file:../contracts/document.org][document.contract]]\n* Document\n",
+            &request.to_string(),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+
+    assert_eq!(value["failed"], 1);
+    assert_eq!(value["evaluations"].as_array().unwrap().len(), 1);
+    assert_eq!(value["evaluations"][0]["contractId"], "document.contract");
+}
+
+#[test]
 fn rejects_a_bound_contract_without_assertions() {
     let contract = "* Empty contract\n:PROPERTIES:\n:CONTRACT_ID: empty.contract\n:CONTRACT_SCOPE: document\n:END:\n";
     let request = serde_json::json!({

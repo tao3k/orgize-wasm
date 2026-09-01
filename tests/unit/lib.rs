@@ -1,3 +1,5 @@
+#[path = "asp_rust_policy.rs"]
+mod asp_rust_policy;
 #[path = "dto_agenda.rs"]
 mod dto_agenda;
 #[path = "dto_attachments.rs"]
